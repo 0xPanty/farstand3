@@ -451,7 +451,7 @@ export default function App() {
                              </div>
     
                              {/* Grid */}
-                             <div className="grid grid-cols-3 gap-x-4 gap-y-8 p-4 w-full">
+                             <div className="grid grid-cols-3 gap-x-4 gap-y-8 p-4 w-full mt-6">
                                  <StatCircle label="破壊力" subLabel="POWER" value={standData.stats.power} detail={standData.statDetails?.power} />
                                  <StatCircle label="スピード" subLabel="SPEED" value={standData.stats.speed} detail={standData.statDetails?.speed} />
                                  <StatCircle label="持続力" subLabel="DURABILITY" value={standData.stats.durability} detail={standData.statDetails?.durability} />
