@@ -53,11 +53,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 async function fetchFarcasterUser(fid: number): Promise<any> {
   try {
     const response = await fetch(
-      `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fid}`,
+      `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fid}&viewer_fid=${fid}`,
       {
         headers: {
           accept: "application/json",
-          api_key: NEYNAR_API_KEY || "",
+          "x-api-key": NEYNAR_API_KEY || "",
+          "x-neynar-experimental": "true",
         },
       }
     );
@@ -69,20 +70,47 @@ async function fetchFarcasterUser(fid: number): Promise<any> {
 
     if (!user) return null;
 
+    // Also fetch user's casts to count them
+    let castCount = 0;
+    let likesReceived = 0;
+    let recastsReceived = 0;
+    
+    try {
+      const castsResponse = await fetch(
+        `https://api.neynar.com/v2/farcaster/feed/user/${fid}/casts?limit=150`,
+        {
+          headers: {
+            accept: "application/json",
+            "x-api-key": NEYNAR_API_KEY || "",
+          },
+        }
+      );
+      if (castsResponse.ok) {
+        const castsData = await castsResponse.json();
+        castCount = castsData.casts?.length || 0;
+        castsData.casts?.forEach((cast: any) => {
+          likesReceived += cast.reactions?.likes_count || 0;
+          recastsReceived += cast.reactions?.recasts_count || 0;
+        });
+      }
+    } catch (e) {
+      console.warn("Failed to fetch casts:", e);
+    }
+
     return {
       fid: user.fid,
       username: user.username,
       displayName: user.display_name,
-      bio: user.profile.bio.text,
+      bio: user.profile?.bio?.text || "",
       pfpUrl: user.pfp_url,
-      followerCount: user.follower_count,
-      followingCount: user.following_count,
-      castCount: user.stats?.total_casts || 0, 
-      likesReceived: (user.stats?.likes_received || 0),
-      recastsReceived: (user.stats?.recasts_received || 0),
+      followerCount: user.follower_count || 0,
+      followingCount: user.following_count || 0,
+      castCount,
+      likesReceived,
+      recastsReceived,
       verifications: user.verifications || [],
       powerBadge: user.power_badge || false,
-      score: user.score, 
+      score: user.experimental?.neynar_user_score || user.score,
     };
   } catch (error) {
     console.error("Farcaster Fetch Error:", error);
@@ -118,14 +146,15 @@ async function getEthTransactionCount(address: string): Promise<number> {
 // ==========================================
 async function calculateFarcasterStats(profile: any): Promise<any> {
   
-  // A. POWER
+  // A. POWER (Neynar score is 0-1, convert to percentage)
   let power = 'E';
+  const scorePercent = profile.score ? profile.score * 100 : 0;
   
-  if (profile.score) {
-      if (profile.score > 90) power = 'A';
-      else if (profile.score > 70) power = 'B';
-      else if (profile.score > 50) power = 'C';
-      else if (profile.score > 30) power = 'D';
+  if (scorePercent > 0) {
+      if (scorePercent > 90) power = 'A';
+      else if (scorePercent > 70) power = 'B';
+      else if (scorePercent > 50) power = 'C';
+      else if (scorePercent > 30) power = 'D';
   } else {
       if (profile.powerBadge) power = 'A';
       else if (profile.followerCount > 5000) power = 'A';
@@ -135,7 +164,7 @@ async function calculateFarcasterStats(profile: any): Promise<any> {
   }
 
   const powerDetail = profile.score 
-    ? `Score: ${profile.score.toFixed(1)}` 
+    ? `Score: ${scorePercent.toFixed(0)}%` 
     : (profile.powerBadge ? "Power Badge" : `Followers: ${profile.followerCount}`);
 
   // B. SPEED

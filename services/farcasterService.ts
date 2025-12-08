@@ -5,16 +5,18 @@ const NEYNAR_API_KEY = import.meta.env.VITE_NEYNAR_API_KEY || "BDED1C34-E2A9-43F
 const ETH_RPC_URL = "https://cloudflare-eth.com";
 
 // ==========================================
-// 1. Fetch User Data
+// 1. Fetch User Data (with extended viewer_fid for more stats)
 // ==========================================
 export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile & { score?: number } | null> => {
   try {
+    // Use viewer_fid to get more context, and x-neynar-experimental for score
     const response = await fetch(
-      `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fid}`,
+      `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fid}&viewer_fid=${fid}`,
       {
         headers: {
           accept: "application/json",
-          api_key: NEYNAR_API_KEY,
+          "x-api-key": NEYNAR_API_KEY,
+          "x-neynar-experimental": "true",
         },
       }
     );
@@ -26,21 +28,48 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
 
     if (!user) return null;
 
+    // Also fetch user's casts to count them
+    let castCount = 0;
+    let likesReceived = 0;
+    let recastsReceived = 0;
+    
+    try {
+      const castsResponse = await fetch(
+        `https://api.neynar.com/v2/farcaster/feed/user/${fid}/casts?limit=150`,
+        {
+          headers: {
+            accept: "application/json",
+            "x-api-key": NEYNAR_API_KEY,
+          },
+        }
+      );
+      if (castsResponse.ok) {
+        const castsData = await castsResponse.json();
+        castCount = castsData.casts?.length || 0;
+        // Sum up engagement from recent casts
+        castsData.casts?.forEach((cast: any) => {
+          likesReceived += cast.reactions?.likes_count || 0;
+          recastsReceived += cast.reactions?.recasts_count || 0;
+        });
+      }
+    } catch (e) {
+      console.warn("Failed to fetch casts:", e);
+    }
+
     return {
       fid: user.fid,
       username: user.username,
       displayName: user.display_name,
-      bio: user.profile.bio.text,
+      bio: user.profile?.bio?.text || "",
       pfpUrl: user.pfp_url,
-      followerCount: user.follower_count,
-      followingCount: user.following_count,
-      castCount: user.stats?.total_casts || 0, 
-      likesReceived: (user.stats?.likes_received || 0),
-      recastsReceived: (user.stats?.recasts_received || 0),
+      followerCount: user.follower_count || 0,
+      followingCount: user.following_count || 0,
+      castCount,
+      likesReceived,
+      recastsReceived,
       verifications: user.verifications || [],
       powerBadge: user.power_badge || false,
-      // @ts-ignore - Neynar API often returns score even if not typed in basic SDK
-      score: user.score, 
+      score: user.experimental?.neynar_user_score || user.score,
     };
   } catch (error) {
     console.error("Farcaster Fetch Error:", error);
@@ -77,14 +106,15 @@ const getEthTransactionCount = async (address: string): Promise<number> => {
 export const calculateFarcasterStats = async (profile: FarcasterProfile & { score?: number }): Promise<{ stats: StandStats; details: StandStatRawValues }> => {
   
   // A. POWER (Neynar Score / Social Capital)
+  // Neynar score is 0-1, so multiply by 100 for percentage
   let power: StatValue = 'E';
+  const scorePercent = profile.score ? profile.score * 100 : 0;
   
-  // If we have a Neynar Score, use it for calculation
-  if (profile.score) {
-      if (profile.score > 90) power = 'A';
-      else if (profile.score > 70) power = 'B';
-      else if (profile.score > 50) power = 'C';
-      else if (profile.score > 30) power = 'D';
+  if (scorePercent > 0) {
+      if (scorePercent > 90) power = 'A';
+      else if (scorePercent > 70) power = 'B';
+      else if (scorePercent > 50) power = 'C';
+      else if (scorePercent > 30) power = 'D';
   } else {
       if (profile.powerBadge) power = 'A';
       else if (profile.followerCount > 5000) power = 'A';
@@ -93,9 +123,9 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
       else if (profile.followerCount > 50) power = 'D';
   }
 
-  // Display Detail: Prefer Score, fall back to Followers
+  // Display Detail: Prefer Score (as percentage), fall back to Followers
   const powerDetail = profile.score 
-    ? `Score: ${profile.score.toFixed(1)}` 
+    ? `Score: ${scorePercent.toFixed(0)}%` 
     : (profile.powerBadge ? "Power Badge" : `Followers: ${profile.followerCount}`);
 
   // B. SPEED (Chain TXs)
