@@ -141,6 +141,374 @@ const MenacingFloaters = () => {
 };
 
 // ==========================================
+// Component: JOJO Style Printer (Stand Data Printer)
+// ==========================================
+interface StandPrinterProps {
+    user: FarcasterProfile | null;
+    stats: StandStats | null;
+    statDetails?: StandStatRawValues;
+    standName?: string;
+    standImageUrl?: string;
+}
+
+const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, standName, standImageUrl }) => {
+    const [isPrinting, setIsPrinting] = useState(false);
+    const [showPaper, setShowPaper] = useState(false);
+    const [printText, setPrintText] = useState("");
+    
+    // Calculate total score
+    const gradeToScore = (g: StatValue): number => {
+        const map: Record<string, number> = { 'A': 100, 'B': 80, 'C': 60, 'D': 40, 'E': 20, 'N/A': 0 };
+        return map[g] || 0;
+    };
+    
+    const totalScore = stats ? (
+        gradeToScore(stats.power) + 
+        gradeToScore(stats.speed) + 
+        gradeToScore(stats.range) + 
+        gradeToScore(stats.durability) + 
+        gradeToScore(stats.precision) + 
+        gradeToScore(stats.potential)
+    ) : 0;
+    
+    const getRank = (score: number): string => {
+        if (score >= 540) return 'S';
+        if (score >= 450) return 'A';
+        if (score >= 360) return 'B';
+        if (score >= 270) return 'C';
+        if (score >= 180) return 'D';
+        return 'E';
+    };
+    
+    // Star rating (1-5 stars based on score)
+    const getStars = (score: number): string => {
+        const starCount = Math.ceil((score / 600) * 5);
+        const filled = '★'.repeat(starCount);
+        const empty = '☆'.repeat(5 - starCount);
+        return filled + empty;
+    };
+
+    const fullText = user ? `@${user.username}
+${user.displayName}${user.powerBadge ? ' ⚡' : ''}
+${user.verifications.length > 0 ? user.verifications[0].slice(0, 6) + '...' + user.verifications[0].slice(-4) : ''}
+${standName ? `─────────────────────────
+『${standName.replace(/[『』]/g, '')}』
+` : ''}─────────────────────────
+Followers ${user.followerCount.toLocaleString().padStart(8)}
+Following ${user.followingCount.toLocaleString().padStart(8)}
+Casts     ${user.castCount.toLocaleString().padStart(8)}
+Likes     ${(user.likesReceived || 0).toLocaleString().padStart(8)}
+Recasts   ${(user.recastsReceived || 0).toLocaleString().padStart(8)}
+${stats && statDetails ? `═════════════════════════
+    STAND PARAMETERS
+═════════════════════════
+破壊力    ${stats.power}  ${statDetails.power || ''}
+速度      ${stats.speed}  ${statDetails.speed || ''}
+射程      ${stats.range}  ${statDetails.range || ''}
+持続力    ${stats.durability}  ${statDetails.durability || ''}
+精密      ${stats.precision}  ${statDetails.precision || ''}
+成長性    ${stats.potential}  ${statDetails.potential || ''}
+─────────────────────────
+Rating ${getStars(totalScore)}
+SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
+`.trim() : 'NO DATA...';
+
+    const handlePrint = () => {
+        if (isPrinting || !user) return;
+        setIsPrinting(true);
+        setShowPaper(true);
+        setPrintText("");
+        
+        // Typewriter effect
+        let i = 0;
+        const interval = setInterval(() => {
+            if (i < fullText.length) {
+                setPrintText(fullText.slice(0, i + 1));
+                i++;
+            } else {
+                clearInterval(interval);
+                setIsPrinting(false);
+            }
+        }, 20);
+    };
+
+    const handleReset = () => {
+        setShowPaper(false);
+        setPrintText("");
+    };
+
+    return (
+        <div className="relative flex flex-col items-center">
+            {/* Printer Body */}
+            <div className="relative">
+                {/* Main Frame - Premium metallic style */}
+                <div className="w-80 bg-gradient-to-b from-[#2a2a2a] via-[#1a1a1a] to-[#0a0a0a] rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8),0_0_60px_rgba(251,191,36,0.15),inset_0_1px_0_rgba(255,255,255,0.1)] border border-[#444] overflow-hidden">
+                    
+                    {/* Top Bar - Brushed metal */}
+                    <div className="h-10 bg-gradient-to-b from-[#3a3a3a] via-[#2a2a2a] to-[#1a1a1a] flex items-center justify-between px-4 border-b border-[#555] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+                        <span className="text-[#fbbf24] font-black text-[10px] tracking-[0.2em] drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]">STAND-PRINTER</span>
+                        <div className="flex gap-2 items-center">
+                            <div className="w-2 h-2 rounded-full bg-[#22c55e] shadow-[0_0_6px_#22c55e]"></div>
+                            <div className="w-2 h-2 rounded-full bg-[#333] border border-[#555]"></div>
+                        </div>
+                    </div>
+                    
+                    {/* Screen Area */}
+                    <div className="p-4">
+                        <div className="bg-[#0a0a0a] border border-[#333] rounded-lg p-4 h-28 overflow-hidden relative shadow-[inset_0_2px_10px_rgba(0,0,0,0.8)]">
+                            {/* CRT glow effect */}
+                            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(219,39,119,0.05)_0%,transparent_70%)] pointer-events-none"></div>
+                            {/* Scan line effect */}
+                            <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_3px] pointer-events-none opacity-50"></div>
+                            
+                            {/* Screen content */}
+                            <div className="font-mono text-xs leading-relaxed relative z-10">
+                                {user ? (
+                                    <>
+                                        <div className="text-[#22c55e] mb-2 flex items-center gap-2">
+                                            <span className="inline-block w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse"></span>
+                                            USER DETECTED
+                                        </div>
+                                        <div className="text-[#fbbf24] font-bold">@{user.username}</div>
+                                        <div className="text-[#666] text-[10px]">FID: #{user.fid}</div>
+                                        <div className="text-[#06b6d4] text-[10px] mt-2 animate-pulse tracking-wider">▶ READY TO PRINT...</div>
+                                    </>
+                                ) : (
+                                    <div className="text-[#666] animate-pulse">CONNECTING...</div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Control Panel */}
+                    <div className="px-4 pb-4 flex items-center justify-between">
+                        {/* Reset Button */}
+                        <button 
+                            onClick={handleReset}
+                            className="w-12 h-12 bg-gradient-to-b from-[#2a2a2a] to-[#1a1a1a] border border-[#444] rounded-xl flex items-center justify-center hover:border-[#fbbf24] transition-all active:scale-95 shadow-[0_4px_8px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                        >
+                            <RotateCcw className="w-4 h-4 text-[#888]" />
+                        </button>
+                        
+                        {/* Speaker Grille */}
+                        <div className="flex flex-col gap-1 px-4">
+                            {[...Array(4)].map((_, i) => (
+                                <div key={i} className="w-20 h-[2px] bg-gradient-to-r from-transparent via-[#333] to-transparent rounded"></div>
+                            ))}
+                        </div>
+                        
+                        {/* Print Button */}
+                        <button 
+                            onClick={handlePrint}
+                            disabled={isPrinting || !user}
+                            className={`px-5 py-3 font-black text-xs tracking-wider rounded-xl transition-all active:scale-95 ${
+                                isPrinting 
+                                    ? 'bg-[#333] text-[#666] cursor-not-allowed' 
+                                    : 'bg-gradient-to-b from-[#fbbf24] to-[#b45309] text-black shadow-[0_4px_12px_rgba(251,191,36,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_6px_20px_rgba(251,191,36,0.6)] hover:-translate-y-0.5'
+                            }`}
+                        >
+                            {isPrinting ? 'PRINTING...' : 'PRINT'}
+                        </button>
+                    </div>
+                    
+                    {/* Paper Slot */}
+                    <div className="h-4 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] border-t border-[#333] relative overflow-visible">
+                        <div className="absolute left-1/2 -translate-x-1/2 top-0 w-52 h-2 bg-[#0a0a0a] rounded-b-lg shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"></div>
+                    </div>
+                </div>
+                
+                {/* Printed Paper - Japanese Receipt Style */}
+                {showPaper && (
+                    <div 
+                        className={`absolute left-1/2 -translate-x-1/2 w-72 transition-all duration-1000 ease-out ${
+                            isPrinting ? 'animate-paper-print' : ''
+                        }`}
+                        style={{ 
+                            top: '100%',
+                            transformOrigin: 'top center',
+                        }}
+                    >
+                        {/* Paper with thermal print texture */}
+                        <div className="relative bg-[#f5f5f0] shadow-[0_15px_50px_rgba(0,0,0,0.5)]"
+                             style={{
+                                 backgroundImage: `
+                                     url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E"),
+                                     linear-gradient(to bottom, rgba(0,0,0,0.02) 0%, transparent 2%, transparent 98%, rgba(0,0,0,0.03) 100%)
+                                 `,
+                             }}
+                        >
+                            {/* Paper texture overlay */}
+                            <div className="absolute inset-0 opacity-30" style={{
+                                backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.01) 1px, rgba(0,0,0,0.01) 2px)`
+                            }}></div>
+                            
+                            {/* Close button */}
+                            <button 
+                                onClick={handleReset}
+                                className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center text-[#aaa] hover:text-[#333] transition-colors z-20 text-xs"
+                            >
+                                ✕
+                            </button>
+                            
+                            {/* Receipt Content */}
+                            <div className="px-4 py-3 relative">
+                                
+                                {/* Header Logo - Ink stamp style */}
+                                <div className="text-center mb-2 pb-2 border-b border-dashed border-[#ccc]">
+                                    <div className="relative inline-block">
+                                        <h1 className="text-2xl font-black tracking-wider text-[#1a1a1a] relative"
+                                            style={{ 
+                                                fontFamily: 'Impact, sans-serif',
+                                                textShadow: '1px 0 0 rgba(0,0,0,0.1)',
+                                                filter: 'url(#ink-bleed)'
+                                            }}>
+                                            STAND DATA
+                                        </h1>
+                                        {/* Ink spots */}
+                                        <div className="absolute -top-1 -left-2 w-1.5 h-1.5 bg-[#333] rounded-full opacity-20"></div>
+                                        <div className="absolute -bottom-0.5 right-4 w-1 h-1 bg-[#333] rounded-full opacity-15"></div>
+                                    </div>
+                                    <div className="text-[8px] text-[#666] mt-1 tracking-widest">SPEEDWAGON FOUNDATION</div>
+                                </div>
+                                
+                                {/* Date & ID line */}
+                                <div className="flex justify-between text-[9px] text-[#555] font-mono mb-2 pb-1 border-b border-dotted border-[#ddd]">
+                                    <span>{new Date().toLocaleDateString('ja-JP').replace(/\//g, '/')} {new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}</span>
+                                    <span>No.{user?.fid?.toString().padStart(6, '0') || '------'}</span>
+                                </div>
+                                
+                                {/* Content with optional Stand image */}
+                                <div className="flex gap-2">
+                                    {/* Left: Text content */}
+                                    <div className={`text-[10px] leading-[1.5] font-mono text-[#1a1a1a] whitespace-pre-wrap tracking-tight ${standImageUrl ? 'flex-1' : 'w-full'}`}
+                                         style={{ fontFamily: "'Courier New', monospace" }}>
+                                        {printText}
+                                        {isPrinting && <span className="animate-blink text-[#333]">█</span>}
+                                    </div>
+                                    
+                                    {/* Right: Stand image (black & white ink style) */}
+                                    {standImageUrl && !isPrinting && printText && (
+                                        <div className="w-24 shrink-0 relative">
+                                            <div className="absolute inset-0 border border-dashed border-[#ccc]"></div>
+                                            <img 
+                                                src={standImageUrl} 
+                                                alt="Stand"
+                                                className="w-full h-auto object-cover"
+                                                style={{
+                                                    filter: 'grayscale(100%) contrast(1.2) brightness(1.1)',
+                                                    mixBlendMode: 'multiply',
+                                                    opacity: 0.85,
+                                                }}
+                                            />
+                                            {/* Ink texture overlay */}
+                                            <div className="absolute inset-0 opacity-20"
+                                                 style={{
+                                                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+                                                     mixBlendMode: 'overlay'
+                                                 }}
+                                            ></div>
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                {/* Footer */}
+                                {!isPrinting && printText && (
+                                    <div className="mt-3 pt-2 border-t border-dashed border-[#ccc]">
+                                        {/* Barcode generated from hash - Code 128 style */}
+                                        {(() => {
+                                            const hashSource = user?.verifications?.[0] || user?.fid?.toString() || '0x0000000000000000';
+                                            const hashClean = hashSource.replace('0x', '');
+                                            // Generate Code 128 style pattern (thin and thick bars)
+                                            const barPattern: { w: number; gap: boolean }[] = [];
+                                            for (let i = 0; i < 50; i++) {
+                                                const c = hashClean[i % hashClean.length];
+                                                const v = parseInt(c, 16);
+                                                const width = isNaN(v) ? 2 : (v % 4) + 1;
+                                                barPattern.push({ w: width, gap: false });
+                                                // Add gap after bar
+                                                const gapWidth = ((v || 0) % 3) + 1;
+                                                barPattern.push({ w: gapWidth, gap: true });
+                                            }
+                                            return (
+                                                <div className="flex items-center h-14 w-full mb-2">
+                                                    {barPattern.map((bar, i) => (
+                                                        <div 
+                                                            key={i} 
+                                                            className={bar.gap ? 'bg-transparent' : 'bg-[#1a1a1a]'}
+                                                            style={{ width: `${bar.w}px`, height: '100%' }}
+                                                        ></div>
+                                                    ))}
+                                                </div>
+                                            );
+                                        })()}
+                                        
+                                        {/* Hash value */}
+                                        <p className="text-center text-[8px] text-[#555] font-mono tracking-wider mb-2">
+                                            {user?.verifications?.[0] 
+                                                ? `${user.verifications[0].slice(0, 10)}...${user.verifications[0].slice(-8)}`
+                                                : user?.fid?.toString() || '------'}
+                                        </p>
+                                        
+                                        {/* Mint Info */}
+                                        <div className="border-t border-dotted border-[#ccc] pt-2">
+                                            <div className="flex justify-between text-[9px] font-mono">
+                                                <span className="text-[#666]">MINT FEE</span>
+                                                <span className="text-[#333] font-bold">FREE</span>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Credit - single line */}
+                                        <div className="text-center border-t border-dotted border-[#ccc] pt-2 mt-2">
+                                            <p className="text-[8px] text-[#888]">Created by <span className="font-bold text-[#555]">@misa</span></p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        
+                        {/* Torn edge effect */}
+                        <svg className="w-full h-3" viewBox="0 0 288 12" preserveAspectRatio="none">
+                            <path d="M0,0 L288,0 L288,3 Q280,6 272,3 Q264,0 256,3 Q248,6 240,3 Q232,0 224,3 Q216,6 208,3 Q200,0 192,3 Q184,6 176,3 Q168,0 160,3 Q152,6 144,3 Q136,0 128,3 Q120,6 112,3 Q104,0 96,3 Q88,6 80,3 Q72,0 64,3 Q56,6 48,3 Q40,0 32,3 Q24,6 16,3 Q8,0 0,3 Z" 
+                                  fill="#f5f5f0"/>
+                        </svg>
+                        
+                        {/* SVG Filter for ink effect */}
+                        <svg width="0" height="0">
+                            <filter id="ink-bleed">
+                                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise"/>
+                                <feDisplacementMap in="SourceGraphic" in2="noise" scale="1" xChannelSelector="R" yChannelSelector="G"/>
+                            </filter>
+                        </svg>
+                    </div>
+                )}
+            </div>
+            
+            {/* Brand label */}
+            <div className="mt-4 text-[#555] text-[8px] font-medium tracking-[0.2em]">SPW FOUNDATION TECH</div>
+            
+            {/* Styles */}
+            <style>{`
+                @keyframes paper-print {
+                    0% { max-height: 0; opacity: 0; }
+                    10% { opacity: 1; }
+                    100% { max-height: 500px; }
+                }
+                .animate-paper-print {
+                    animation: paper-print 3s ease-out forwards;
+                }
+                @keyframes blink {
+                    0%, 50% { opacity: 1; }
+                    51%, 100% { opacity: 0; }
+                }
+                .animate-blink {
+                    animation: blink 0.5s infinite;
+                }
+            `}</style>
+        </div>
+    );
+};
+
+// ==========================================
 // Component: Farcaster Gate Background (Enhanced)
 // ==========================================
 const FarcasterGateBackground = () => {
@@ -222,29 +590,54 @@ const LoadingScreen = () => {
 };
 
 // ==========================================
-// Component: Interaction View (Blank White Page)
+// Component: Printer View (Stand Data Printer Page)
 // ==========================================
-const InteractionView = ({ onBack }: { onBack: () => void }) => {
+interface PrinterViewProps {
+    onBack: () => void;
+    user: FarcasterProfile | null;
+    stats: StandStats | null;
+    statDetails?: StandStatRawValues;
+    standName?: string;
+    standImageUrl?: string;
+}
+
+const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDetails, standName, standImageUrl }) => {
     return (
-        <main className="h-dvh w-screen bg-white flex flex-col relative overflow-hidden" 
+        <main className="h-dvh w-screen bg-black bg-noise pattern-flowing-checkers flex flex-col relative overflow-hidden" 
               style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+             
+             {/* Background */}
+             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(251,191,36,0.1)_0%,transparent_70%)] pointer-events-none"></div>
+             
+             {/* Menacing floaters */}
+             <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
+                <div className="absolute top-[15%] left-[5%] text-[#db2777] font-black text-4xl menacing-text animate-pulse">ゴ</div>
+                <div className="absolute top-[25%] right-[8%] text-[#fbbf24] font-black text-3xl menacing-text animate-pulse" style={{ animationDelay: '0.5s' }}>ゴ</div>
+                <div className="absolute bottom-[30%] left-[10%] text-[#db2777] font-black text-5xl menacing-text animate-pulse" style={{ animationDelay: '1s' }}>ド</div>
+             </div>
              
              {/* Back Arrow */}
              <div className="absolute top-4 left-4 z-50">
                 <button 
                     onClick={onBack}
-                    className="flex items-center gap-2 text-black hover:text-[#db2777] transition-colors group px-4 py-2"
+                    className="flex items-center gap-2 text-[#fbbf24] hover:text-[#db2777] transition-colors group px-4 py-2"
                 >
                     <ArrowLeft className="w-6 h-6 transform group-hover:-translate-x-1 transition-transform" />
                     <span className="font-bold tracking-widest text-xs uppercase">Return</span>
                 </button>
              </div>
              
-             {/* Blank State Content */}
-             <div className="flex-1 flex flex-col items-center justify-center relative z-20">
-                 <h2 className="text-3xl md:text-4xl font-jojo text-gray-200 uppercase tracking-widest text-center">
-                    Interaction<br/>Layer
-                 </h2>
+             {/* Header */}
+             <div className="mt-16 text-center z-20">
+                 <h1 className="text-3xl md:text-4xl font-jojo text-white drop-shadow-[2px_2px_0_#db2777]">
+                    STAND<span className="text-[#fbbf24]">-PRINTER</span>
+                 </h1>
+                 <p className="text-[10px] text-[#666] tracking-widest mt-2">SPEEDWAGON FOUNDATION TECHNOLOGY</p>
+             </div>
+             
+             {/* Printer Component */}
+             <div className="flex-1 flex items-center justify-center relative z-20 overflow-y-auto py-8">
+                 <StandPrinter user={user} stats={stats} statDetails={statDetails} standName={standName} standImageUrl={standImageUrl} />
              </div>
         </main>
     );
@@ -525,7 +918,14 @@ export default function App() {
   // VIEW: INTERACTION LAYER (BLANK WHITE)
   // ==========================
   if (showInteraction) {
-      return <InteractionView onBack={() => setShowInteraction(false)} />;
+      return <PrinterView 
+          onBack={() => setShowInteraction(false)} 
+          user={farcasterUser}
+          stats={calculatedData?.stats || null}
+          statDetails={calculatedData?.details}
+          standName={standData?.standName}
+          standImageUrl={standData?.standImageUrl}
+      />;
   }
   
   // ==========================
@@ -543,7 +943,14 @@ export default function App() {
             <FarcasterGateBackground />
             <MenacingFloaters />
 
-            {/* REMOVED ARROW FROM HERE */}
+            {/* Printer Button (Top Right) */}
+            <button 
+                onClick={() => setShowInteraction(true)}
+                className="absolute top-4 right-4 z-50 px-3 py-2 bg-black/80 border-2 border-[#fbbf24] rounded-lg flex items-center gap-2 hover:bg-[#fbbf24] hover:text-black transition-all group"
+            >
+                <span className="text-[#fbbf24] group-hover:text-black text-lg">🖨️</span>
+                <span className="text-[#fbbf24] group-hover:text-black text-[10px] font-bold tracking-wider hidden md:inline">PRINTER</span>
+            </button>
 
             {/* Full Screen Main Container */}
             <div className="flex-1 flex flex-col items-center justify-between w-full h-full relative z-20">
