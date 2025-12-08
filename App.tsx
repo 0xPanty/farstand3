@@ -219,7 +219,7 @@ SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
         setShowPaper(true);
         setPrintText("");
         
-        // Typewriter effect
+        // Typewriter effect - print character by character
         let i = 0;
         const interval = setInterval(() => {
             if (i < fullText.length) {
@@ -227,9 +227,11 @@ SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
                 i++;
             } else {
                 clearInterval(interval);
-                setIsPrinting(false);
+                setTimeout(() => {
+                    setIsPrinting(false);
+                }, 300);
             }
-        }, 20);
+        }, 15); // Speed: 15ms per character
     };
 
     const handleReset = () => {
@@ -320,12 +322,12 @@ SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
                 {/* Printed Paper - Japanese Receipt Style */}
                 {showPaper && (
                     <div 
-                        className={`absolute left-1/2 -translate-x-1/2 w-72 transition-all duration-1000 ease-out ${
-                            isPrinting ? 'animate-paper-print' : ''
-                        }`}
+                        className="absolute left-1/2 -translate-x-1/2 w-72 overflow-hidden"
                         style={{ 
                             top: '100%',
                             transformOrigin: 'top center',
+                            maxHeight: isPrinting ? `${Math.min(printText.split('\n').length * 16 + 200, 800)}px` : '800px',
+                            transition: 'max-height 0.1s linear',
                         }}
                     >
                         {/* Paper with thermal print texture */}
@@ -499,14 +501,6 @@ SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
             
             {/* Styles */}
             <style>{`
-                @keyframes paper-print {
-                    0% { max-height: 0; opacity: 0; }
-                    10% { opacity: 1; }
-                    100% { max-height: 500px; }
-                }
-                .animate-paper-print {
-                    animation: paper-print 3s ease-out forwards;
-                }
                 @keyframes blink {
                     0%, 50% { opacity: 1; }
                     51%, 100% { opacity: 0; }
