@@ -202,12 +202,12 @@ Recasts   ${(user.recastsReceived || 0).toLocaleString().padStart(8)}
 ${stats && statDetails ? `═════════════════════════
     STAND PARAMETERS
 ═════════════════════════
-破壊力    ${stats.power}  ${statDetails.power || ''}
-速度      ${stats.speed}  ${statDetails.speed || ''}
-射程      ${stats.range}  ${statDetails.range || ''}
-持続力    ${stats.durability}  ${statDetails.durability || ''}
-精密      ${stats.precision}  ${statDetails.precision || ''}
-成長性    ${stats.potential}  ${statDetails.potential || ''}
+POWER      ${stats.power}  ${statDetails.power || ''}
+SPEED      ${stats.speed}  ${statDetails.speed || ''}
+RANGE      ${stats.range}  ${statDetails.range || ''}
+DURABILITY ${stats.durability}  ${statDetails.durability || ''}
+PRECISION  ${stats.precision}  ${statDetails.precision || ''}
+POTENTIAL  ${stats.potential}  ${statDetails.potential || ''}
 ─────────────────────────
 Rating ${getStars(totalScore)}
 SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
