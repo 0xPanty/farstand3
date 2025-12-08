@@ -93,7 +93,9 @@ const getEthTransactionCount = async (address: string): Promise<number> => {
       }),
     });
     const data = await response.json();
-    return parseInt(data.result, 16);
+    const count = parseInt(data.result, 16);
+    // Return 0 if NaN
+    return isNaN(count) ? 0 : count;
   } catch (e) {
     console.warn("RPC Fetch failed, using fallback speed", e);
     return 0;
