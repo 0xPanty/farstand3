@@ -329,17 +329,21 @@ SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
                         }}
                     >
                         {/* Paper with thermal print texture */}
-                        <div className="relative bg-[#f5f5f0] shadow-[0_15px_50px_rgba(0,0,0,0.5)]"
+                        <div className="relative bg-[#f8f8f5] shadow-[0_15px_50px_rgba(0,0,0,0.5)]"
                              style={{
                                  backgroundImage: `
-                                     url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E"),
-                                     linear-gradient(to bottom, rgba(0,0,0,0.02) 0%, transparent 2%, transparent 98%, rgba(0,0,0,0.03) 100%)
+                                     url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"),
+                                     linear-gradient(to bottom, rgba(0,0,0,0.015) 0%, transparent 1%, transparent 99%, rgba(0,0,0,0.02) 100%)
                                  `,
                              }}
                         >
-                            {/* Paper texture overlay */}
-                            <div className="absolute inset-0 opacity-30" style={{
-                                backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.01) 1px, rgba(0,0,0,0.01) 2px)`
+                            {/* Thermal paper texture - horizontal lines */}
+                            <div className="absolute inset-0 opacity-[0.15]" style={{
+                                backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px)`
+                            }}></div>
+                            {/* Slight ink bleed effect */}
+                            <div className="absolute inset-0 mix-blend-multiply opacity-[0.02]" style={{
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n2'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.5' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n2)'/%3E%3C/svg%3E")`
                             }}></div>
                             
                             {/* Close button */}
@@ -353,22 +357,23 @@ SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
                             {/* Receipt Content */}
                             <div className="px-4 py-3 relative">
                                 
-                                {/* Header Logo - Ink stamp style */}
-                                <div className="text-center mb-2 pb-2 border-b border-dashed border-[#ccc]">
+                                {/* Header Logo - Thermal ink style */}
+                                <div className="text-center mb-2 pb-2 border-b border-dashed border-[#bbb]">
                                     <div className="relative inline-block">
-                                        <h1 className="text-2xl font-black tracking-wider text-[#1a1a1a] relative"
+                                        <h1 className="text-xl font-black tracking-[0.15em] text-[#1a1a1a] relative"
                                             style={{ 
-                                                fontFamily: 'Impact, sans-serif',
-                                                textShadow: '1px 0 0 rgba(0,0,0,0.1)',
-                                                filter: 'url(#ink-bleed)'
+                                                fontFamily: "'Courier New', 'MS Gothic', monospace",
+                                                fontWeight: 900,
+                                                textShadow: '0.5px 0.5px 0 rgba(0,0,0,0.15), -0.2px -0.2px 0 rgba(255,255,255,0.5)',
+                                                letterSpacing: '0.2em',
                                             }}>
                                             STAND DATA
                                         </h1>
-                                        {/* Ink spots */}
-                                        <div className="absolute -top-1 -left-2 w-1.5 h-1.5 bg-[#333] rounded-full opacity-20"></div>
-                                        <div className="absolute -bottom-0.5 right-4 w-1 h-1 bg-[#333] rounded-full opacity-15"></div>
                                     </div>
-                                    <div className="text-[8px] text-[#666] mt-1 tracking-widest">SPEEDWAGON FOUNDATION</div>
+                                    <div className="text-[7px] text-[#888] mt-1 tracking-[0.25em]" 
+                                         style={{ fontFamily: "'Courier New', monospace" }}>
+                                        SPEEDWAGON FOUNDATION
+                                    </div>
                                 </div>
                                 
                                 {/* Date & ID line */}
@@ -379,9 +384,15 @@ SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
                                 
                                 {/* Content with optional Stand image */}
                                 <div className="flex gap-2">
-                                    {/* Left: Text content */}
-                                    <div className={`text-[10px] leading-[1.5] font-mono text-[#1a1a1a] whitespace-pre-wrap tracking-tight ${standImageUrl ? 'flex-1' : 'w-full'}`}
-                                         style={{ fontFamily: "'Courier New', monospace" }}>
+                                    {/* Left: Text content - Thermal printer ink style */}
+                                    <div className={`text-[10px] leading-[1.6] font-mono text-[#1a1a1a] whitespace-pre-wrap ${standImageUrl ? 'flex-1' : 'w-full'}`}
+                                         style={{ 
+                                             fontFamily: "'Courier New', 'MS Gothic', monospace",
+                                             fontWeight: 500,
+                                             letterSpacing: '-0.3px',
+                                             textShadow: '0.3px 0 0 rgba(0,0,0,0.2), -0.3px 0 0 rgba(0,0,0,0.1)',
+                                             filter: 'contrast(1.1)',
+                                         }}>
                                         {printText}
                                         {isPrinting && <span className="animate-blink text-[#333]">█</span>}
                                     </div>
