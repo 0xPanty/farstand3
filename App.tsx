@@ -208,7 +208,7 @@ RANGE      ${stats.range}  ${statDetails.range || ''}
 DURABILITY ${stats.durability}  ${statDetails.durability || ''}
 PRECISION  ${stats.precision}  ${statDetails.precision || ''}
 POTENTIAL  ${stats.potential}  ${statDetails.potential || ''}
-─────────────────────────
+***************************
 Rating ${getStars(totalScore)}
 SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
 `.trim() : 'NO DATA...';
