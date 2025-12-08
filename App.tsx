@@ -627,8 +627,7 @@ export default function App() {
                 </div>
 
                 {/* Bottom Decorative Strip */}
-                {/* Added mb-6 to lift it up as requested by 'Move this whole thing up a bit' */}
-                <div className="w-full border-y-2 border-[#fbbf24] bg-black mb-6 shadow-[0_0_20px_rgba(251,191,36,0.3)]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+                <div className="w-full border-y-2 border-[#fbbf24] bg-black shadow-[0_0_20px_rgba(251,191,36,0.3)]">
                     <div className="h-16 flex items-center justify-between px-0 overflow-hidden relative">
                         {/* Left Decor */}
                         <div className="flex gap-1 shrink-0 z-10 bg-black h-full items-center px-2 border-r border-[#fbbf24]/30">
