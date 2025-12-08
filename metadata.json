@@ -1,0 +1,7 @@
+{
+  "name": "JoJo Stand Maker",
+  "description": "Upload your photo to awaken your inner Stand! Uses Gemini Vision to analyze your aura and generate a unique JoJo's Bizarre Adventure stand profile and image.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
