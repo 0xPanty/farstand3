@@ -152,10 +152,9 @@ interface StandPrinterProps {
     sketchImageUrl?: string;
 }
 
-const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, standName, standImageUrl, sketchImageUrl }) => {
+const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, standName }) => {
     const [isPrinting, setIsPrinting] = useState(false);
     const [showPaper, setShowPaper] = useState(false);
-    const [printText, setPrintText] = useState("");
     
     // Calculate total score
     const gradeToScore = (g: StatValue): number => {
@@ -189,55 +188,19 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
         return filled + empty;
     };
 
-    const fullText = user ? `@${user.username}
-${user.displayName}${user.powerBadge ? ' ⚡' : ''}
-${user.verifications.length > 0 ? user.verifications[0].slice(0, 6) + '...' + user.verifications[0].slice(-4) : ''}
-${standName ? `─────────────────────────
-『${standName.replace(/[『』]/g, '')}』
-` : ''}─────────────────────────
-Followers ${user.followerCount.toLocaleString().padStart(8)}
-Following ${user.followingCount.toLocaleString().padStart(8)}
-Casts     ${user.castCount.toLocaleString().padStart(8)}
-Likes     ${(user.likesReceived || 0).toLocaleString().padStart(8)}
-Recasts   ${(user.recastsReceived || 0).toLocaleString().padStart(8)}
-${stats && statDetails ? `═════════════════════════
-    STAND PARAMETERS
-═════════════════════════
-POWER      ${stats.power}  ${statDetails.power || ''}
-SPEED      ${stats.speed}  ${statDetails.speed || ''}
-RANGE      ${stats.range}  ${statDetails.range || ''}
-DURABILITY ${stats.durability}  ${statDetails.durability || ''}
-PRECISION  ${stats.precision}  ${statDetails.precision || ''}
-POTENTIAL  ${stats.potential}  ${statDetails.potential || ''}
-***************************
-Rating ${getStars(totalScore)}
-SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
-`.trim() : 'NO DATA...';
-
     const handlePrint = () => {
         if (isPrinting || !user) return;
         setIsPrinting(true);
         setShowPaper(true);
-        setPrintText("");
         
-        // Typewriter effect - print character by character
-        let i = 0;
-        const interval = setInterval(() => {
-            if (i < fullText.length) {
-                setPrintText(fullText.slice(0, i + 1));
-                i++;
-            } else {
-                clearInterval(interval);
-                setTimeout(() => {
-                    setIsPrinting(false);
-                }, 300);
-            }
-        }, 15); // Speed: 15ms per character
+        // Simulate printing delay
+        setTimeout(() => {
+            setIsPrinting(false);
+        }, 1500);
     };
 
     const handleReset = () => {
         setShowPaper(false);
-        setPrintText("");
     };
 
     return (
@@ -327,8 +290,8 @@ SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
                         style={{ 
                             top: '100%',
                             transformOrigin: 'top center',
-                            maxHeight: isPrinting ? `${Math.min(printText.split('\n').length * 16 + 200, 800)}px` : '800px',
-                            transition: 'max-height 0.1s linear',
+                            maxHeight: isPrinting ? '100px' : '1000px',
+                            transition: 'max-height 1.5s ease-out',
                         }}
                     >
                         {/* Paper with thermal print texture */}
@@ -357,102 +320,138 @@ SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
                                 ✕
                             </button>
                             
-                            {/* Receipt Content */}
-                            <div className="px-4 py-3 relative">
+                            {/* Receipt Content - Full Japanese Style */}
+                            <div className="px-5 py-4 relative font-mono" style={{ fontFamily: "'Courier New', 'MS Gothic', monospace" }}>
                                 
-                                {/* Header Logo - Thermal ink style */}
-                                <div className="text-center mb-2 pb-2 border-b border-dashed border-[#bbb]">
-                                    <div className="relative inline-block">
-                                        <h1 className="text-xl font-black tracking-[0.15em] text-[#1a1a1a] relative"
-                                            style={{ 
-                                                fontFamily: "'Courier New', 'MS Gothic', monospace",
-                                                fontWeight: 900,
-                                                textShadow: '0.5px 0.5px 0 rgba(0,0,0,0.15), -0.2px -0.2px 0 rgba(255,255,255,0.5)',
-                                                letterSpacing: '0.2em',
-                                            }}>
-                                            STAND DATA
-                                        </h1>
-                                    </div>
-                                    <div className="text-[7px] text-[#888] mt-1 tracking-[0.25em]" 
-                                         style={{ fontFamily: "'Courier New', monospace" }}>
+                                {/* Title - Large & Bold */}
+                                <div className="text-center mb-4 pb-3 border-b-2 border-[#1a1a1a]">
+                                    <h1 className="text-2xl font-black tracking-[0.3em] text-[#1a1a1a] underline underline-offset-4 decoration-2">
+                                        STAND DATA
+                                    </h1>
+                                    <div className="text-[8px] text-[#666] mt-2 tracking-[0.2em]">
                                         SPEEDWAGON FOUNDATION
                                     </div>
-                                </div>
-                                
-                                {/* Date & ID line */}
-                                <div className="flex justify-between text-[9px] text-[#555] font-mono mb-2 pb-1 border-b border-dotted border-[#ddd]">
-                                    <span>{new Date().toLocaleDateString('ja-JP').replace(/\//g, '/')} {new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}</span>
-                                    <span>No.{user?.fid?.toString().padStart(6, '0') || '------'}</span>
-                                </div>
-                                
-                                {/* Content */}
-                                <div className="flex">
-                                    {/* Text content - Thermal printer ink style */}
-                                    <div className="text-[10px] leading-[1.6] font-mono text-[#1a1a1a] whitespace-pre-wrap w-full"
-                                         style={{ 
-                                             fontFamily: "'Courier New', 'MS Gothic', monospace",
-                                             fontWeight: 500,
-                                             letterSpacing: '-0.3px',
-                                             textShadow: '0.3px 0 0 rgba(0,0,0,0.2), -0.3px 0 0 rgba(0,0,0,0.1)',
-                                             filter: 'contrast(1.1)',
-                                         }}>
-                                        {printText}
-                                        {isPrinting && <span className="animate-blink text-[#333]">█</span>}
+                                    <div className="text-[8px] text-[#666] tracking-[0.15em]">
+                                        Morioh, S-City, 1999
                                     </div>
                                 </div>
                                 
-                                {/* Footer */}
-                                {!isPrinting && printText && (
-                                    <div className="mt-3 pt-2 border-t border-dashed border-[#ccc]">
-                                        {/* Barcode generated from hash - Code 128 style */}
+                                {/* Order Info */}
+                                <div className="text-[9px] text-[#333] mb-3 pb-2 border-b border-dashed border-[#999]">
+                                    <div className="font-bold">ORDER #{user?.fid?.toString().padStart(6, '0') || '000000'} FOR STAND ANALYSIS</div>
+                                    <div>{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}　　{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}</div>
+                                </div>
+                                
+                                {/* User Section */}
+                                <div className="mb-3 pb-2 border-b border-dotted border-[#bbb]">
+                                    <div className="flex justify-between text-[10px] mb-1">
+                                        <span className="text-[#666]">USER</span>
+                                        <span className="font-bold text-[#1a1a1a]">@{user?.username}</span>
+                                    </div>
+                                    <div className="flex justify-between text-[10px] mb-1">
+                                        <span className="text-[#666]">NAME</span>
+                                        <span className="font-bold text-[#1a1a1a]">{user?.displayName}{user?.powerBadge ? ' ⚡' : ''}</span>
+                                    </div>
+                                    {user?.verifications?.[0] && (
+                                        <div className="flex justify-between text-[10px]">
+                                            <span className="text-[#666]">WALLET</span>
+                                            <span className="text-[#1a1a1a]">{user.verifications[0].slice(0, 6)}...{user.verifications[0].slice(-4)}</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Stand Name - Highlight */}
+                                {standName && (
+                                    <div className="mb-3 pb-2 border-b border-dotted border-[#bbb]">
+                                        <div className="text-[9px] text-[#666] mb-1">STAND NAME</div>
+                                        <div className="text-lg font-black text-[#1a1a1a] tracking-wide">
+                                            『{standName.replace(/[『』]/g, '')}』
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {/* Stats Table */}
+                                <div className="mb-3 pb-2 border-b border-dotted border-[#bbb]">
+                                    <div className="text-[9px] text-[#666] mb-2 font-bold tracking-wider">─── SOCIAL METRICS ───</div>
+                                    <div className="space-y-1 text-[10px]">
+                                        <div className="flex justify-between"><span>Followers</span><span className="font-bold">{user?.followerCount?.toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Following</span><span className="font-bold">{user?.followingCount?.toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Casts</span><span className="font-bold">{user?.castCount?.toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Likes</span><span className="font-bold">{(user?.likesReceived || 0).toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Recasts</span><span className="font-bold">{(user?.recastsReceived || 0).toLocaleString()}</span></div>
+                                    </div>
+                                </div>
+                                
+                                {/* Stand Parameters */}
+                                {stats && statDetails && (
+                                    <div className="mb-3 pb-2 border-b border-dotted border-[#bbb]">
+                                        <div className="text-[9px] text-[#666] mb-2 font-bold tracking-wider">─── STAND PARAMETERS ───</div>
+                                        <div className="space-y-1 text-[10px]">
+                                            <div className="flex justify-between"><span>POWER</span><span><span className="font-black text-[12px]">{stats.power}</span> <span className="text-[8px] text-[#666]">{statDetails.power}</span></span></div>
+                                            <div className="flex justify-between"><span>SPEED</span><span><span className="font-black text-[12px]">{stats.speed}</span> <span className="text-[8px] text-[#666]">{statDetails.speed}</span></span></div>
+                                            <div className="flex justify-between"><span>RANGE</span><span><span className="font-black text-[12px]">{stats.range}</span> <span className="text-[8px] text-[#666]">{statDetails.range}</span></span></div>
+                                            <div className="flex justify-between"><span>DURABILITY</span><span><span className="font-black text-[12px]">{stats.durability}</span> <span className="text-[8px] text-[#666]">{statDetails.durability}</span></span></div>
+                                            <div className="flex justify-between"><span>PRECISION</span><span><span className="font-black text-[12px]">{stats.precision}</span> <span className="text-[8px] text-[#666]">{statDetails.precision}</span></span></div>
+                                            <div className="flex justify-between"><span>POTENTIAL</span><span><span className="font-black text-[12px]">{stats.potential}</span> <span className="text-[8px] text-[#666]">{statDetails.potential}</span></span></div>
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {/* Score Summary */}
+                                <div className="mb-3 pb-2 border-b border-double border-[#1a1a1a]">
+                                    <div className="flex justify-between text-[10px] mb-1">
+                                        <span>RATING</span>
+                                        <span className="font-bold tracking-wider">{getStars(totalScore)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-[10px] mb-1">
+                                        <span>TOTAL SCORE</span>
+                                        <span className="font-bold">{totalScore}/600</span>
+                                    </div>
+                                    <div className="flex justify-between text-[11px] font-black">
+                                        <span>RANK</span>
+                                        <span className="text-lg">{getRank(totalScore)}</span>
+                                    </div>
+                                </div>
+                                
+                                {/* Barcode */}
+                                {!isPrinting && (
+                                    <div className="mb-2">
                                         {(() => {
                                             const hashSource = user?.verifications?.[0] || user?.fid?.toString() || '0x0000000000000000';
                                             const hashClean = hashSource.replace('0x', '');
-                                            // Generate Code 128 style pattern (thin and thick bars)
                                             const barPattern: { w: number; gap: boolean }[] = [];
-                                            for (let i = 0; i < 50; i++) {
+                                            for (let i = 0; i < 60; i++) {
                                                 const c = hashClean[i % hashClean.length];
                                                 const v = parseInt(c, 16);
-                                                const width = isNaN(v) ? 2 : (v % 4) + 1;
+                                                const width = isNaN(v) ? 1 : (v % 3) + 1;
                                                 barPattern.push({ w: width, gap: false });
-                                                // Add gap after bar
-                                                const gapWidth = ((v || 0) % 3) + 1;
+                                                const gapWidth = ((v || 0) % 2) + 1;
                                                 barPattern.push({ w: gapWidth, gap: true });
                                             }
                                             return (
-                                                <div className="flex items-center h-14 w-full mb-2">
+                                                <div className="flex items-center justify-center h-10 w-full">
                                                     {barPattern.map((bar, i) => (
-                                                        <div 
-                                                            key={i} 
-                                                            className={bar.gap ? 'bg-transparent' : 'bg-[#1a1a1a]'}
-                                                            style={{ width: `${bar.w}px`, height: '100%' }}
-                                                        ></div>
+                                                        <div key={i} className={bar.gap ? 'bg-transparent' : 'bg-[#1a1a1a]'} style={{ width: `${bar.w}px`, height: '100%' }}></div>
                                                     ))}
                                                 </div>
                                             );
                                         })()}
-                                        
-                                        {/* Hash value */}
-                                        <p className="text-center text-[8px] text-[#555] font-mono tracking-wider mb-2">
-                                            {user?.verifications?.[0] 
-                                                ? `${user.verifications[0].slice(0, 10)}...${user.verifications[0].slice(-8)}`
-                                                : user?.fid?.toString() || '------'}
+                                        <p className="text-center text-[7px] text-[#666] mt-1 tracking-widest">
+                                            {user?.verifications?.[0] ? `${user.verifications[0].slice(0, 14)}...${user.verifications[0].slice(-10)}` : `FID-${user?.fid}`}
                                         </p>
-                                        
-                                        {/* Mint Info */}
-                                        <div className="border-t border-dotted border-[#ccc] pt-2">
-                                            <div className="flex justify-between text-[9px] font-mono">
-                                                <span className="text-[#666]">MINT FEE</span>
-                                                <span className="text-[#333] font-bold">FREE</span>
-                                            </div>
-                                        </div>
-                                        
-                                        {/* Credit - single line */}
-                                        <div className="text-center border-t border-dotted border-[#ccc] pt-2 mt-2">
-                                            <p className="text-[8px] text-[#888]">Created by <span className="font-bold text-[#555]">@misa</span></p>
-                                        </div>
                                     </div>
                                 )}
+                                
+                                {/* Footer */}
+                                {!isPrinting && (
+                                    <div className="text-center pt-2 border-t border-dashed border-[#999]">
+                                        <div className="text-[10px] font-black tracking-[0.2em] mb-2">THANK YOU FOR AWAKENING</div>
+                                        <div className="text-[8px] text-[#888]">Created by <span className="font-bold text-[#333]">@xqc</span></div>
+                                    </div>
+                                )}
+                                
+                                {/* Printing cursor */}
+                                {isPrinting && <span className="animate-blink text-[#333] text-lg">█</span>}
                             </div>
                         </div>
                         
@@ -620,7 +619,7 @@ const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDeta
              
              {/* Printer Component */}
              <div className="flex-1 flex items-center justify-center relative z-20 overflow-y-auto py-8">
-                 <StandPrinter user={user} stats={stats} statDetails={statDetails} standName={standName} standImageUrl={standImageUrl} sketchImageUrl={sketchImageUrl} />
+                 <StandPrinter user={user} stats={stats} statDetails={statDetails} standName={standName} />
              </div>
         </main>
     );
