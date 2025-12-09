@@ -849,17 +849,15 @@ export default function App() {
                         </div>
                     </div>
     
-                    <div className="flex-1 overflow-y-auto no-scrollbar bg-[url('https://www.transparenttextures.com/patterns/white-diamond.png')] pb-20">
-                        {/* Printer Button - Below header */}
-                        <div className="flex justify-center py-3 bg-gray-50 border-b border-gray-200">
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); setShowInteraction(true); }}
-                                className="w-14 h-14 bg-black text-[#fbbf24] flex items-center justify-center rounded-full shadow-lg active:scale-95 transition-transform border-2 border-[#fbbf24]/50 hover:bg-[#fbbf24] hover:text-black"
-                                title="Print Stand Data"
-                            >
-                                <span className="text-2xl">🖨️</span>
-                            </button>
-                        </div>
+                    <div className="flex-1 overflow-y-auto no-scrollbar bg-[url('https://www.transparenttextures.com/patterns/white-diamond.png')] pb-20 relative">
+                        {/* Printer Button - Fixed top right */}
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); setShowInteraction(true); }}
+                            className="fixed top-24 right-6 z-50 w-12 h-12 bg-black text-[#fbbf24] flex items-center justify-center rounded-full shadow-lg active:scale-95 transition-transform border-2 border-[#fbbf24]/50 hover:bg-[#fbbf24] hover:text-black"
+                            title="Print Stand Data"
+                        >
+                            <span className="text-xl">🖨️</span>
+                        </button>
                         
                         {/* 1. Name Strip */}
                         <div className="p-6 pb-2">
