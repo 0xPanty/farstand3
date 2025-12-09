@@ -677,14 +677,14 @@ interface PrinterViewProps {
 
 const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDetails, standName, standImageUrl, sketchImageUrl }) => {
     return (
-        <main className="h-dvh w-screen bg-black bg-noise pattern-flowing-checkers flex flex-col relative overflow-hidden" 
+        <main className="min-h-dvh w-screen bg-black bg-noise pattern-flowing-checkers flex flex-col relative overflow-y-auto" 
               style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
              
              {/* Background */}
-             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(251,191,36,0.1)_0%,transparent_70%)] pointer-events-none"></div>
+             <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(251,191,36,0.1)_0%,transparent_70%)] pointer-events-none"></div>
              
              {/* Back Arrow */}
-             <div className="absolute top-4 left-4 z-50">
+             <div className="fixed top-4 left-4 z-50">
                 <button 
                     onClick={onBack}
                     className="flex items-center gap-2 text-[#fbbf24] hover:text-[#db2777] transition-colors group px-4 py-2"
@@ -695,7 +695,7 @@ const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDeta
              </div>
              
              {/* Header */}
-             <div className="mt-16 text-center z-20">
+             <div className="mt-16 text-center z-20 shrink-0">
                  <h1 className="text-3xl md:text-4xl font-jojo text-white drop-shadow-[2px_2px_0_#db2777]">
                     STAND<span className="text-[#fbbf24]">-PRINTER</span>
                  </h1>
@@ -703,7 +703,7 @@ const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDeta
              </div>
              
              {/* Printer Component */}
-             <div className="flex-1 flex items-center justify-center relative z-20 overflow-y-auto py-8">
+             <div className="flex-1 flex items-start justify-center relative z-20 py-8 pb-96">
                  <StandPrinter user={user} stats={stats} statDetails={statDetails} standName={standName} />
              </div>
         </main>
