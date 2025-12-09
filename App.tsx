@@ -766,6 +766,20 @@ export default function App() {
     setIsFlipped(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
+
+  // ==========================
+  // VIEW: PRINTER (Must be checked FIRST)
+  // ==========================
+  if (showInteraction) {
+      return <PrinterView 
+          onBack={() => setShowInteraction(false)} 
+          user={farcasterUser}
+          stats={calculatedData?.stats || null}
+          statDetails={calculatedData?.details}
+          standName={standData?.standName}
+          standImageUrl={standData?.standImageUrl}
+      />;
+  }
   
   // ==========================
   // VIEW: RESULT SCREEN (Flip Card)
@@ -927,20 +941,6 @@ export default function App() {
       );
   }
 
-  // ==========================
-  // VIEW: INTERACTION LAYER (BLANK WHITE)
-  // ==========================
-  if (showInteraction) {
-      return <PrinterView 
-          onBack={() => setShowInteraction(false)} 
-          user={farcasterUser}
-          stats={calculatedData?.stats || null}
-          statDetails={calculatedData?.details}
-          standName={standData?.standName}
-          standImageUrl={standData?.standImageUrl}
-      />;
-  }
-  
   // ==========================
   // VIEW: UPLOAD SCREEN (RITUAL MODE)
   // ==========================
