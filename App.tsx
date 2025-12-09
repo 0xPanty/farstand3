@@ -835,17 +835,9 @@ export default function App() {
                              <Crosshair className="w-5 h-5 text-[#eab308] animate-[spin_4s_linear_infinite]" />
                              <span className="text-[#eab308] text-sm tracking-[0.3em] font-bold">STAND PARAMETERS</span>
                         </div>
-                        <div className="flex gap-2 items-center">
+                        <div className="flex gap-2">
                             <div className="w-3 h-3 rounded-full bg-[#db2777]"></div>
                             <div className="w-3 h-3 rounded-full bg-[#06b6d4]"></div>
-                            {/* Close Button */}
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); onReset(); }}
-                                className="w-8 h-8 bg-black text-white flex items-center justify-center rounded-full ml-2 active:scale-95 transition-transform border border-white/30 hover:bg-red-900/50"
-                                title="Close"
-                            >
-                                <X size={18} />
-                            </button>
                         </div>
                     </div>
     
