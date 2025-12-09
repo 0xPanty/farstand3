@@ -401,25 +401,26 @@ SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
                                     
                                     {/* Right: Stand image (black & white ink style) */}
                                     {standImageUrl && !isPrinting && printText && (
-                                        <div className="w-24 shrink-0 relative">
-                                            <div className="absolute inset-0 border border-dashed border-[#ccc]"></div>
-                                            <img 
-                                                src={standImageUrl} 
-                                                alt="Stand"
-                                                className="w-full h-auto object-cover"
-                                                style={{
-                                                    filter: 'grayscale(100%) contrast(1.2) brightness(1.1)',
-                                                    mixBlendMode: 'multiply',
-                                                    opacity: 0.85,
-                                                }}
-                                            />
-                                            {/* Ink texture overlay */}
-                                            <div className="absolute inset-0 opacity-20"
-                                                 style={{
-                                                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-                                                     mixBlendMode: 'overlay'
-                                                 }}
-                                            ></div>
+                                        <div className="w-28 shrink-0 relative ml-2">
+                                            <div className="border border-dashed border-[#999] p-1 bg-white">
+                                                <img 
+                                                    src={standImageUrl} 
+                                                    alt="Stand"
+                                                    className="w-full h-auto object-contain"
+                                                    style={{
+                                                        filter: 'grayscale(100%) contrast(1.3) brightness(1.05)',
+                                                        mixBlendMode: 'multiply',
+                                                    }}
+                                                />
+                                                {/* Ink texture overlay */}
+                                                <div className="absolute inset-1 opacity-30 pointer-events-none"
+                                                     style={{
+                                                         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+                                                         mixBlendMode: 'overlay'
+                                                     }}
+                                                ></div>
+                                            </div>
+                                            <div className="text-center text-[6px] text-[#666] mt-1 font-mono">STAND IMG</div>
                                         </div>
                                     )}
                                 </div>
