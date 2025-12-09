@@ -919,16 +919,6 @@ export default function App() {
     
                 {/* Floating Action Buttons (Fixed on Screen, independent of Flip) */}
                 <div className="absolute top-4 left-4 z-50">
-                     {/* Close Button */}
-                     <button 
-                        onClick={(e) => { e.stopPropagation(); onReset(); }}
-                        className="w-12 h-12 bg-black text-white flex items-center justify-center rounded-full shadow-lg active:scale-95 transition-transform border-2 border-white/20 hover:bg-red-900/50"
-                        title="Close"
-                     >
-                        <X size={24} />
-                     </button>
-                </div>
-                <div className="absolute top-4 right-4 z-50">
                      {/* Printer Button */}
                      <button 
                         onClick={(e) => { e.stopPropagation(); setShowInteraction(true); }}
@@ -936,6 +926,16 @@ export default function App() {
                         title="Print Stand Data"
                      >
                         <span className="text-xl">🖨️</span>
+                     </button>
+                </div>
+                <div className="absolute top-4 right-4 z-50">
+                     {/* Close Button */}
+                     <button 
+                        onClick={(e) => { e.stopPropagation(); onReset(); }}
+                        className="w-12 h-12 bg-black text-white flex items-center justify-center rounded-full shadow-lg active:scale-95 transition-transform border-2 border-white/20 hover:bg-red-900/50"
+                        title="Close"
+                     >
+                        <X size={24} />
                      </button>
                 </div>
                 
