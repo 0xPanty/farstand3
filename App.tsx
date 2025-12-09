@@ -323,9 +323,13 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                             {/* Receipt Content - Full Japanese Style */}
                             <div className="px-5 py-4 relative font-mono" style={{ fontFamily: "'Courier New', 'MS Gothic', monospace" }}>
                                 
-                                {/* Title - Large & Bold */}
+                                {/* Title - Large & Bold with ink effect */}
                                 <div className="text-center mb-4 pb-3 border-b-2 border-[#1a1a1a]">
-                                    <h1 className="text-2xl font-black tracking-[0.3em] text-[#1a1a1a] underline underline-offset-4 decoration-2">
+                                    <h1 className="text-3xl font-black tracking-[0.3em] text-[#0a0a0a] underline underline-offset-4 decoration-2"
+                                        style={{
+                                            textShadow: '0.5px 0.5px 0 rgba(0,0,0,0.3), -0.3px -0.3px 0 rgba(0,0,0,0.1)',
+                                            filter: 'contrast(1.2)',
+                                        }}>
                                         STAND DATA
                                     </h1>
                                     <div className="text-[8px] text-[#666] mt-2 tracking-[0.2em]">
@@ -372,44 +376,44 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 
                                 {/* Stats Table */}
                                 <div className="mb-4 pb-3 border-b border-dotted border-[#999]">
-                                    <div className="text-[10px] text-[#333] mb-2 font-black tracking-wider">─── SOCIAL METRICS ───</div>
-                                    <div className="space-y-1 text-[12px] text-[#1a1a1a]">
-                                        <div className="flex justify-between"><span>Followers</span><span className="font-black">{user?.followerCount?.toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span>Following</span><span className="font-black">{user?.followingCount?.toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span>Casts</span><span className="font-black">{user?.castCount?.toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span>Likes</span><span className="font-black">{(user?.likesReceived || 0).toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span>Recasts</span><span className="font-black">{(user?.recastsReceived || 0).toLocaleString()}</span></div>
+                                    <div className="text-[10px] text-[#444] mb-2 tracking-wider">─── SOCIAL METRICS ───</div>
+                                    <div className="space-y-1 text-[11px] text-[#333]">
+                                        <div className="flex justify-between"><span>Followers</span><span>{user?.followerCount?.toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Following</span><span>{user?.followingCount?.toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Casts</span><span>{user?.castCount?.toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Likes</span><span>{(user?.likesReceived || 0).toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Recasts</span><span>{(user?.recastsReceived || 0).toLocaleString()}</span></div>
                                     </div>
                                 </div>
                                 
                                 {/* Stand Parameters */}
                                 {stats && statDetails && (
                                     <div className="mb-4 pb-3 border-b border-dotted border-[#999]">
-                                        <div className="text-[10px] text-[#333] mb-2 font-black tracking-wider">─── STAND PARAMETERS ───</div>
-                                        <div className="space-y-1 text-[12px] text-[#1a1a1a]">
-                                            <div className="flex justify-between"><span>POWER</span><span><span className="font-black text-[14px]">{stats.power}</span> <span className="text-[10px] text-[#555]">{statDetails.power}</span></span></div>
-                                            <div className="flex justify-between"><span>SPEED</span><span><span className="font-black text-[14px]">{stats.speed}</span> <span className="text-[10px] text-[#555]">{statDetails.speed}</span></span></div>
-                                            <div className="flex justify-between"><span>RANGE</span><span><span className="font-black text-[14px]">{stats.range}</span> <span className="text-[10px] text-[#555]">{statDetails.range}</span></span></div>
-                                            <div className="flex justify-between"><span>DURABILITY</span><span><span className="font-black text-[14px]">{stats.durability}</span> <span className="text-[10px] text-[#555]">{statDetails.durability}</span></span></div>
-                                            <div className="flex justify-between"><span>PRECISION</span><span><span className="font-black text-[14px]">{stats.precision}</span> <span className="text-[10px] text-[#555]">{statDetails.precision}</span></span></div>
-                                            <div className="flex justify-between"><span>POTENTIAL</span><span><span className="font-black text-[14px]">{stats.potential}</span> <span className="text-[10px] text-[#555]">{statDetails.potential}</span></span></div>
+                                        <div className="text-[10px] text-[#444] mb-2 tracking-wider">─── STAND PARAMETERS ───</div>
+                                        <div className="space-y-1 text-[11px] text-[#333]">
+                                            <div className="flex justify-between"><span>POWER</span><span><span className="text-[13px]">{stats.power}</span> <span className="text-[9px] text-[#666]">{statDetails.power}</span></span></div>
+                                            <div className="flex justify-between"><span>SPEED</span><span><span className="text-[13px]">{stats.speed}</span> <span className="text-[9px] text-[#666]">{statDetails.speed}</span></span></div>
+                                            <div className="flex justify-between"><span>RANGE</span><span><span className="text-[13px]">{stats.range}</span> <span className="text-[9px] text-[#666]">{statDetails.range}</span></span></div>
+                                            <div className="flex justify-between"><span>DURABILITY</span><span><span className="text-[13px]">{stats.durability}</span> <span className="text-[9px] text-[#666]">{statDetails.durability}</span></span></div>
+                                            <div className="flex justify-between"><span>PRECISION</span><span><span className="text-[13px]">{stats.precision}</span> <span className="text-[9px] text-[#666]">{statDetails.precision}</span></span></div>
+                                            <div className="flex justify-between"><span>POTENTIAL</span><span><span className="text-[13px]">{stats.potential}</span> <span className="text-[9px] text-[#666]">{statDetails.potential}</span></span></div>
                                         </div>
                                     </div>
                                 )}
                                 
                                 {/* Score Summary */}
                                 <div className="mb-4 pb-3 border-b border-double border-[#1a1a1a]">
-                                    <div className="flex justify-between text-[12px] text-[#1a1a1a] mb-1">
+                                    <div className="flex justify-between text-[11px] text-[#333] mb-1">
                                         <span>RATING</span>
                                         <span className="font-black tracking-wider">{getStars(totalScore)}</span>
                                     </div>
-                                    <div className="flex justify-between text-[12px] text-[#1a1a1a] mb-1">
+                                    <div className="flex justify-between text-[11px] text-[#333] mb-1">
                                         <span>TOTAL SCORE</span>
-                                        <span className="font-black">{totalScore}/600</span>
+                                        <span>{totalScore}/600</span>
                                     </div>
-                                    <div className="flex justify-between text-[14px] text-[#1a1a1a] font-black">
-                                        <span>RANK</span>
-                                        <span className="text-xl">{getRank(totalScore)}</span>
+                                    <div className="flex justify-between text-[12px] text-[#333]">
+                                        <span className="font-black">RANK</span>
+                                        <span className="text-lg font-black">{getRank(totalScore)}</span>
                                     </div>
                                 </div>
                                 
@@ -445,8 +449,8 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 {/* Footer */}
                                 {!isPrinting && (
                                     <div className="text-center pt-3 border-t border-dashed border-[#999]">
-                                        <div className="text-[12px] text-[#1a1a1a] font-black tracking-[0.15em] mb-2">THANK YOU FOR AWAKENING</div>
-                                        <div className="text-[10px] text-[#555]">Created by <span className="font-black text-[#1a1a1a]">@xqc</span></div>
+                                        <div className="text-[11px] text-[#333] font-black tracking-[0.15em] mb-2">THANK YOU FOR AWAKENING</div>
+                                        <div className="text-[9px] text-[#666]">Created by <span className="text-[#333]">@xqc</span></div>
                                     </div>
                                 )}
                                 
