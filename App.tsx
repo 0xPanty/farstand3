@@ -792,13 +792,12 @@ export default function App() {
                             <div className="w-full h-full flex items-center justify-center text-white">Image Gen Failed</div>
                         )}
                         
-                        {/* Name Overlay (Fixed at top) */}
-                        <div className="absolute top-12 left-0 w-full p-6 z-20">
-                             <div className="bg-[#db2777] text-white text-xs font-bold px-3 py-1 inline-block transform -skew-x-12 mb-2 shadow-md">
+                        {/* Name Overlay (Top left corner) */}
+                        <div className="absolute top-4 left-0 p-4 z-20 max-w-[70%]">
+                             <div className="bg-[#db2777] text-white text-[10px] font-bold px-2 py-0.5 inline-block transform -skew-x-12 mb-1 shadow-md">
                                 STAND NAME
                              </div>
-                             {/* REDUCED FONT SIZE HERE as requested */}
-                             <h1 className="text-4xl md:text-5xl font-black italic font-jojo text-white drop-shadow-[4px_4px_0_#000] leading-[0.85] tracking-tighter text-outline-thick transform -rotate-2 origin-top-left break-words">
+                             <h1 className="text-2xl md:text-3xl font-black italic font-jojo text-white drop-shadow-[3px_3px_0_#000] leading-[0.9] tracking-tight text-outline-thick transform -rotate-1 origin-top-left break-words">
                                 {standData.standName.replace(/[『』]/g, '')}
                              </h1>
                         </div>
