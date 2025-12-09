@@ -867,21 +867,21 @@ export default function App() {
                         </div>
     
                         {/* 2. Stats Visuals */}
-                        <div className="px-2 pt-4 pb-6 flex flex-col items-center gap-6 bg-gradient-to-b from-gray-100 to-white border-y border-gray-200">
-                             {/* Radar - Moved up significantly */}
-                             <div className="transform scale-100 pt-0 pb-0 -mt-14">
+                        <div className="px-2 pt-2 pb-4 flex flex-col items-center bg-gradient-to-b from-gray-100 to-white border-y border-gray-200">
+                             {/* Radar */}
+                             <div className="transform scale-90 -mt-6 -mb-6">
                                  <RadarChart stats={standData.stats} />
                              </div>
     
                              {/* Explanation Text */}
-                             <div className="text-center -mt-10 mb-2 px-4 relative z-10">
+                             <div className="text-center px-4 relative z-10 mb-2">
                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-200 pb-1 inline-block">
                                     Stats Generated from On-Chain Data & Social Quality
                                 </p>
                              </div>
     
-                             {/* Grid */}
-                             <div className="grid grid-cols-3 gap-x-4 gap-y-8 p-4 w-full mt-16">
+                             {/* Grid - Compact layout */}
+                             <div className="grid grid-cols-3 gap-x-2 gap-y-4 px-2 w-full">
                                  <StatCircle label="破壊力" subLabel="POWER" value={standData.stats.power} detail={standData.statDetails?.power} />
                                  <StatCircle label="スピード" subLabel="SPEED" value={standData.stats.speed} detail={standData.statDetails?.speed} />
                                  <StatCircle label="持続力" subLabel="DURABILITY" value={standData.stats.durability} detail={standData.statDetails?.durability} />
