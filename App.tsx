@@ -672,11 +672,11 @@ interface PrinterViewProps {
 
 const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDetails, standName, standImageUrl, sketchImageUrl }) => {
     return (
-        <main className="min-h-dvh w-screen bg-black bg-noise pattern-flowing-checkers flex flex-col relative overflow-y-auto" 
-              style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <main className="absolute inset-0 bg-black bg-noise pattern-flowing-checkers flex flex-col overflow-y-scroll" 
+              style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)', WebkitOverflowScrolling: 'touch' }}>
              
              {/* Background */}
-             <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(251,191,36,0.1)_0%,transparent_70%)] pointer-events-none"></div>
+             <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(251,191,36,0.1)_0%,transparent_70%)] pointer-events-none z-0"></div>
              
              {/* Back Arrow */}
              <div className="fixed top-4 left-4 z-50">
@@ -698,7 +698,7 @@ const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDeta
              </div>
              
              {/* Printer Component */}
-             <div className="flex-1 flex items-start justify-center relative z-20 py-8 pb-96">
+             <div className="flex items-start justify-center relative z-20 py-8 pb-[600px]">
                  <StandPrinter user={user} stats={stats} statDetails={statDetails} standName={standName} />
              </div>
         </main>
