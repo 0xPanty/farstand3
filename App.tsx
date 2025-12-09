@@ -115,11 +115,6 @@ const StatCircle: React.FC<StatCircleProps> = ({ label, subLabel, value, detail 
             <div className="flex flex-col items-center leading-none">
                  <span className="text-xs md:text-sm font-black text-black">{label}</span>
                  <span className="text-[8px] md:text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-0.5">{subLabel}</span>
-                 {detail ? (
-                    <span className="text-[8px] md:text-[10px] font-bold text-[#3b82f6] font-mono mt-1 whitespace-nowrap tracking-tight bg-blue-50 px-1 rounded">{detail}</span>
-                 ) : (
-                    <span className="h-4 mt-1"></span>
-                 )}
             </div>
         </div>
     );
