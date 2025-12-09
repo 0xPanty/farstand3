@@ -843,7 +843,7 @@ export default function App() {
     
                     <div className="flex-1 overflow-y-auto no-scrollbar bg-[url('https://www.transparenttextures.com/patterns/white-diamond.png')] pb-20 relative">
                         {/* 1. Name Strip */}
-                        <div className="p-6 pb-2 pr-20">
+                        <div className="p-6 pb-2">
                             <div className="border-l-8 border-[#db2777] pl-4">
                                 <h2 className="text-4xl font-black text-gray-900 leading-none tracking-tight">{standData.standName.replace(/[『』]/g, '')}</h2>
                             </div>
@@ -876,9 +876,19 @@ export default function App() {
     
                         {/* 3. Ability Section */}
                         <div className="p-6 space-y-8">
-                            <div className="flex items-center gap-2 mb-1">
-                                 <Zap className="w-6 h-6 text-[#eab308] fill-current" />
-                                 <span className="text-gray-400 text-sm font-bold">ABILITY</span>
+                            <div className="flex items-center justify-between mb-1">
+                                 <div className="flex items-center gap-2">
+                                     <Zap className="w-6 h-6 text-[#eab308] fill-current" />
+                                     <span className="text-gray-400 text-sm font-bold">ABILITY</span>
+                                 </div>
+                                 {/* Print Button */}
+                                 <button 
+                                     onClick={(e) => { e.stopPropagation(); setShowInteraction(true); }}
+                                     className="flex items-center gap-2 px-3 py-1.5 bg-black text-[#fbbf24] rounded-full text-xs font-bold active:scale-95 transition-transform border border-[#fbbf24]/50 hover:bg-[#fbbf24] hover:text-black"
+                                 >
+                                     <span>🖨️</span>
+                                     <span>PRINT DATA</span>
+                                 </button>
                             </div>
                             
                             {/* Ability Box 1 */}
@@ -917,16 +927,7 @@ export default function App() {
                     </div>
                 </div>
     
-                {/* Printer Button - Only show when flipped */}
-                {isFlipped && (
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); setShowInteraction(true); }}
-                        className="fixed top-24 right-6 z-50 w-12 h-12 bg-black text-[#fbbf24] flex items-center justify-center rounded-full shadow-lg active:scale-95 transition-transform border-2 border-[#fbbf24]/50 hover:bg-[#fbbf24] hover:text-black"
-                        title="Print Stand Data"
-                    >
-                        <span className="text-xl">🖨️</span>
-                    </button>
-                )}
+                
                 
             </div>
         </main>
