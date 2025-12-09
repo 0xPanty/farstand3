@@ -402,7 +402,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 )}
                                 
                                 {/* Score Summary */}
-                                <div className="mb-4 pb-3 border-b border-double border-[#1a1a1a]">
+                                <div className="mb-4 pb-3 border-b border-double border-[#1a1a1a] relative">
                                     <div className="flex justify-between text-[11px] text-[#333] mb-1">
                                         <span>RATING</span>
                                         <span className="font-black tracking-wider">{getStars(totalScore)}</span>
@@ -415,6 +415,30 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                         <span className="font-black">RANK</span>
                                         <span className="text-lg font-black">{getRank(totalScore)}</span>
                                     </div>
+                                    
+                                    {/* AWAKENED Stamp */}
+                                    {!isPrinting && (
+                                        <div 
+                                            className="absolute -rotate-12 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                                            style={{
+                                                border: '3px solid #8b0000',
+                                                borderRadius: '4px',
+                                                padding: '4px 12px',
+                                                color: '#8b0000',
+                                                fontSize: '18px',
+                                                fontWeight: 900,
+                                                letterSpacing: '0.15em',
+                                                textTransform: 'uppercase',
+                                                opacity: 0.85,
+                                                textShadow: '0 0 1px rgba(139,0,0,0.5)',
+                                                boxShadow: 'inset 0 0 8px rgba(139,0,0,0.3)',
+                                                background: 'rgba(255,255,255,0.3)',
+                                                filter: 'blur(0.3px)',
+                                            }}
+                                        >
+                                            AWAKENED
+                                        </div>
+                                    )}
                                 </div>
                                 
                                 {/* Barcode */}
