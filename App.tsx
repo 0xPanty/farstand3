@@ -250,7 +250,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
         // Keep printing state longer for matrix effect
         setTimeout(() => {
             setIsPrinting(false);
-        }, 2500);
+        }, 5000);
     };
 
     const handleReset = () => {
@@ -354,7 +354,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                 {/* Printed Paper - Japanese Receipt Style */}
                 {showPaper && (
                     <div 
-                        className="absolute left-1/2 -translate-x-1/2 w-72 overflow-hidden animate-paper-print"
+                        className="absolute left-1/2 -translate-x-1/2 w-72 animate-paper-print"
                         style={{ 
                             top: '100%',
                             transformOrigin: 'top center',
