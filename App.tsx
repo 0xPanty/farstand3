@@ -371,45 +371,45 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 )}
                                 
                                 {/* Stats Table */}
-                                <div className="mb-3 pb-2 border-b border-dotted border-[#bbb]">
-                                    <div className="text-[9px] text-[#666] mb-2 font-bold tracking-wider">─── SOCIAL METRICS ───</div>
-                                    <div className="space-y-1 text-[10px]">
-                                        <div className="flex justify-between"><span>Followers</span><span className="font-bold">{user?.followerCount?.toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span>Following</span><span className="font-bold">{user?.followingCount?.toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span>Casts</span><span className="font-bold">{user?.castCount?.toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span>Likes</span><span className="font-bold">{(user?.likesReceived || 0).toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span>Recasts</span><span className="font-bold">{(user?.recastsReceived || 0).toLocaleString()}</span></div>
+                                <div className="mb-4 pb-3 border-b border-dotted border-[#999]">
+                                    <div className="text-[10px] text-[#333] mb-2 font-black tracking-wider">─── SOCIAL METRICS ───</div>
+                                    <div className="space-y-1 text-[12px] text-[#1a1a1a]">
+                                        <div className="flex justify-between"><span>Followers</span><span className="font-black">{user?.followerCount?.toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Following</span><span className="font-black">{user?.followingCount?.toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Casts</span><span className="font-black">{user?.castCount?.toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Likes</span><span className="font-black">{(user?.likesReceived || 0).toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Recasts</span><span className="font-black">{(user?.recastsReceived || 0).toLocaleString()}</span></div>
                                     </div>
                                 </div>
                                 
                                 {/* Stand Parameters */}
                                 {stats && statDetails && (
-                                    <div className="mb-3 pb-2 border-b border-dotted border-[#bbb]">
-                                        <div className="text-[9px] text-[#666] mb-2 font-bold tracking-wider">─── STAND PARAMETERS ───</div>
-                                        <div className="space-y-1 text-[10px]">
-                                            <div className="flex justify-between"><span>POWER</span><span><span className="font-black text-[12px]">{stats.power}</span> <span className="text-[8px] text-[#666]">{statDetails.power}</span></span></div>
-                                            <div className="flex justify-between"><span>SPEED</span><span><span className="font-black text-[12px]">{stats.speed}</span> <span className="text-[8px] text-[#666]">{statDetails.speed}</span></span></div>
-                                            <div className="flex justify-between"><span>RANGE</span><span><span className="font-black text-[12px]">{stats.range}</span> <span className="text-[8px] text-[#666]">{statDetails.range}</span></span></div>
-                                            <div className="flex justify-between"><span>DURABILITY</span><span><span className="font-black text-[12px]">{stats.durability}</span> <span className="text-[8px] text-[#666]">{statDetails.durability}</span></span></div>
-                                            <div className="flex justify-between"><span>PRECISION</span><span><span className="font-black text-[12px]">{stats.precision}</span> <span className="text-[8px] text-[#666]">{statDetails.precision}</span></span></div>
-                                            <div className="flex justify-between"><span>POTENTIAL</span><span><span className="font-black text-[12px]">{stats.potential}</span> <span className="text-[8px] text-[#666]">{statDetails.potential}</span></span></div>
+                                    <div className="mb-4 pb-3 border-b border-dotted border-[#999]">
+                                        <div className="text-[10px] text-[#333] mb-2 font-black tracking-wider">─── STAND PARAMETERS ───</div>
+                                        <div className="space-y-1 text-[12px] text-[#1a1a1a]">
+                                            <div className="flex justify-between"><span>POWER</span><span><span className="font-black text-[14px]">{stats.power}</span> <span className="text-[10px] text-[#555]">{statDetails.power}</span></span></div>
+                                            <div className="flex justify-between"><span>SPEED</span><span><span className="font-black text-[14px]">{stats.speed}</span> <span className="text-[10px] text-[#555]">{statDetails.speed}</span></span></div>
+                                            <div className="flex justify-between"><span>RANGE</span><span><span className="font-black text-[14px]">{stats.range}</span> <span className="text-[10px] text-[#555]">{statDetails.range}</span></span></div>
+                                            <div className="flex justify-between"><span>DURABILITY</span><span><span className="font-black text-[14px]">{stats.durability}</span> <span className="text-[10px] text-[#555]">{statDetails.durability}</span></span></div>
+                                            <div className="flex justify-between"><span>PRECISION</span><span><span className="font-black text-[14px]">{stats.precision}</span> <span className="text-[10px] text-[#555]">{statDetails.precision}</span></span></div>
+                                            <div className="flex justify-between"><span>POTENTIAL</span><span><span className="font-black text-[14px]">{stats.potential}</span> <span className="text-[10px] text-[#555]">{statDetails.potential}</span></span></div>
                                         </div>
                                     </div>
                                 )}
                                 
                                 {/* Score Summary */}
-                                <div className="mb-3 pb-2 border-b border-double border-[#1a1a1a]">
-                                    <div className="flex justify-between text-[10px] mb-1">
+                                <div className="mb-4 pb-3 border-b border-double border-[#1a1a1a]">
+                                    <div className="flex justify-between text-[12px] text-[#1a1a1a] mb-1">
                                         <span>RATING</span>
-                                        <span className="font-bold tracking-wider">{getStars(totalScore)}</span>
+                                        <span className="font-black tracking-wider">{getStars(totalScore)}</span>
                                     </div>
-                                    <div className="flex justify-between text-[10px] mb-1">
+                                    <div className="flex justify-between text-[12px] text-[#1a1a1a] mb-1">
                                         <span>TOTAL SCORE</span>
-                                        <span className="font-bold">{totalScore}/600</span>
+                                        <span className="font-black">{totalScore}/600</span>
                                     </div>
-                                    <div className="flex justify-between text-[11px] font-black">
+                                    <div className="flex justify-between text-[14px] text-[#1a1a1a] font-black">
                                         <span>RANK</span>
-                                        <span className="text-lg">{getRank(totalScore)}</span>
+                                        <span className="text-xl">{getRank(totalScore)}</span>
                                     </div>
                                 </div>
                                 
@@ -444,9 +444,9 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 
                                 {/* Footer */}
                                 {!isPrinting && (
-                                    <div className="text-center pt-2 border-t border-dashed border-[#999]">
-                                        <div className="text-[10px] font-black tracking-[0.2em] mb-2">THANK YOU FOR AWAKENING</div>
-                                        <div className="text-[8px] text-[#888]">Created by <span className="font-bold text-[#333]">@xqc</span></div>
+                                    <div className="text-center pt-3 border-t border-dashed border-[#999]">
+                                        <div className="text-[12px] text-[#1a1a1a] font-black tracking-[0.15em] mb-2">THANK YOU FOR AWAKENING</div>
+                                        <div className="text-[10px] text-[#555]">Created by <span className="font-black text-[#1a1a1a]">@xqc</span></div>
                                     </div>
                                 )}
                                 
