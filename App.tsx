@@ -435,9 +435,6 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                     <div className="space-y-1 text-[11px] text-[#333]">
                                         <div className="flex justify-between"><span>Followers</span><span>{user?.followerCount?.toLocaleString()}</span></div>
                                         <div className="flex justify-between"><span>Following</span><span>{user?.followingCount?.toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span>Casts</span><span>{user?.castCount?.toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span>Likes</span><span>{(user?.likesReceived || 0).toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span>Recasts</span><span>{(user?.recastsReceived || 0).toLocaleString()}</span></div>
                                     </div>
                                 </div>
                                 

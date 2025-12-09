@@ -28,17 +28,22 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
 
     if (!user) return null;
 
-    // Estimate engagement from follower/following ratio
+    // Fetch real cast count from free Farcaster Hub API
     let castCount = 0;
-    let likesReceived = 0;
-    let recastsReceived = 0;
     
-    // Use follower count as engagement estimate (free API limitation)
-    // Higher followers = more engagement typically
-    likesReceived = Math.floor(user.follower_count * 0.5);
-    recastsReceived = Math.floor(user.follower_count * 0.1);
-    // Estimate cast count from account activity
-    castCount = Math.floor(user.following_count * 0.8);
+    try {
+      const hubResponse = await fetch(
+        `https://hub.pinata.cloud/v1/castsByFid?fid=${fid}&pageSize=1000`
+      );
+      if (hubResponse.ok) {
+        const hubData = await hubResponse.json();
+        castCount = hubData.messages?.filter(
+          (m: any) => m.data?.type === 'MESSAGE_TYPE_CAST_ADD'
+        ).length || 0;
+      }
+    } catch (e) {
+      console.warn("Hub API fetch failed:", e);
+    }
 
     return {
       fid: user.fid,
@@ -49,8 +54,6 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
       followerCount: user.follower_count || 0,
       followingCount: user.following_count || 0,
       castCount,
-      likesReceived,
-      recastsReceived,
       verifications: user.verifications || [],
       powerBadge: user.power_badge || false,
       score: user.experimental?.neynar_user_score || user.score,
@@ -145,15 +148,14 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
 
   const precisionDetail = `Hash: ${precisionIndex}`;
 
-  // E. RANGE (Engagement - Likes + Recasts)
-  const totalEngagement = profile.likesReceived + profile.recastsReceived;
+  // E. RANGE (Followers - Social Reach)
   let range: StatValue = 'E';
-  if (totalEngagement > 50000) range = 'A';
-  else if (totalEngagement > 10000) range = 'B';
-  else if (totalEngagement > 2000) range = 'C';
-  else if (totalEngagement > 500) range = 'D';
+  if (profile.followerCount > 10000) range = 'A';
+  else if (profile.followerCount > 3000) range = 'B';
+  else if (profile.followerCount > 1000) range = 'C';
+  else if (profile.followerCount > 200) range = 'D';
 
-  const rangeDetail = `Engage: ${totalEngagement}`;
+  const rangeDetail = `${profile.followerCount} Followers`;
 
   // F. POTENTIAL (FID Age)
   let potential: StatValue = 'E';
