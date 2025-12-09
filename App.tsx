@@ -3,7 +3,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Plus, X, RotateCcw, Zap, Triangle, Sparkles, Crosshair, ArrowRight, ArrowLeft } from "lucide-react";
-import sdk from "@farcaster/frame-sdk";
+import { sdk } from "@farcaster/miniapp-sdk";
 import { analyzeUserAndGenerateStand } from "./services/geminiService";
 import { fetchFarcasterUser, calculateFarcasterStats } from "./services/farcasterService";
 import { StandResult, StatValue, StandStats, FarcasterProfile, StandStatRawValues } from "./types";
