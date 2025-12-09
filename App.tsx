@@ -136,6 +136,61 @@ const MenacingFloaters = () => {
 };
 
 // ==========================================
+// Component: Matrix Rain Effect (Real animated digits)
+// ==========================================
+const MatrixRain: React.FC = () => {
+    const [columns, setColumns] = useState<string[][]>([]);
+    
+    useEffect(() => {
+        // Initialize columns
+        const initColumns = Array(12).fill(null).map(() => 
+            Array(10).fill(null).map(() => Math.floor(Math.random() * 10).toString())
+        );
+        setColumns(initColumns);
+        
+        // Update digits randomly every 50ms
+        const interval = setInterval(() => {
+            setColumns(prev => prev.map(col => 
+                col.map(digit => 
+                    Math.random() > 0.7 ? Math.floor(Math.random() * 10).toString() : digit
+                )
+            ));
+        }, 50);
+        
+        return () => clearInterval(interval);
+    }, []);
+    
+    return (
+        <div className="absolute left-16 right-2 top-6 bottom-2 overflow-hidden z-10">
+            {columns.map((col, colIdx) => (
+                <div 
+                    key={colIdx}
+                    className="absolute text-[9px] font-mono text-[#22c55e] leading-[1.2] whitespace-pre animate-matrix-rain"
+                    style={{ 
+                        left: `${colIdx * 12}px`,
+                        animationDelay: `${colIdx * 0.1}s`,
+                        animationDuration: `${1.2 + colIdx * 0.08}s`
+                    }}
+                >
+                    {col.map((digit, i) => (
+                        <div 
+                            key={i} 
+                            style={{ 
+                                opacity: 1 - i * 0.1,
+                                textShadow: i === 0 ? '0 0 10px #22c55e, 0 0 20px #22c55e' : '0 0 5px #22c55e',
+                                color: i === 0 ? '#fff' : '#22c55e'
+                            }}
+                        >
+                            {digit}
+                        </div>
+                    ))}
+                </div>
+            ))}
+        </div>
+    );
+};
+
+// ==========================================
 // Component: JOJO Style Printer (Stand Data Printer)
 // ==========================================
 interface StandPrinterProps {
@@ -235,28 +290,8 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 </div>
                             </div>
                             
-                            {/* Matrix rain effect - expanded area */}
-                            {isPrinting && (
-                                <div className="absolute left-20 right-2 top-6 bottom-2 overflow-hidden z-10">
-                                    {[...Array(12)].map((_, col) => (
-                                        <div 
-                                            key={col} 
-                                            className="absolute text-[9px] font-mono text-[#22c55e] leading-[1.1] whitespace-pre animate-matrix-rain"
-                                            style={{ 
-                                                left: `${col * 12}px`,
-                                                animationDelay: `${col * 0.12}s`,
-                                                animationDuration: `${1.5 + col * 0.1}s`
-                                            }}
-                                        >
-                                            {[...Array(10)].map((_, i) => (
-                                                <div key={i} style={{ opacity: 1 - i * 0.1, textShadow: i === 0 ? '0 0 8px #22c55e' : 'none' }}>
-                                                    {Math.floor(Math.random() * 10)}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                            {/* Matrix rain effect - real animated digits */}
+                            {isPrinting && <MatrixRain />}
                             
                             {/* Screen content */}
                             <div className="font-mono text-xs leading-relaxed relative z-10">
