@@ -429,14 +429,6 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                     </div>
                                 )}
                                 
-                                {/* Stats Table */}
-                                <div className="mb-4 pb-3 border-b border-dotted border-[#999]">
-                                    <div className="text-[10px] text-[#444] mb-2 tracking-wider">─── SOCIAL METRICS ───</div>
-                                    <div className="space-y-1 text-[11px] text-[#333]">
-                                        <div className="flex justify-between"><span>Followers</span><span>{user?.followerCount?.toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span>Following</span><span>{user?.followingCount?.toLocaleString()}</span></div>
-                                    </div>
-                                </div>
                                 
                                 {/* Stand Parameters */}
                                 {stats && statDetails && (
