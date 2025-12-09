@@ -28,19 +28,24 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
 
     if (!user) return null;
 
-    // Fetch real cast count from free Farcaster Hub API
+    // Fetch real cast count from free Farcaster Hub API (with pagination)
     let castCount = 0;
     
     try {
-      const hubResponse = await fetch(
-        `https://hub.pinata.cloud/v1/castsByFid?fid=${fid}&pageSize=1000`
-      );
-      if (hubResponse.ok) {
-        const hubData = await hubResponse.json();
-        castCount = hubData.messages?.filter(
-          (m: any) => m.data?.type === 'MESSAGE_TYPE_CAST_ADD'
-        ).length || 0;
-      }
+      let nextPageToken: string | null = null;
+      do {
+        const url = `https://hub.pinata.cloud/v1/castsByFid?fid=${fid}&pageSize=1000${nextPageToken ? `&pageToken=${nextPageToken}` : ''}`;
+        const hubResponse = await fetch(url);
+        if (hubResponse.ok) {
+          const hubData = await hubResponse.json();
+          castCount += hubData.messages?.filter(
+            (m: any) => m.data?.type === 'MESSAGE_TYPE_CAST_ADD'
+          ).length || 0;
+          nextPageToken = hubData.nextPageToken || null;
+        } else {
+          break;
+        }
+      } while (nextPageToken);
     } catch (e) {
       console.warn("Hub API fetch failed:", e);
     }
