@@ -852,7 +852,7 @@ export default function App() {
                         </button>
                         
                         {/* 1. Name Strip */}
-                        <div className="p-6 pb-2">
+                        <div className="p-6 pb-2 pr-20">
                             <div className="border-l-8 border-[#db2777] pl-4">
                                 <h2 className="text-4xl font-black text-gray-900 leading-none tracking-tight">{standData.standName.replace(/[『』]/g, '')}</h2>
                             </div>
