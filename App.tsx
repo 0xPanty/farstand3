@@ -918,8 +918,8 @@ export default function App() {
                 </div>
     
                 {/* Floating Action Buttons (Fixed on Screen, independent of Flip) */}
-                <div className="absolute top-4 right-4 z-50 flex flex-col gap-3">
-                     {/* 1. Close Button */}
+                <div className="absolute top-4 left-4 z-50">
+                     {/* Close Button */}
                      <button 
                         onClick={(e) => { e.stopPropagation(); onReset(); }}
                         className="w-12 h-12 bg-black text-white flex items-center justify-center rounded-full shadow-lg active:scale-95 transition-transform border-2 border-white/20 hover:bg-red-900/50"
@@ -927,7 +927,9 @@ export default function App() {
                      >
                         <X size={24} />
                      </button>
-                     {/* 2. Printer Button */}
+                </div>
+                <div className="absolute top-4 right-4 z-50">
+                     {/* Printer Button */}
                      <button 
                         onClick={(e) => { e.stopPropagation(); setShowInteraction(true); }}
                         className="w-12 h-12 bg-black text-[#fbbf24] flex items-center justify-center rounded-full shadow-lg active:scale-95 transition-transform border-2 border-[#fbbf24]/50 hover:bg-[#fbbf24] hover:text-black"
