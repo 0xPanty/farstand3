@@ -386,9 +386,9 @@ SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
                                 </div>
                                 
                                 {/* Content with optional Stand image */}
-                                <div className="flex gap-2">
+                                <div className="flex">
                                     {/* Left: Text content - Thermal printer ink style */}
-                                    <div className={`text-[10px] leading-[1.6] font-mono text-[#1a1a1a] whitespace-pre-wrap ${standImageUrl ? 'flex-1' : 'w-full'}`}
+                                    <div className={`text-[10px] leading-[1.6] font-mono text-[#1a1a1a] whitespace-pre-wrap ${(sketchImageUrl || standImageUrl) ? 'flex-1 pr-1' : 'w-full'}`}
                                          style={{ 
                                              fontFamily: "'Courier New', 'MS Gothic', monospace",
                                              fontWeight: 500,
@@ -400,20 +400,19 @@ SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
                                         {isPrinting && <span className="animate-blink text-[#333]">█</span>}
                                     </div>
                                     
-                                    {/* Right: Stand User sketch (pencil style for receipt) */}
+                                    {/* Right: Stand User sketch - fills space, no border, blends with paper */}
                                     {(sketchImageUrl || standImageUrl) && !isPrinting && printText && (
-                                        <div className="w-32 shrink-0 relative ml-2">
-                                            <div className="border border-[#999] bg-white">
-                                                <img 
-                                                    src={sketchImageUrl || standImageUrl} 
-                                                    alt="Stand User"
-                                                    className="w-full h-auto object-contain"
-                                                    style={{
-                                                        filter: sketchImageUrl ? 'contrast(1.1)' : 'grayscale(100%) contrast(1.3) brightness(1.05)',
-                                                        mixBlendMode: 'multiply',
-                                                    }}
-                                                />
-                                            </div>
+                                        <div className="w-36 shrink-0 -mr-4 -mb-2 -mt-1 relative overflow-hidden">
+                                            <img 
+                                                src={sketchImageUrl || standImageUrl} 
+                                                alt="Stand User"
+                                                className="w-full h-auto object-cover scale-110 origin-center"
+                                                style={{
+                                                    filter: sketchImageUrl ? 'sepia(10%) contrast(1.05)' : 'grayscale(100%) sepia(20%) contrast(1.2) brightness(1.05)',
+                                                    mixBlendMode: 'multiply',
+                                                    opacity: 0.9,
+                                                }}
+                                            />
                                         </div>
                                     )}
                                 </div>

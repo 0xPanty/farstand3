@@ -239,21 +239,24 @@ async function generateSketchImage(standImageBase64: string): Promise<string> {
   const cleanBase64 = standImageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
 
   const sketchPrompt = `
-    Transform this image into a BLACK AND WHITE PENCIL SKETCH style illustration.
+    Create a HAND-DRAWN PENCIL SKETCH portrait of the character in this image.
     
     CRITICAL REQUIREMENTS:
-    1. **PURE WHITE BACKGROUND** - The background must be completely white/blank. Remove ALL background elements.
-    2. **ONLY THE CHARACTER** - Extract and draw ONLY the human figure/Stand User. No Stand spirit, no effects, no SFX text.
-    3. **PENCIL SKETCH STYLE**:
-       - Fine pencil line work
-       - Cross-hatching for shading
-       - Clean, crisp outlines
-       - Like a professional manga artist's pencil draft
-    4. **HIGH CONTRAST** - Strong blacks and whites, suitable for thermal printer output
-    5. **PORTRAIT COMPOSITION** - Focus on upper body/face area, centered
-    6. **NO COLOR** - Strictly grayscale/black and white only
+    1. **CREAM/OFF-WHITE BACKGROUND** - Background color: #f8f8f5 (warm paper tone). NO pure white.
+    2. **CLOSE-UP PORTRAIT** - Draw only HEAD and UPPER CHEST/SHOULDERS. Fill the entire frame. Face should be LARGE and prominent.
+    3. **AUTHENTIC HAND-DRAWN FEEL**:
+       - Visible pencil strokes and texture
+       - Slightly rough, imperfect lines (NOT clean vector lines)
+       - Cross-hatching and scribble shading like real pencil
+       - Some areas can be loose/sketchy, not everything perfectly defined
+       - Smudge effects where shading blends
+       - Vary line weight - heavier for outlines, lighter for details
+    4. **NO Stand spirit, NO effects, NO SFX text** - ONLY the human character
+    5. **STYLE**: Like a quick portrait sketch in an artist's moleskine notebook. Raw, expressive, with visible artistic hand.
+    6. **FILL THE FRAME** - The face/head should take up 70-80% of the image. Crop tight.
+    7. **WARM TONES** - Use sepia/brown tones for the pencil work, not pure black. Like a graphite or charcoal sketch on cream paper.
     
-    Style reference: Like a preliminary pencil sketch from a manga artist's sketchbook.
+    DO NOT make it look AI-generated or too clean. It should look like a human artist drew it quickly but skillfully.
   `;
 
   const response = await ai.models.generateContent({
