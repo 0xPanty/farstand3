@@ -81,10 +81,10 @@ const RadarChart: React.FC<{ stats: StandStats }> = ({ stats }) => {
          
          return (
             <div key={i} className="absolute z-20 flex flex-col items-center justify-center" style={style}>
-                <span className="text-lg font-bold text-[#fbbf24] bg-black/90 px-2.5 py-1 rounded-sm shadow-[2px_2px_0_rgba(0,0,0,0.5)] whitespace-nowrap border border-[#fbbf24]/40 tracking-[0.08em]">
+                <span className="text-xl font-black text-[#fbbf24] bg-black px-3 py-1 rounded-sm shadow-[2px_2px_0_rgba(0,0,0,0.3)] whitespace-nowrap border border-[#fbbf24]/30">
                     {jpLabels[i]}
                 </span>
-                <span className="text-[10px] font-semibold text-slate-500 uppercase mt-1.5 tracking-wide">{label}</span>
+                <span className="text-xs font-bold text-slate-600 uppercase mt-1 tracking-wider">{label}</span>
             </div>
          );
       })}
@@ -108,13 +108,13 @@ const StatCircle: React.FC<StatCircleProps> = ({ label, subLabel, value, detail 
     const textColor = isHigh ? 'text-[#db2777]' : 'text-black';
     
     return (
-        <div className="flex flex-col items-center justify-center transform hover:scale-105 transition-transform duration-300">
-            <div className={`w-14 h-14 md:w-18 md:h-18 rounded-full border-[3px] ${borderColor} flex items-center justify-center bg-white shadow-[3px_3px_0_rgba(0,0,0,0.15)] mb-1.5`}>
-                <span className={`text-2xl md:text-3xl font-black italic font-jojo leading-none ${textColor}`}>{value}</span>
+        <div className="flex flex-col items-center justify-center transform hover:scale-110 transition-transform duration-300">
+            <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full border-[4px] ${borderColor} flex items-center justify-center bg-white shadow-[4px_4px_0_rgba(0,0,0,0.1)] mb-2`}>
+                <span className={`text-3xl md:text-4xl font-black italic font-jojo leading-none ${textColor}`}>{value}</span>
             </div>
-            <div className="flex flex-col items-center leading-tight">
-                 <span className="text-[11px] md:text-xs font-bold text-gray-800 tracking-[0.05em]">{label}</span>
-                 <span className="text-[8px] md:text-[9px] font-medium text-gray-400 uppercase tracking-wider mt-0.5">{subLabel}</span>
+            <div className="flex flex-col items-center leading-none">
+                 <span className="text-xs md:text-sm font-black text-black">{label}</span>
+                 <span className="text-[8px] md:text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-0.5">{subLabel}</span>
             </div>
         </div>
     );
@@ -313,14 +313,14 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                             </button>
                             
                             {/* Receipt Content - Full Japanese Style */}
-                            <div className="px-5 py-4 relative font-mono" style={{ fontFamily: "'SF Mono', 'Consolas', 'Monaco', monospace", fontVariantNumeric: 'tabular-nums' }}>
+                            <div className="px-5 py-4 relative font-mono" style={{ fontFamily: "'Courier New', 'MS Gothic', monospace" }}>
                                 
                                 {/* Title - Large & Bold with ink effect */}
                                 <div className="text-center mb-4 pb-3 border-b-2 border-[#1a1a1a]">
-                                    <h1 className="text-2xl font-black tracking-[0.2em] text-[#0a0a0a] underline underline-offset-4 decoration-2"
+                                    <h1 className="text-3xl font-black tracking-[0.3em] text-[#0a0a0a] underline underline-offset-4 decoration-2"
                                         style={{
-                                            textShadow: '0.5px 0.5px 0 rgba(0,0,0,0.25)',
-                                            filter: 'contrast(1.1)',
+                                            textShadow: '0.5px 0.5px 0 rgba(0,0,0,0.3), -0.3px -0.3px 0 rgba(0,0,0,0.1)',
+                                            filter: 'contrast(1.2)',
                                         }}>
                                         STAND DATA
                                     </h1>
@@ -362,27 +362,27 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 
                                 {/* Stats Table */}
                                 <div className="mb-4 pb-3 border-b border-dotted border-[#999]">
-                                    <div className="text-[9px] text-[#555] mb-2 tracking-[0.15em] font-semibold">─── SOCIAL METRICS ───</div>
-                                    <div className="space-y-1.5 text-[11px] text-[#333]">
-                                        <div className="flex justify-between"><span className="text-[#666]">Followers</span><span className="font-bold">{user?.followerCount?.toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span className="text-[#666]">Following</span><span className="font-bold">{user?.followingCount?.toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span className="text-[#666]">Casts</span><span className="font-bold">{user?.castCount?.toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span className="text-[#666]">Likes</span><span className="font-bold">{(user?.likesReceived || 0).toLocaleString()}</span></div>
-                                        <div className="flex justify-between"><span className="text-[#666]">Recasts</span><span className="font-bold">{(user?.recastsReceived || 0).toLocaleString()}</span></div>
+                                    <div className="text-[10px] text-[#444] mb-2 tracking-wider">─── SOCIAL METRICS ───</div>
+                                    <div className="space-y-1 text-[11px] text-[#333]">
+                                        <div className="flex justify-between"><span>Followers</span><span>{user?.followerCount?.toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Following</span><span>{user?.followingCount?.toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Casts</span><span>{user?.castCount?.toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Likes</span><span>{(user?.likesReceived || 0).toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Recasts</span><span>{(user?.recastsReceived || 0).toLocaleString()}</span></div>
                                     </div>
                                 </div>
                                 
                                 {/* Stand Parameters */}
                                 {stats && statDetails && (
                                     <div className="mb-4 pb-3 border-b border-dotted border-[#999]">
-                                        <div className="text-[9px] text-[#555] mb-2 tracking-[0.15em] font-semibold">─── STAND PARAMETERS ───</div>
-                                        <div className="space-y-1.5 text-[11px] text-[#333]">
-                                            <div className="flex justify-between items-center"><span className="text-[#666]">POWER</span><span className="flex items-baseline gap-1.5"><span className="text-sm font-black">{stats.power}</span><span className="text-[8px] text-[#888]">{statDetails.power}</span></span></div>
-                                            <div className="flex justify-between items-center"><span className="text-[#666]">SPEED</span><span className="flex items-baseline gap-1.5"><span className="text-sm font-black">{stats.speed}</span><span className="text-[8px] text-[#888]">{statDetails.speed}</span></span></div>
-                                            <div className="flex justify-between items-center"><span className="text-[#666]">RANGE</span><span className="flex items-baseline gap-1.5"><span className="text-sm font-black">{stats.range}</span><span className="text-[8px] text-[#888]">{statDetails.range}</span></span></div>
-                                            <div className="flex justify-between items-center"><span className="text-[#666]">DURABILITY</span><span className="flex items-baseline gap-1.5"><span className="text-sm font-black">{stats.durability}</span><span className="text-[8px] text-[#888]">{statDetails.durability}</span></span></div>
-                                            <div className="flex justify-between items-center"><span className="text-[#666]">PRECISION</span><span className="flex items-baseline gap-1.5"><span className="text-sm font-black">{stats.precision}</span><span className="text-[8px] text-[#888]">{statDetails.precision}</span></span></div>
-                                            <div className="flex justify-between items-center"><span className="text-[#666]">POTENTIAL</span><span className="flex items-baseline gap-1.5"><span className="text-sm font-black">{stats.potential}</span><span className="text-[8px] text-[#888]">{statDetails.potential}</span></span></div>
+                                        <div className="text-[10px] text-[#444] mb-2 tracking-wider">─── STAND PARAMETERS ───</div>
+                                        <div className="space-y-1 text-[11px] text-[#333]">
+                                            <div className="flex justify-between"><span>POWER</span><span><span className="text-[13px]">{stats.power}</span> <span className="text-[9px] text-[#666]">{statDetails.power}</span></span></div>
+                                            <div className="flex justify-between"><span>SPEED</span><span><span className="text-[13px]">{stats.speed}</span> <span className="text-[9px] text-[#666]">{statDetails.speed}</span></span></div>
+                                            <div className="flex justify-between"><span>RANGE</span><span><span className="text-[13px]">{stats.range}</span> <span className="text-[9px] text-[#666]">{statDetails.range}</span></span></div>
+                                            <div className="flex justify-between"><span>DURABILITY</span><span><span className="text-[13px]">{stats.durability}</span> <span className="text-[9px] text-[#666]">{statDetails.durability}</span></span></div>
+                                            <div className="flex justify-between"><span>PRECISION</span><span><span className="text-[13px]">{stats.precision}</span> <span className="text-[9px] text-[#666]">{statDetails.precision}</span></span></div>
+                                            <div className="flex justify-between"><span>POTENTIAL</span><span><span className="text-[13px]">{stats.potential}</span> <span className="text-[9px] text-[#666]">{statDetails.potential}</span></span></div>
                                         </div>
                                     </div>
                                 )}
@@ -817,22 +817,22 @@ export default function App() {
                 <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-white border-x-[4px] border-black shadow-2xl overflow-hidden flex flex-col">
                     
                     {/* Header Strip */}
-                    <div className="h-14 bg-black flex items-center justify-between px-5 border-b-[3px] border-[#db2777] shrink-0">
+                    <div className="h-16 bg-black flex items-center justify-between px-6 border-b-4 border-[#db2777] shrink-0">
                         <div className="flex items-center gap-2">
-                             <Crosshair className="w-4 h-4 text-[#eab308] animate-[spin_4s_linear_infinite]" />
-                             <span className="text-[#eab308] text-xs tracking-[0.2em] font-semibold">STAND PARAMETERS</span>
+                             <Crosshair className="w-5 h-5 text-[#eab308] animate-[spin_4s_linear_infinite]" />
+                             <span className="text-[#eab308] text-sm tracking-[0.3em] font-bold">STAND PARAMETERS</span>
                         </div>
-                        <div className="flex gap-1.5">
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#db2777]"></div>
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#06b6d4]"></div>
+                        <div className="flex gap-2">
+                            <div className="w-3 h-3 rounded-full bg-[#db2777]"></div>
+                            <div className="w-3 h-3 rounded-full bg-[#06b6d4]"></div>
                         </div>
                     </div>
     
                     <div className="flex-1 overflow-y-auto no-scrollbar bg-[url('https://www.transparenttextures.com/patterns/white-diamond.png')] pb-20 relative">
                         {/* 1. Name Strip */}
-                        <div className="p-5 pb-2">
-                            <div className="border-l-6 border-[#db2777] pl-3">
-                                <h2 className="text-3xl font-bold text-gray-900 leading-tight tracking-tight">{standData.standName.replace(/[『』]/g, '')}</h2>
+                        <div className="p-6 pb-2">
+                            <div className="border-l-8 border-[#db2777] pl-4">
+                                <h2 className="text-4xl font-black text-gray-900 leading-none tracking-tight">{standData.standName.replace(/[『』]/g, '')}</h2>
                             </div>
                         </div>
     
@@ -845,7 +845,7 @@ export default function App() {
     
                              {/* Explanation Text */}
                              <div className="text-center px-4 relative z-10 mb-2">
-                                <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-[0.12em] border-b border-gray-200 pb-1 inline-block">
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-200 pb-1 inline-block">
                                     Stats Generated from On-Chain Data & Social Quality
                                 </p>
                              </div>
@@ -862,16 +862,16 @@ export default function App() {
                         </div>
     
                         {/* 3. Ability Section */}
-                        <div className="p-5 space-y-6">
+                        <div className="p-6 space-y-8">
                             <div className="flex items-center justify-between mb-1">
                                  <div className="flex items-center gap-2">
-                                     <Zap className="w-5 h-5 text-[#eab308] fill-current" />
-                                     <span className="text-gray-400 text-xs font-semibold tracking-wide">ABILITY</span>
+                                     <Zap className="w-6 h-6 text-[#eab308] fill-current" />
+                                     <span className="text-gray-400 text-sm font-bold">ABILITY</span>
                                  </div>
                                  {/* Print Button */}
                                  <button 
                                      onClick={(e) => { e.stopPropagation(); setShowInteraction(true); }}
-                                     className="flex items-center gap-1.5 px-2.5 py-1 bg-black text-[#fbbf24] rounded-full text-[10px] font-semibold active:scale-95 transition-transform border border-[#fbbf24]/40 hover:bg-[#fbbf24] hover:text-black"
+                                     className="flex items-center gap-2 px-3 py-1.5 bg-black text-[#fbbf24] rounded-full text-xs font-bold active:scale-95 transition-transform border border-[#fbbf24]/50 hover:bg-[#fbbf24] hover:text-black"
                                  >
                                      <span>🖨️</span>
                                      <span>PRINT DATA</span>
@@ -879,25 +879,25 @@ export default function App() {
                             </div>
                             
                             {/* Ability Box 1 */}
-                            <div className="relative border-2 border-black bg-white shadow-[4px_4px_0_rgba(0,0,0,0.08)]">
-                                 <div className="absolute -top-2.5 left-3 bg-[#eab308] border-2 border-black px-2.5 py-0.5 transform -rotate-2">
-                                     <span className="text-[10px] font-bold text-black tracking-wide">MAIN ABILITY</span>
+                            <div className="relative border-[3px] border-black bg-white shadow-[6px_6px_0_rgba(0,0,0,0.1)]">
+                                 <div className="absolute -top-3 left-3 bg-[#eab308] border-2 border-black px-3 py-0.5 transform -rotate-2">
+                                     <span className="text-xs font-black text-black">MAIN ABILITY</span>
                                  </div>
-                                 <div className="p-5 pt-6">
-                                     <h3 className="font-bold text-xl text-[#db2777] mb-2 leading-snug">{standData.ability.split('：')[0] || 'Unknown Ability'}</h3>
-                                     <p className="text-sm text-gray-700 font-normal leading-relaxed">
+                                 <div className="p-6 pt-8">
+                                     <h3 className="font-bold text-2xl text-[#db2777] mb-2 leading-tight">{standData.ability.split('：')[0] || 'Unknown Ability'}</h3>
+                                     <p className="text-base text-gray-800 font-medium leading-relaxed">
                                          {standData.ability}
                                      </p>
                                  </div>
                             </div>
     
                             {/* Manifestation Box */}
-                            <div className="relative border-2 border-black bg-white shadow-[4px_4px_0_rgba(0,0,0,0.08)]">
-                                 <div className="absolute -top-2.5 left-3 bg-[#06b6d4] border-2 border-black px-2.5 py-0.5 transform rotate-1">
-                                     <span className="text-[10px] font-bold text-white tracking-wide">MANIFESTATION</span>
+                            <div className="relative border-[3px] border-black bg-white shadow-[6px_6px_0_rgba(0,0,0,0.1)]">
+                                 <div className="absolute -top-3 left-3 bg-[#06b6d4] border-2 border-black px-3 py-0.5 transform rotate-1">
+                                     <span className="text-xs font-black text-white">MANIFESTATION</span>
                                  </div>
-                                 <div className="p-5 pt-6">
-                                     <p className="text-sm text-gray-700 font-normal leading-relaxed">
+                                 <div className="p-6 pt-8">
+                                     <p className="text-base text-gray-800 font-medium leading-relaxed">
                                          {standData.standDescription}
                                      </p>
                                  </div>
@@ -906,9 +906,9 @@ export default function App() {
                     </div>
     
                     {/* Footer: Battle Cry - UPDATED WITH ARROW */}
-                    <div className="bg-black pt-5 pb-10 shrink-0 border-t-[3px] border-[#db2777] relative overflow-hidden group flex flex-col items-center justify-center">
-                        <div className="text-white text-[9px] tracking-[0.25em] uppercase text-center mb-1.5 font-semibold opacity-80">BATTLE CRY</div>
-                        <p className="text-white font-bold italic text-center text-2xl md:text-4xl leading-tight relative z-10 font-jojo drop-shadow-[0_2px_0_rgba(0,0,0,0.8)] px-4">
+                    <div className="bg-black pt-6 pb-12 shrink-0 border-t-4 border-[#db2777] relative overflow-hidden group flex flex-col items-center justify-center">
+                        <div className="text-white text-[10px] tracking-[0.4em] uppercase text-center mb-1 font-bold">BATTLE CRY</div>
+                        <p className="text-white font-black italic text-center text-3xl md:text-5xl leading-none relative z-10 font-jojo drop-shadow-[0_2px_0_rgba(0,0,0,1)] filter drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] px-4">
                             "{standData.battleCry}"
                         </p>
                     </div>
@@ -944,25 +944,25 @@ export default function App() {
             {isLoading && <LoadingScreen />}
 
             {/* HEADER AREA */}
-            <div className="mt-10 md:mt-14 text-center z-20 relative w-full px-4">
-                <div className="inline-block bg-[#fbbf24] px-3 py-0.5 transform -skew-x-12 mb-3 shadow-[0_0_12px_rgba(251,191,36,0.6)]">
-                    <span className="text-black font-bold text-[10px] tracking-[0.2em] transform skew-x-12 inline-block">THE ARROW AWAITS</span>
+            <div className="mt-12 md:mt-16 text-center z-20 relative w-full px-4">
+                <div className="inline-block bg-[#fbbf24] px-4 py-0.5 transform -skew-x-12 mb-4 shadow-[0_0_10px_#fbbf24]">
+                    <span className="text-black font-black text-xs tracking-widest transform skew-x-12 inline-block">THE ARROW AWAITS</span>
                 </div>
-                <h1 className="text-5xl md:text-6xl font-jojo text-white drop-shadow-[3px_3px_0_#db2777] tracking-tight leading-[0.95]">
+                <h1 className="text-6xl md:text-7xl font-jojo text-white drop-shadow-[4px_4px_0_#db2777] tracking-tight leading-[0.9]">
                     AWAKEN<br/><span className="text-[#fbbf24] text-outline-thick">STAND</span>
                 </h1>
                 
                 {farcasterUser ? (
-                    <div className="mt-5 flex items-center justify-center gap-2">
-                            <div className="w-1.5 h-1.5 bg-[#06b6d4] rotate-45 animate-pulse"></div>
-                            <p className="text-[11px] tracking-[0.15em] text-[#06b6d4] uppercase font-semibold">
+                    <div className="mt-6 flex items-center justify-center gap-2">
+                            <div className="w-2 h-2 bg-[#06b6d4] rotate-45 animate-pulse"></div>
+                            <p className="text-xs tracking-[0.2em] text-[#06b6d4] uppercase font-bold border-b border-[#06b6d4]">
                             SOUL: @{farcasterUser.username}
                             </p>
-                            <div className="w-1.5 h-1.5 bg-[#06b6d4] rotate-45 animate-pulse"></div>
+                            <div className="w-2 h-2 bg-[#06b6d4] rotate-45 animate-pulse"></div>
                     </div>
                 ) : (
-                    <div className="mt-5 opacity-50">
-                            <p className="text-[11px] tracking-[0.15em] text-gray-400 uppercase font-medium">Connecting Soul...</p>
+                    <div className="mt-6 opacity-50">
+                            <p className="text-xs tracking-[0.2em] text-gray-400 uppercase font-bold">Connecting Soul...</p>
                     </div>
                 )}
             </div>
@@ -1009,42 +1009,42 @@ export default function App() {
 
             {/* FOOTER AREA */}
             <div className="w-full flex flex-col items-center z-20">
-                <div className="mb-3 h-10 flex items-center justify-center">
+                <div className="mb-4 h-12 flex items-center justify-center">
                     {preview ? (
-                        <button onClick={() => { setPreview(null); setBase64Image(null); }} className="text-[#db2777] text-[11px] font-semibold active:text-white uppercase tracking-[0.12em] border-b border-[#db2777]/70 py-1.5 px-3 hover:border-[#db2777] transition-colors">
+                        <button onClick={() => { setPreview(null); setBase64Image(null); }} className="text-[#db2777] text-sm font-bold active:text-white uppercase tracking-widest border-b border-[#db2777] py-2 px-4">
                             Release Soul / Retake
                         </button>
                     ) : (
-                        <span className="text-[#fbbf24] text-[10px] tracking-[0.15em] animate-pulse font-semibold">TOUCH THE ARROW TO BEGIN</span>
+                        <span className="text-[#fbbf24] text-xs tracking-widest animate-pulse font-bold">TOUCH THE ARROW TO BEGIN</span>
                     )}
                 </div>
 
                 {/* Bottom Decorative Strip */}
-                <div className="w-full border-y border-[#fbbf24]/80 bg-black/95 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
-                    <div className="h-12 flex items-center justify-between px-0 overflow-hidden relative">
+                <div className="w-full border-y-2 border-[#fbbf24] bg-black shadow-[0_0_20px_rgba(251,191,36,0.3)]">
+                    <div className="h-16 flex items-center justify-between px-0 overflow-hidden relative">
                         {/* Left Decor */}
-                        <div className="flex gap-1 shrink-0 z-10 bg-black h-full items-center px-2 border-r border-[#fbbf24]/20">
-                            <Triangle className="w-3 h-3 text-[#db2777] fill-current rotate-90" />
+                        <div className="flex gap-1 shrink-0 z-10 bg-black h-full items-center px-2 border-r border-[#fbbf24]/30">
+                            <Triangle className="w-4 h-4 text-[#db2777] fill-current rotate-90" />
                         </div>
                         
                         {/* Scrolling Text - UPDATED FONT HERE */}
                         <div className="flex-1 overflow-hidden relative h-full flex items-center">
-                            <div className="animate-marquee-infinite flex gap-12 items-center">
-                                <span className="text-lg font-bold italic font-jojo tracking-[0.12em] text-transparent bg-clip-text bg-gradient-to-b from-[#fbbf24] via-[#fcd34d] to-[#b45309] whitespace-nowrap">
+                            <div className="animate-marquee-infinite flex gap-8 items-center">
+                                <span className="text-2xl font-black italic font-jojo tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-[#fbbf24] via-[#fcd34d] to-[#b45309] drop-shadow-[0_2px_0_rgba(0,0,0,1)] whitespace-nowrap">
                                     YOUR ON-CHAIN STAND VISUALIZER
                                 </span>
-                                <span className="text-lg font-bold italic font-jojo tracking-[0.12em] text-transparent bg-clip-text bg-gradient-to-b from-[#fbbf24] via-[#fcd34d] to-[#b45309] whitespace-nowrap">
+                                <span className="text-2xl font-black italic font-jojo tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-[#fbbf24] via-[#fcd34d] to-[#b45309] drop-shadow-[0_2px_0_rgba(0,0,0,1)] whitespace-nowrap">
                                     YOUR ON-CHAIN STAND VISUALIZER
                                 </span>
-                                <span className="text-lg font-bold italic font-jojo tracking-[0.12em] text-transparent bg-clip-text bg-gradient-to-b from-[#fbbf24] via-[#fcd34d] to-[#b45309] whitespace-nowrap">
+                                <span className="text-2xl font-black italic font-jojo tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-[#fbbf24] via-[#fcd34d] to-[#b45309] drop-shadow-[0_2px_0_rgba(0,0,0,1)] whitespace-nowrap">
                                     YOUR ON-CHAIN STAND VISUALIZER
                                 </span>
                             </div>
                         </div>
 
                         {/* Right Decor */}
-                        <div className="flex gap-1 shrink-0 z-10 bg-black h-full items-center px-2 border-l border-[#fbbf24]/20">
-                            <Triangle className="w-3 h-3 text-[#db2777] fill-current -rotate-90" />
+                        <div className="flex gap-1 shrink-0 z-10 bg-black h-full items-center px-2 border-l border-[#fbbf24]/30">
+                            <Triangle className="w-4 h-4 text-[#db2777] fill-current -rotate-90" />
                         </div>
                     </div>
                 </div>
