@@ -38,8 +38,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const imageUrl = await generateStandVisuals(base64Image, visualPrompt);
       return res.status(200).json({ standImageUrl: imageUrl });
     }
+    else if (action === 'sketch') {
+      // Generate pencil sketch style image for receipt printer
+      const sketchUrl = await generateSketchImage(base64Image);
+      return res.status(200).json({ sketchImageUrl: sketchUrl });
+    }
     else {
-      return res.status(400).json({ error: 'Invalid action. Use "analyze" or "visualize"' });
+      return res.status(400).json({ error: 'Invalid action. Use "analyze", "visualize", or "sketch"' });
     }
 
   } catch (error: any) {
@@ -223,4 +228,60 @@ async function generateStandVisuals(originalImageBase64: string, visualPrompt: s
   }
   
   throw new Error("No inline image data found.");
+}
+
+// ==========================================
+// Generate Sketch Image (Pencil/Ink Style for Receipt)
+// ==========================================
+async function generateSketchImage(standImageBase64: string): Promise<string> {
+  const modelId = "gemini-2.5-flash-image";
+
+  const cleanBase64 = standImageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
+
+  const sketchPrompt = `
+    Transform this image into a BLACK AND WHITE PENCIL SKETCH style illustration.
+    
+    CRITICAL REQUIREMENTS:
+    1. **PURE WHITE BACKGROUND** - The background must be completely white/blank. Remove ALL background elements.
+    2. **ONLY THE CHARACTER** - Extract and draw ONLY the human figure/Stand User. No Stand spirit, no effects, no SFX text.
+    3. **PENCIL SKETCH STYLE**:
+       - Fine pencil line work
+       - Cross-hatching for shading
+       - Clean, crisp outlines
+       - Like a professional manga artist's pencil draft
+    4. **HIGH CONTRAST** - Strong blacks and whites, suitable for thermal printer output
+    5. **PORTRAIT COMPOSITION** - Focus on upper body/face area, centered
+    6. **NO COLOR** - Strictly grayscale/black and white only
+    
+    Style reference: Like a preliminary pencil sketch from a manga artist's sketchbook.
+  `;
+
+  const response = await ai.models.generateContent({
+    model: modelId,
+    contents: {
+      parts: [
+        {
+          inlineData: {
+            mimeType: 'image/jpeg',
+            data: cleanBase64,
+          },
+        },
+        {
+          text: sketchPrompt,
+        },
+      ],
+    },
+    config: {},
+  });
+
+  const parts = response.candidates?.[0]?.content?.parts;
+  if (!parts) throw new Error("No sketch image generated.");
+
+  for (const part of parts) {
+    if (part.inlineData && part.inlineData.data) {
+      return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+    }
+  }
+  
+  throw new Error("No sketch image data found.");
 }

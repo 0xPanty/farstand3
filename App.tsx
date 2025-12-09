@@ -149,9 +149,10 @@ interface StandPrinterProps {
     statDetails?: StandStatRawValues;
     standName?: string;
     standImageUrl?: string;
+    sketchImageUrl?: string;
 }
 
-const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, standName, standImageUrl }) => {
+const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, standName, standImageUrl, sketchImageUrl }) => {
     const [isPrinting, setIsPrinting] = useState(false);
     const [showPaper, setShowPaper] = useState(false);
     const [printText, setPrintText] = useState("");
@@ -399,28 +400,20 @@ SCORE  ${totalScore}/600  RANK ${getRank(totalScore)}` : ''}
                                         {isPrinting && <span className="animate-blink text-[#333]">█</span>}
                                     </div>
                                     
-                                    {/* Right: Stand image (black & white ink style) */}
-                                    {standImageUrl && !isPrinting && printText && (
-                                        <div className="w-28 shrink-0 relative ml-2">
-                                            <div className="border border-dashed border-[#999] p-1 bg-white">
+                                    {/* Right: Stand User sketch (pencil style for receipt) */}
+                                    {(sketchImageUrl || standImageUrl) && !isPrinting && printText && (
+                                        <div className="w-32 shrink-0 relative ml-2">
+                                            <div className="border border-[#999] bg-white">
                                                 <img 
-                                                    src={standImageUrl} 
-                                                    alt="Stand"
+                                                    src={sketchImageUrl || standImageUrl} 
+                                                    alt="Stand User"
                                                     className="w-full h-auto object-contain"
                                                     style={{
-                                                        filter: 'grayscale(100%) contrast(1.3) brightness(1.05)',
+                                                        filter: sketchImageUrl ? 'contrast(1.1)' : 'grayscale(100%) contrast(1.3) brightness(1.05)',
                                                         mixBlendMode: 'multiply',
                                                     }}
                                                 />
-                                                {/* Ink texture overlay */}
-                                                <div className="absolute inset-1 opacity-30 pointer-events-none"
-                                                     style={{
-                                                         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-                                                         mixBlendMode: 'overlay'
-                                                     }}
-                                                ></div>
                                             </div>
-                                            <div className="text-center text-[6px] text-[#666] mt-1 font-mono">STAND IMG</div>
                                         </div>
                                     )}
                                 </div>
@@ -605,9 +598,10 @@ interface PrinterViewProps {
     statDetails?: StandStatRawValues;
     standName?: string;
     standImageUrl?: string;
+    sketchImageUrl?: string;
 }
 
-const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDetails, standName, standImageUrl }) => {
+const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDetails, standName, standImageUrl, sketchImageUrl }) => {
     return (
         <main className="h-dvh w-screen bg-black bg-noise pattern-flowing-checkers flex flex-col relative overflow-hidden" 
               style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
@@ -643,7 +637,7 @@ const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDeta
              
              {/* Printer Component */}
              <div className="flex-1 flex items-center justify-center relative z-20 overflow-y-auto py-8">
-                 <StandPrinter user={user} stats={stats} statDetails={statDetails} standName={standName} standImageUrl={standImageUrl} />
+                 <StandPrinter user={user} stats={stats} statDetails={statDetails} standName={standName} standImageUrl={standImageUrl} sketchImageUrl={sketchImageUrl} />
              </div>
         </main>
     );
@@ -779,6 +773,7 @@ export default function App() {
           statDetails={calculatedData?.details}
           standName={standData?.standName}
           standImageUrl={standData?.standImageUrl}
+          sketchImageUrl={standData?.sketchImageUrl}
       />;
   }
   

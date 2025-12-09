@@ -29,6 +29,8 @@ export const analyzeUserAndGenerateStand = async (
 
   // Step 2: Generate visuals if we have a visual prompt
   let standImageUrl: string | undefined;
+  let sketchImageUrl: string | undefined;
+  
   if (profile.visualPrompt) {
     try {
       const visualResponse = await fetch(`${API_BASE_URL}/generate-stand`, {
@@ -44,6 +46,27 @@ export const analyzeUserAndGenerateStand = async (
       if (visualResponse.ok) {
         const visualData = await visualResponse.json();
         standImageUrl = visualData.standImageUrl;
+        
+        // Step 3: Generate sketch version for receipt printer
+        if (standImageUrl) {
+          try {
+            const sketchResponse = await fetch(`${API_BASE_URL}/generate-stand`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                base64Image: standImageUrl,
+                action: 'sketch'
+              })
+            });
+
+            if (sketchResponse.ok) {
+              const sketchData = await sketchResponse.json();
+              sketchImageUrl = sketchData.sketchImageUrl;
+            }
+          } catch (e) {
+            console.error('Sketch generation failed:', e);
+          }
+        }
       }
     } catch (e) {
       console.error('Visual generation failed:', e);
@@ -53,6 +76,7 @@ export const analyzeUserAndGenerateStand = async (
   return {
     ...profile,
     statDetails: farcasterData?.details,
-    standImageUrl
+    standImageUrl,
+    sketchImageUrl
   };
 };

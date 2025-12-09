@@ -44,5 +44,6 @@ export interface StandResult {
   stats: StandStats;
   statDetails?: StandStatRawValues; // Added for displaying raw metrics
   standImageUrl?: string;
+  sketchImageUrl?: string; // Pencil sketch version for receipt printer
   visualPrompt?: string;
 }
