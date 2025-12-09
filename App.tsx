@@ -243,10 +243,10 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
         setIsPrinting(true);
         setShowPaper(true);
         
-        // Matrix rain effect lasts 5 seconds
+        // Matrix rain effect lasts 4 seconds (sync with paper animation)
         setTimeout(() => {
             setIsPrinting(false);
-        }, 5000);
+        }, 4000);
     };
 
     const handleReset = () => {
@@ -350,7 +350,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                 {/* Printed Paper - Japanese Receipt Style */}
                 {showPaper && (
                     <div 
-                        className="absolute left-1/2 -translate-x-1/2 w-72"
+                        className="absolute left-1/2 -translate-x-1/2 w-72 animate-paper-print"
                         style={{ 
                             top: '100%',
                         }}

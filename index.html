@@ -169,22 +169,17 @@
         animation: matrix-rain 1s linear infinite;
       }
       
-      /* PAPER PRINT ANIMATION - slide out from printer */
+      /* PAPER PRINT ANIMATION - grow from top */
       @keyframes paper-print {
         0% { 
-          transform: translateX(-50%) translateY(-100%);
-          opacity: 0;
-        }
-        10% {
-          opacity: 1;
+          clip-path: inset(0 0 100% 0);
         }
         100% { 
-          transform: translateX(-50%) translateY(0);
-          opacity: 1;
+          clip-path: inset(0 0 0 0);
         }
       }
       .animate-paper-print {
-        animation: paper-print 5s ease-out forwards;
+        animation: paper-print 4s ease-out forwards;
       }
       .animate-marquee-infinite {
         display: flex;
