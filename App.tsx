@@ -385,7 +385,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                             <div className="px-5 py-4 relative font-mono" style={{ fontFamily: "'Courier New', 'MS Gothic', monospace" }}>
                                 
                                 {/* Title - Large & Bold with ink effect */}
-                                <div className="text-center mb-4 pb-3 border-b-2 border-[#1a1a1a]">
+                                <div className="text-center mb-4 pb-3 border-b-4 border-[#1a1a1a]">
                                     <h1 className="text-3xl font-black tracking-[0.3em] text-[#0a0a0a] underline underline-offset-4 decoration-2"
                                         style={{
                                             textShadow: '0.5px 0.5px 0 rgba(0,0,0,0.3), -0.3px -0.3px 0 rgba(0,0,0,0.1)',
