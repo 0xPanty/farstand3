@@ -609,13 +609,6 @@ const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDeta
              {/* Background */}
              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(251,191,36,0.1)_0%,transparent_70%)] pointer-events-none"></div>
              
-             {/* Menacing floaters */}
-             <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-                <div className="absolute top-[15%] left-[5%] text-[#db2777] font-black text-4xl menacing-text animate-pulse">ゴ</div>
-                <div className="absolute top-[25%] right-[8%] text-[#fbbf24] font-black text-3xl menacing-text animate-pulse" style={{ animationDelay: '0.5s' }}>ゴ</div>
-                <div className="absolute bottom-[30%] left-[10%] text-[#db2777] font-black text-5xl menacing-text animate-pulse" style={{ animationDelay: '1s' }}>ド</div>
-             </div>
-             
              {/* Back Arrow */}
              <div className="absolute top-4 left-4 z-50">
                 <button 
