@@ -168,6 +168,24 @@
       .animate-matrix-rain {
         animation: matrix-rain 1s linear infinite;
       }
+      
+      /* PAPER PRINT ANIMATION - slow and smooth */
+      @keyframes paper-print {
+        0% { 
+          max-height: 0;
+          opacity: 0;
+        }
+        5% {
+          opacity: 1;
+        }
+        100% { 
+          max-height: 800px;
+          opacity: 1;
+        }
+      }
+      .animate-paper-print {
+        animation: paper-print 2.5s ease-out forwards;
+      }
       .animate-marquee-infinite {
         display: flex;
         width: max-content;

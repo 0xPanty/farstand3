@@ -186,11 +186,16 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
     const handlePrint = () => {
         if (isPrinting || !user) return;
         setIsPrinting(true);
-        setShowPaper(true);
         
+        // Delay showing paper to sync with animation
+        setTimeout(() => {
+            setShowPaper(true);
+        }, 300);
+        
+        // Keep printing state longer for matrix effect
         setTimeout(() => {
             setIsPrinting(false);
-        }, 500);
+        }, 2500);
     };
 
     const handleReset = () => {
@@ -230,22 +235,22 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 </div>
                             </div>
                             
-                            {/* Matrix rain effect - right side */}
+                            {/* Matrix rain effect - expanded area */}
                             {isPrinting && (
-                                <div className="absolute right-2 top-8 bottom-2 w-16 overflow-hidden z-10 opacity-80">
-                                    {[...Array(6)].map((_, col) => (
+                                <div className="absolute left-20 right-2 top-6 bottom-2 overflow-hidden z-10">
+                                    {[...Array(12)].map((_, col) => (
                                         <div 
                                             key={col} 
-                                            className="absolute text-[8px] font-mono text-[#22c55e] leading-none whitespace-pre animate-matrix-rain"
+                                            className="absolute text-[9px] font-mono text-[#22c55e] leading-[1.1] whitespace-pre animate-matrix-rain"
                                             style={{ 
-                                                left: `${col * 10}px`,
-                                                animationDelay: `${col * 0.15}s`,
-                                                animationDuration: `${0.8 + Math.random() * 0.4}s`
+                                                left: `${col * 12}px`,
+                                                animationDelay: `${col * 0.12}s`,
+                                                animationDuration: `${1.5 + col * 0.1}s`
                                             }}
                                         >
-                                            {[...Array(12)].map((_, i) => (
-                                                <div key={i} style={{ opacity: 1 - i * 0.08 }}>
-                                                    {String.fromCharCode(0x30A0 + Math.random() * 96)}
+                                            {[...Array(10)].map((_, i) => (
+                                                <div key={i} style={{ opacity: 1 - i * 0.1, textShadow: i === 0 ? '0 0 8px #22c55e' : 'none' }}>
+                                                    {Math.floor(Math.random() * 10)}
                                                 </div>
                                             ))}
                                         </div>
@@ -314,7 +319,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                 {/* Printed Paper - Japanese Receipt Style */}
                 {showPaper && (
                     <div 
-                        className="absolute left-1/2 -translate-x-1/2 w-72 overflow-hidden"
+                        className="absolute left-1/2 -translate-x-1/2 w-72 overflow-hidden animate-paper-print"
                         style={{ 
                             top: '100%',
                             transformOrigin: 'top center',
