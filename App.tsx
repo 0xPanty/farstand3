@@ -221,6 +221,38 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                             {/* Scan line effect */}
                             <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_3px] pointer-events-none opacity-50"></div>
                             
+                            {/* Battery indicator - top right */}
+                            <div className="absolute top-2 right-2 flex items-center gap-1 z-20">
+                                <span className="text-[8px] text-[#22c55e] font-mono">98%</span>
+                                <div className="relative w-5 h-2.5 border border-[#22c55e] rounded-sm">
+                                    <div className="absolute inset-0.5 bg-[#22c55e] rounded-sm" style={{ width: '85%' }}></div>
+                                    <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-0.5 h-1.5 bg-[#22c55e] rounded-r-sm"></div>
+                                </div>
+                            </div>
+                            
+                            {/* Matrix rain effect - right side */}
+                            {isPrinting && (
+                                <div className="absolute right-2 top-8 bottom-2 w-16 overflow-hidden z-10 opacity-80">
+                                    {[...Array(6)].map((_, col) => (
+                                        <div 
+                                            key={col} 
+                                            className="absolute text-[8px] font-mono text-[#22c55e] leading-none whitespace-pre animate-matrix-rain"
+                                            style={{ 
+                                                left: `${col * 10}px`,
+                                                animationDelay: `${col * 0.15}s`,
+                                                animationDuration: `${0.8 + Math.random() * 0.4}s`
+                                            }}
+                                        >
+                                            {[...Array(12)].map((_, i) => (
+                                                <div key={i} style={{ opacity: 1 - i * 0.08 }}>
+                                                    {String.fromCharCode(0x30A0 + Math.random() * 96)}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            
                             {/* Screen content */}
                             <div className="font-mono text-xs leading-relaxed relative z-10">
                                 {user ? (
@@ -231,7 +263,9 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                         </div>
                                         <div className="text-[#fbbf24] font-bold">@{user.username}</div>
                                         <div className="text-[#666] text-[10px]">FID: #{user.fid}</div>
-                                        <div className="text-[#06b6d4] text-[10px] mt-2 animate-pulse tracking-wider">▶ READY TO PRINT...</div>
+                                        <div className="text-[#06b6d4] text-[10px] mt-2 animate-pulse tracking-wider">
+                                            {isPrinting ? '▶ PRINTING...' : '▶ READY TO PRINT...'}
+                                        </div>
                                     </>
                                 ) : (
                                     <div className="text-[#666] animate-pulse">CONNECTING...</div>
