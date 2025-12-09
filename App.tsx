@@ -188,46 +188,14 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
         return filled + empty;
     };
 
-    // Printer sound effect
-    const playPrintSound = () => {
-        // Create oscillator for printer-like sound
-        try {
-            const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-            
-            const playTick = (time: number) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.frequency.value = 200 + Math.random() * 100;
-                osc.type = 'square';
-                gain.gain.setValueAtTime(0.03, time);
-                gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
-                osc.start(time);
-                osc.stop(time + 0.05);
-            };
-            
-            // Play ticking sounds for 3 seconds
-            for (let i = 0; i < 60; i++) {
-                playTick(audioCtx.currentTime + i * 0.05);
-            }
-        } catch (e) {
-            console.log('Audio not supported');
-        }
-    };
-
     const handlePrint = () => {
         if (isPrinting || !user) return;
         setIsPrinting(true);
         setShowPaper(true);
         
-        // Play printer sound
-        playPrintSound();
-        
-        // Slower printing - 3.5 seconds
         setTimeout(() => {
             setIsPrinting(false);
-        }, 3500);
+        }, 500);
     };
 
     const handleReset = () => {
@@ -321,8 +289,6 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                         style={{ 
                             top: '100%',
                             transformOrigin: 'top center',
-                            maxHeight: isPrinting ? '80px' : '1200px',
-                            transition: isPrinting ? 'max-height 0.3s ease-out' : 'max-height 3.5s ease-out',
                         }}
                     >
                         {/* Paper with thermal print texture */}
