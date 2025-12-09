@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { Plus, X, RotateCcw, Zap, Triangle, Sparkles, Crosshair, ArrowRight, ArrowLeft } from "lucide-react";
+import { Plus, X, RotateCcw, Zap, Triangle, Sparkles, Crosshair, ArrowRight, ArrowLeft, Download } from "lucide-react";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { analyzeUserAndGenerateStand } from "./services/geminiService";
 import { fetchFarcasterUser, calculateFarcasterStats } from "./services/farcasterService";
@@ -671,6 +671,24 @@ interface PrinterViewProps {
 }
 
 const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDetails, standName, standImageUrl, sketchImageUrl }) => {
+    const handleDownload = async () => {
+        if (!standImageUrl) return;
+        try {
+            const response = await fetch(standImageUrl);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${standName || 'stand'}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Download failed:', error);
+        }
+    };
+
     return (
         <main className="absolute inset-0 bg-black bg-noise pattern-flowing-checkers flex flex-col overflow-y-scroll" 
               style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)', WebkitOverflowScrolling: 'touch' }}>
@@ -688,6 +706,19 @@ const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDeta
                     <span className="font-bold tracking-widest text-xs uppercase">Return</span>
                 </button>
              </div>
+             
+             {/* Download Button */}
+             {standImageUrl && (
+                 <div className="fixed top-4 right-4 z-50">
+                    <button 
+                        onClick={handleDownload}
+                        className="flex items-center gap-2 text-[#fbbf24] hover:text-[#db2777] transition-colors group px-4 py-2 bg-black/50 rounded-lg border border-[#fbbf24]/30"
+                    >
+                        <Download className="w-5 h-5" />
+                        <span className="font-bold tracking-widest text-xs uppercase">Save</span>
+                    </button>
+                 </div>
+             )}
              
              {/* Header */}
              <div className="mt-16 text-center z-20 shrink-0">
