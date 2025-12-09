@@ -835,13 +835,32 @@ export default function App() {
                              <Crosshair className="w-5 h-5 text-[#eab308] animate-[spin_4s_linear_infinite]" />
                              <span className="text-[#eab308] text-sm tracking-[0.3em] font-bold">STAND PARAMETERS</span>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 items-center">
                             <div className="w-3 h-3 rounded-full bg-[#db2777]"></div>
                             <div className="w-3 h-3 rounded-full bg-[#06b6d4]"></div>
+                            {/* Close Button */}
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); onReset(); }}
+                                className="w-8 h-8 bg-black text-white flex items-center justify-center rounded-full ml-2 active:scale-95 transition-transform border border-white/30 hover:bg-red-900/50"
+                                title="Close"
+                            >
+                                <X size={18} />
+                            </button>
                         </div>
                     </div>
     
                     <div className="flex-1 overflow-y-auto no-scrollbar bg-[url('https://www.transparenttextures.com/patterns/white-diamond.png')] pb-20">
+                        {/* Printer Button - Below header */}
+                        <div className="flex justify-center py-3 bg-gray-50 border-b border-gray-200">
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); setShowInteraction(true); }}
+                                className="w-14 h-14 bg-black text-[#fbbf24] flex items-center justify-center rounded-full shadow-lg active:scale-95 transition-transform border-2 border-[#fbbf24]/50 hover:bg-[#fbbf24] hover:text-black"
+                                title="Print Stand Data"
+                            >
+                                <span className="text-2xl">🖨️</span>
+                            </button>
+                        </div>
+                        
                         {/* 1. Name Strip */}
                         <div className="p-6 pb-2">
                             <div className="border-l-8 border-[#db2777] pl-4">
@@ -917,31 +936,7 @@ export default function App() {
                     </div>
                 </div>
     
-                {/* Floating Action Buttons - Only show on back side (when flipped) */}
-                {isFlipped && (
-                    <>
-                        <div className="absolute top-4 left-4 z-50">
-                             {/* Printer Button */}
-                             <button 
-                                onClick={(e) => { e.stopPropagation(); setShowInteraction(true); }}
-                                className="w-12 h-12 bg-black text-[#fbbf24] flex items-center justify-center rounded-full shadow-lg active:scale-95 transition-transform border-2 border-[#fbbf24]/50 hover:bg-[#fbbf24] hover:text-black"
-                                title="Print Stand Data"
-                             >
-                                <span className="text-xl">🖨️</span>
-                             </button>
-                        </div>
-                        <div className="absolute top-4 right-4 z-50">
-                             {/* Close Button */}
-                             <button 
-                                onClick={(e) => { e.stopPropagation(); onReset(); }}
-                                className="w-12 h-12 bg-black text-white flex items-center justify-center rounded-full shadow-lg active:scale-95 transition-transform border-2 border-white/20 hover:bg-red-900/50"
-                                title="Close"
-                             >
-                                <X size={24} />
-                             </button>
-                        </div>
-                    </>
-                )}
+                
                 
             </div>
         </main>
