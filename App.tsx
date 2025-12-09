@@ -912,6 +912,14 @@ export default function App() {
                      >
                         <X size={24} />
                      </button>
+                     {/* 2. Printer Button */}
+                     <button 
+                        onClick={(e) => { e.stopPropagation(); setShowInteraction(true); }}
+                        className="w-12 h-12 bg-black text-[#fbbf24] flex items-center justify-center rounded-full shadow-lg active:scale-95 transition-transform border-2 border-[#fbbf24]/50 hover:bg-[#fbbf24] hover:text-black"
+                        title="Print Stand Data"
+                     >
+                        <span className="text-xl">🖨️</span>
+                     </button>
                 </div>
                 
             </div>
@@ -948,14 +956,7 @@ export default function App() {
             <FarcasterGateBackground />
             <MenacingFloaters />
 
-            {/* Printer Button (Top Right) */}
-            <button 
-                onClick={() => setShowInteraction(true)}
-                className="absolute top-4 right-4 z-50 px-3 py-2 bg-black/80 border-2 border-[#fbbf24] rounded-lg flex items-center gap-2 hover:bg-[#fbbf24] hover:text-black transition-all group"
-            >
-                <span className="text-[#fbbf24] group-hover:text-black text-lg">🖨️</span>
-                <span className="text-[#fbbf24] group-hover:text-black text-[10px] font-bold tracking-wider hidden md:inline">PRINTER</span>
-            </button>
+
 
             {/* Full Screen Main Container */}
             <div className="flex-1 flex flex-col items-center justify-between w-full h-full relative z-20">
