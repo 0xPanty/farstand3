@@ -169,23 +169,22 @@
         animation: matrix-rain 1s linear infinite;
       }
       
-      /* PAPER PRINT ANIMATION - slow and smooth */
+      /* PAPER PRINT ANIMATION - slide out from printer */
       @keyframes paper-print {
         0% { 
-          max-height: 0;
+          transform: translateX(-50%) translateY(-100%);
           opacity: 0;
         }
-        5% {
+        10% {
           opacity: 1;
         }
         100% { 
-          max-height: 2000px;
+          transform: translateX(-50%) translateY(0);
           opacity: 1;
         }
       }
       .animate-paper-print {
         animation: paper-print 5s ease-out forwards;
-        overflow: visible !important;
       }
       .animate-marquee-infinite {
         display: flex;
