@@ -202,9 +202,11 @@ interface StandPrinterProps {
     standName?: string;
     standImageUrl?: string;
     sketchImageUrl?: string;
+    onDownload?: () => void;
+    onShare?: () => void;
 }
 
-const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, standName }) => {
+const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, standName, onDownload, onShare }) => {
     const [isPrinting, setIsPrinting] = useState(false);
     const [showPaper, setShowPaper] = useState(false);
     
@@ -341,26 +343,52 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                     </div>
                     
                     {/* Control Panel */}
-                    <div className="px-4 pb-4 flex items-center justify-between">
-                        {/* Speaker Grille - Left Side */}
-                        <div className="flex flex-col gap-1 px-4">
-                            {[...Array(4)].map((_, i) => (
-                                <div key={i} className="w-20 h-[2px] bg-gradient-to-r from-transparent via-[#333] to-transparent rounded"></div>
-                            ))}
+                    <div className="px-4 pb-4">
+                        {/* Top Row: Speaker Grille + Print Button */}
+                        <div className="flex items-center justify-between mb-3">
+                            {/* Speaker Grille - Left Side */}
+                            <div className="flex flex-col gap-1 px-4">
+                                {[...Array(4)].map((_, i) => (
+                                    <div key={i} className="w-20 h-[2px] bg-gradient-to-r from-transparent via-[#333] to-transparent rounded"></div>
+                                ))}
+                            </div>
+                            
+                            {/* Print Button - Right Side */}
+                            <button 
+                                onClick={handlePrint}
+                                disabled={isPrinting || !user}
+                                className={`px-5 py-3 font-black text-xs tracking-wider rounded-xl transition-all active:scale-95 ${
+                                    isPrinting 
+                                        ? 'bg-[#333] text-[#666] cursor-not-allowed' 
+                                        : 'bg-gradient-to-b from-[#fbbf24] to-[#b45309] text-black shadow-[0_4px_12px_rgba(251,191,36,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_6px_20px_rgba(251,191,36,0.6)] hover:-translate-y-0.5'
+                                }`}
+                            >
+                                {isPrinting ? 'PRINTING...' : 'PRINT'}
+                            </button>
                         </div>
-                        
-                        {/* Print Button - Right Side */}
-                        <button 
-                            onClick={handlePrint}
-                            disabled={isPrinting || !user}
-                            className={`px-5 py-3 font-black text-xs tracking-wider rounded-xl transition-all active:scale-95 ${
-                                isPrinting 
-                                    ? 'bg-[#333] text-[#666] cursor-not-allowed' 
-                                    : 'bg-gradient-to-b from-[#fbbf24] to-[#b45309] text-black shadow-[0_4px_12px_rgba(251,191,36,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_6px_20px_rgba(251,191,36,0.6)] hover:-translate-y-0.5'
-                            }`}
-                        >
-                            {isPrinting ? 'PRINTING...' : 'PRINT'}
-                        </button>
+
+                        {/* Bottom Row: Download + Share Buttons */}
+                        {onDownload && onShare && (
+                            <div className="grid grid-cols-2 gap-2">
+                                <button
+                                    onClick={onDownload}
+                                    className="px-4 py-2.5 font-black text-[10px] tracking-wider rounded-xl transition-all active:scale-95 bg-gradient-to-b from-[#06b6d4] to-[#0891b2] text-white shadow-[0_4px_12px_rgba(6,182,212,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_6px_20px_rgba(6,182,212,0.6)]"
+                                >
+                                    ⬇️ DOWNLOAD
+                                </button>
+
+                                <button
+                                    onClick={onShare}
+                                    className="px-4 py-2.5 font-black text-[10px] tracking-wider rounded-xl transition-all active:scale-95 bg-gradient-to-b from-[#7c3aed] to-[#6d28d9] text-white shadow-[0_4px_12px_rgba(124,58,237,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_6px_20px_rgba(124,58,237,0.6)] flex items-center justify-center gap-1"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="m3 3 3 9-3 9 19-9Z"/>
+                                        <path d="M6 12h16"/>
+                                    </svg>
+                                    SHARE
+                                </button>
+                            </div>
+                        )}
                     </div>
                     
                     {/* Paper Slot */}
@@ -679,9 +707,11 @@ interface PrinterViewProps {
     standName?: string;
     standImageUrl?: string;
     sketchImageUrl?: string;
+    onDownload?: () => void;
+    onShare?: () => void;
 }
 
-const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDetails, standName, standImageUrl, sketchImageUrl }) => {
+const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDetails, standName, standImageUrl, sketchImageUrl, onDownload, onShare }) => {
     return (
         <main className="absolute inset-0 bg-black bg-noise pattern-flowing-checkers flex flex-col overflow-y-scroll" 
               style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)', WebkitOverflowScrolling: 'touch' }}>
@@ -711,7 +741,14 @@ const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDeta
              
              {/* Printer Component */}
              <div className="flex items-start justify-center relative z-20 py-8 pb-[600px]">
-                 <StandPrinter user={user} stats={stats} statDetails={statDetails} standName={standName} />
+                 <StandPrinter 
+                     user={user} 
+                     stats={stats} 
+                     statDetails={statDetails} 
+                     standName={standName}
+                     onDownload={onDownload}
+                     onShare={onShare}
+                 />
              </div>
         </main>
     );
@@ -930,6 +967,8 @@ export default function App() {
           standName={standData?.standName}
           standImageUrl={standData?.standImageUrl}
           sketchImageUrl={standData?.sketchImageUrl}
+          onDownload={handleDownload}
+          onShare={handleShare}
       />;
   }
   
@@ -1079,32 +1118,6 @@ export default function App() {
     
             </div>
 
-            {/* ================================ */}
-            {/* ACTION BUTTONS - Download, Share */}
-            {/* ================================ */}
-            {standData && (
-              <div className="w-full px-4 pb-6 pt-2 z-20">
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={handleDownload}
-                    className="h-14 bg-[#06b6d4] border-4 border-white font-black text-lg tracking-widest hover:bg-[#0891b2] transition-colors active:scale-95 text-white"
-                  >
-                    ⬇️ DOWNLOAD
-                  </button>
-
-                  <button
-                    onClick={handleShare}
-                    className="h-14 bg-[#7c3aed] border-4 border-white font-black text-lg tracking-widest hover:bg-[#6d28d9] transition-colors active:scale-95 text-white flex items-center justify-center gap-2"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="m3 3 3 9-3 9 19-9Z"/>
-                      <path d="M6 12h16"/>
-                    </svg>
-                    SHARE
-                  </button>
-                </div>
-              </div>
-            )}
         </main>
       );
   }
