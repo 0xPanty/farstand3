@@ -1079,9 +1079,9 @@ export default function App() {
                         <div className="absolute inset-0 bg-gradient-to-br from-[#fbbf24] to-[#b45309] shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300 transform rotate-45 border-4 border-white group-hover:scale-105"></div>
                         
                         {/* 2. User Avatar Preview Overlay */}
-                        {farcasterUser?.pfp_url && !isLoading && (
+                        {farcasterUser?.pfpUrl && !isLoading && (
                             <div className="absolute inset-0 overflow-hidden transform rotate-45 border-4 border-black z-0">
-                                <img src={farcasterUser.pfp_url} className="w-full h-full object-cover transform -rotate-45 scale-150 opacity-60 group-hover:opacity-100 transition-opacity" alt="Your Avatar" />
+                                <img src={farcasterUser.pfpUrl} className="w-full h-full object-cover transform -rotate-45 scale-150 opacity-60 group-hover:opacity-100 transition-opacity" alt="Your Avatar" />
                             </div>
                         )}
 
@@ -1142,3 +1142,4 @@ export default function App() {
     </main>
   );
 }
+
