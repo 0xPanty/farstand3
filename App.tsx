@@ -230,6 +230,17 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
         return 'E';
     };
     
+    const getRankColor = (rank: string): string => {
+        switch (rank) {
+            case 'S': return '#ff00ff'; // 紫色 - 最强
+            case 'A': return '#fbbf24'; // 金色
+            case 'B': return '#22c55e'; // 绿色
+            case 'C': return '#06b6d4'; // 青色
+            case 'D': return '#f97316'; // 橙色
+            default: return '#888888'; // 灰色
+        }
+    };
+    
     // Star rating (1-5 stars based on score)
     const getStars = (score: number): string => {
         const starCount = Math.ceil((score / 600) * 5);
@@ -292,17 +303,34 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                             {/* Screen content */}
                             <div className="font-mono text-xs leading-relaxed relative z-10">
                                 {user ? (
-                                    <>
-                                        <div className="text-[#22c55e] mb-2 flex items-center gap-2">
-                                            <span className="inline-block w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse"></span>
-                                            USER DETECTED
+                                    showPaper && !isPrinting ? (
+                                        // Show rank after printing complete
+                                        <div className="flex flex-col items-center justify-center h-full">
+                                            <div className="text-[10px] text-[#666] mb-1">YOUR RANK</div>
+                                            <div 
+                                                className="text-5xl font-black animate-pulse"
+                                                style={{ 
+                                                    color: getRankColor(getRank(totalScore)),
+                                                    textShadow: `0 0 20px ${getRankColor(getRank(totalScore))}, 0 0 40px ${getRankColor(getRank(totalScore))}`
+                                                }}
+                                            >
+                                                {getRank(totalScore)}
+                                            </div>
+                                            <div className="text-[10px] text-[#888] mt-1">{totalScore}/600</div>
                                         </div>
-                                        <div className="text-[#fbbf24] font-bold">@{user.username}</div>
-                                        <div className="text-[#666] text-[10px]">FID: #{user.fid}</div>
-                                        <div className="text-[#06b6d4] text-[10px] mt-2 animate-pulse tracking-wider">
-                                            {isPrinting ? '▶ PRINTING...' : '▶ READY TO PRINT...'}
-                                        </div>
-                                    </>
+                                    ) : (
+                                        <>
+                                            <div className="text-[#22c55e] mb-2 flex items-center gap-2">
+                                                <span className="inline-block w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse"></span>
+                                                USER DETECTED
+                                            </div>
+                                            <div className="text-[#fbbf24] font-bold">@{user.username}</div>
+                                            <div className="text-[#666] text-[10px]">FID: #{user.fid}</div>
+                                            <div className="text-[#06b6d4] text-[10px] mt-2 animate-pulse tracking-wider">
+                                                {isPrinting ? '▶ PRINTING...' : '▶ READY TO PRINT...'}
+                                            </div>
+                                        </>
+                                    )
                                 ) : (
                                     <div className="text-[#666] animate-pulse">CONNECTING...</div>
                                 )}
