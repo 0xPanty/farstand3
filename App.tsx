@@ -1048,44 +1048,12 @@ export default function App() {
                 </h1>
                 
                 {farcasterUser ? (
-                    <div className="mt-6 flex flex-col items-center justify-center gap-3">
-                            {/* User Info Row */}
-                            <div className="flex items-center justify-center gap-2">
-                                <div className="w-2 h-2 bg-[#06b6d4] rotate-45 animate-pulse"></div>
-                                <p className="text-xs tracking-[0.2em] text-[#06b6d4] uppercase font-bold border-b border-[#06b6d4]">
-                                SOUL: @{farcasterUser.username}
-                                </p>
-                                <div className="w-2 h-2 bg-[#06b6d4] rotate-45 animate-pulse"></div>
-                            </div>
-                            
-                            {/* FREE Badge - JOJO Style */}
-                            <div className="relative inline-flex items-center gap-2">
-                                {/* Main FREE Badge */}
-                                <div className="relative transform -skew-x-6">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] blur-sm"></div>
-                                    <div className="relative bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] border-4 border-black px-6 py-2 shadow-[4px_4px_0_rgba(0,0,0,1)]">
-                                        <span className="text-black font-black text-2xl tracking-[0.2em] drop-shadow-[0_2px_0_rgba(255,255,255,0.3)]">
-                                            FREE
-                                        </span>
-                                    </div>
-                                    {/* Speed lines */}
-                                    <div className="absolute -right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1">
-                                        <div className="w-8 h-0.5 bg-[#fbbf24]"></div>
-                                        <div className="w-6 h-0.5 bg-[#fbbf24]"></div>
-                                        <div className="w-4 h-0.5 bg-[#fbbf24]"></div>
-                                    </div>
-                                </div>
-                                
-                                {/* Info Text */}
-                                <div className="text-left">
-                                    <p className="text-[10px] text-white font-bold uppercase tracking-wider leading-tight">
-                                        AUTO-USING YOUR
-                                    </p>
-                                    <p className="text-xs text-[#fbbf24] font-black uppercase tracking-wider leading-tight">
-                                        PROFILE PIC
-                                    </p>
-                                </div>
-                            </div>
+                    <div className="mt-6 flex items-center justify-center gap-2">
+                            <div className="w-2 h-2 bg-[#06b6d4] rotate-45 animate-pulse"></div>
+                            <p className="text-xs tracking-[0.2em] text-[#06b6d4] uppercase font-bold border-b border-[#06b6d4]">
+                            SOUL: @{farcasterUser.username}
+                            </p>
+                            <div className="w-2 h-2 bg-[#06b6d4] rotate-45 animate-pulse"></div>
                     </div>
                 ) : (
                     <div className="mt-6 opacity-50">
@@ -1101,34 +1069,28 @@ export default function App() {
                         <div className="absolute inset-0 border-2 border-dashed border-[#db2777] rounded-full animate-[spin_30s_linear_infinite] opacity-50"></div>
                         <div className="absolute inset-4 border border-dotted border-[#fbbf24] rounded-full animate-[spin_20s_linear_infinite_reverse] opacity-50"></div>
                         
-                        {/* Main Button */}
+                        {/* Main Button - Auto-uses user avatar */}
                         <button 
-                        onClick={() => preview ? handleGenerate() : fileInputRef.current?.click()}
-                        disabled={isLoading}
+                        onClick={handleGenerate}
+                        disabled={isLoading || !farcasterUser}
                         className="relative w-48 h-48 md:w-56 md:h-56 group outline-none active:scale-95 transition-transform"
                         >
                         {/* 1. Diamond Background */}
-                        <div className={`absolute inset-0 bg-gradient-to-br from-[#fbbf24] to-[#b45309] shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300 transform rotate-45 ${preview ? 'border-4 border-white' : 'group-hover:scale-105 group-hover:rotate-90 border-4 border-black'}`}></div>
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#fbbf24] to-[#b45309] shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300 transform rotate-45 border-4 border-white group-hover:scale-105"></div>
                         
-                        {/* 2. Image Preview Overlay */}
-                        {preview && !isLoading && (
+                        {/* 2. User Avatar Preview Overlay */}
+                        {farcasterUser?.pfp_url && !isLoading && (
                             <div className="absolute inset-0 overflow-hidden transform rotate-45 border-4 border-black z-0">
-                                <img src={preview} className="w-full h-full object-cover transform -rotate-45 scale-150 opacity-60 group-hover:opacity-100 transition-opacity" alt="Preview" />
+                                <img src={farcasterUser.pfp_url} className="w-full h-full object-cover transform -rotate-45 scale-150 opacity-60 group-hover:opacity-100 transition-opacity" alt="Your Avatar" />
                             </div>
                         )}
 
                         {/* 3. Inner Content */}
                         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                            {preview ? (
-                                <div className="text-center transform transition-transform group-hover:scale-110 drop-shadow-md">
-                                    <Sparkles className="w-16 h-16 text-white fill-white/50 animate-pulse filter drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" />
-                                    <span className="block text-white font-black text-sm mt-2 text-shadow-black">AWAKEN</span>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col items-center">
-                                    <Plus className="w-16 h-16 text-black" strokeWidth={4} />
-                                </div>
-                            )}
+                            <div className="text-center transform transition-transform group-hover:scale-110 drop-shadow-md">
+                                <Sparkles className="w-16 h-16 text-white fill-white/50 animate-pulse filter drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" />
+                                <span className="block text-white font-black text-base mt-2 text-shadow-black tracking-wider">AWAKEN NOW</span>
+                            </div>
                         </div>
                         </button>
                 </div>
