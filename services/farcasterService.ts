@@ -179,13 +179,14 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
 
   const precisionDetail = `Hash: ${precisionIndex}`;
 
-  // E. RANGE (Engagement - Likes + Recasts) - 调整门槛更合理
+  // E. RANGE (Engagement - Likes + Recasts)
   const totalEngagement = profile.likesReceived + profile.recastsReceived;
   let range: StatValue = 'E';
-  if (totalEngagement > 2000) range = 'A';
+  if (totalEngagement > 1000) range = 'A';
   else if (totalEngagement > 500) range = 'B';
-  else if (totalEngagement > 100) range = 'C';
-  else if (totalEngagement > 20) range = 'D';
+  else if (totalEngagement > 300) range = 'C';
+  else if (totalEngagement > 150) range = 'D';
+  else if (totalEngagement > 50) range = 'E';
 
   const rangeDetail = `Engage: ${totalEngagement}`;
 
