@@ -922,14 +922,21 @@ export default function App() {
   }, [standData]);
 
   // ==========================
-  // VIEW: GALLERY (Check FIRST)
+  // VIEW: LOADING (Check FIRST)
+  // ==========================
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
+  // ==========================
+  // VIEW: GALLERY (Check SECOND)
   // ==========================
   if (showGallery) {
     return <Gallery onBack={() => setShowGallery(false)} />;
   }
 
   // ==========================
-  // VIEW: PRINTER (Must be checked SECOND)
+  // VIEW: PRINTER (Must be checked THIRD)
   // ==========================
   if (showInteraction) {
       return <PrinterView 
@@ -1158,8 +1165,6 @@ export default function App() {
 
             {/* Full Screen Main Container */}
             <div className="flex-1 flex flex-col items-center justify-between w-full h-full relative z-20">
-            
-            {isLoading && <LoadingScreen />}
 
             {/* HEADER AREA */}
             <div className="mt-12 md:mt-16 text-center z-20 relative w-full px-4">
