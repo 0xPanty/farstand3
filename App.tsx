@@ -815,13 +815,21 @@ export default function App() {
   };
 
   const handleGenerate = useCallback(async () => {
-    if (!base64Image || isLoading) return;
+    if (isLoading) return;
+    
+    // Auto-use user's PFP if no image selected
+    const imageToUse = base64Image || farcasterUser?.pfp_url;
+    if (!imageToUse) {
+      alert("No image available. Please ensure you're logged in.");
+      return;
+    }
+    
     setIsLoading(true);
     setStandData(null); // Clear previous result to show LoadingScreen
 
     try {
       const result = await analyzeUserAndGenerateStand(
-          base64Image, 
+          imageToUse, 
           calculatedData || undefined, 
           farcasterUser?.bio || undefined
       );
@@ -1040,12 +1048,44 @@ export default function App() {
                 </h1>
                 
                 {farcasterUser ? (
-                    <div className="mt-6 flex items-center justify-center gap-2">
-                            <div className="w-2 h-2 bg-[#06b6d4] rotate-45 animate-pulse"></div>
-                            <p className="text-xs tracking-[0.2em] text-[#06b6d4] uppercase font-bold border-b border-[#06b6d4]">
-                            SOUL: @{farcasterUser.username}
-                            </p>
-                            <div className="w-2 h-2 bg-[#06b6d4] rotate-45 animate-pulse"></div>
+                    <div className="mt-6 flex flex-col items-center justify-center gap-3">
+                            {/* User Info Row */}
+                            <div className="flex items-center justify-center gap-2">
+                                <div className="w-2 h-2 bg-[#06b6d4] rotate-45 animate-pulse"></div>
+                                <p className="text-xs tracking-[0.2em] text-[#06b6d4] uppercase font-bold border-b border-[#06b6d4]">
+                                SOUL: @{farcasterUser.username}
+                                </p>
+                                <div className="w-2 h-2 bg-[#06b6d4] rotate-45 animate-pulse"></div>
+                            </div>
+                            
+                            {/* FREE Badge - JOJO Style */}
+                            <div className="relative inline-flex items-center gap-2">
+                                {/* Main FREE Badge */}
+                                <div className="relative transform -skew-x-6">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] blur-sm"></div>
+                                    <div className="relative bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] border-4 border-black px-6 py-2 shadow-[4px_4px_0_rgba(0,0,0,1)]">
+                                        <span className="text-black font-black text-2xl tracking-[0.2em] drop-shadow-[0_2px_0_rgba(255,255,255,0.3)]">
+                                            FREE
+                                        </span>
+                                    </div>
+                                    {/* Speed lines */}
+                                    <div className="absolute -right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1">
+                                        <div className="w-8 h-0.5 bg-[#fbbf24]"></div>
+                                        <div className="w-6 h-0.5 bg-[#fbbf24]"></div>
+                                        <div className="w-4 h-0.5 bg-[#fbbf24]"></div>
+                                    </div>
+                                </div>
+                                
+                                {/* Info Text */}
+                                <div className="text-left">
+                                    <p className="text-[10px] text-white font-bold uppercase tracking-wider leading-tight">
+                                        AUTO-USING YOUR
+                                    </p>
+                                    <p className="text-xs text-[#fbbf24] font-black uppercase tracking-wider leading-tight">
+                                        PROFILE PIC
+                                    </p>
+                                </div>
+                            </div>
                     </div>
                 ) : (
                     <div className="mt-6 opacity-50">
