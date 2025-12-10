@@ -77,7 +77,7 @@ async function fetchFarcasterUser(fid: number): Promise<any> {
     
     try {
       const castsResponse = await fetch(
-        `https://api.neynar.com/v2/farcaster/feed/user/${fid}/casts?limit=150`,
+        `https://api.neynar.com/v2/farcaster/feed/user/${fid}/casts?limit=5`,
         {
           headers: {
             accept: "application/json",
@@ -212,11 +212,17 @@ async function calculateFarcasterStats(profile: any): Promise<any> {
 
   const durabilityDetail = `${profile.castCount} Casts`;
 
-  // D. PRECISION
-  const precisionMap = ['A', 'B', 'C', 'D', 'E'];
-  const precisionIndex = profile.fid % 5; 
-  const precision = precisionMap[precisionIndex];
-  const precisionDetail = `Hash: ${precisionIndex}`;
+  // D. PRECISION (Weighted Engagement Ratio - recasts×2 + likes×1, last 5 casts)
+  const weightedInteractions = (profile.recastsReceived * 2) + (profile.likesReceived * 1);
+  const engagementRatio = profile.castCount > 0 ? weightedInteractions / profile.castCount : 0;
+  
+  let precision: StatValue = 'E';
+  if (engagementRatio > 30) precision = 'A';
+  else if (engagementRatio > 20) precision = 'B';
+  else if (engagementRatio > 10) precision = 'C';
+  else if (engagementRatio > 5) precision = 'D';
+  
+  const precisionDetail = `${engagementRatio.toFixed(1)} per Cast`;
 
   // E. RANGE
   const totalEngagement = profile.likesReceived + profile.recastsReceived;
