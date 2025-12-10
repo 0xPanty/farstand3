@@ -12,6 +12,16 @@ dist
 dist-ssr
 *.local
 
+# Environment variables (NEVER commit these!)
+.env
+.env.local
+.env.*.local
+
+# Hardhat files
+contracts/cache
+contracts/artifacts
+contracts/node_modules
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
