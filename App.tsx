@@ -344,23 +344,23 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                     
                     {/* Control Panel */}
                     <div className="px-4 pb-4 flex items-center justify-between gap-3">
-                        {/* Left: Game Boy A/B Buttons */}
+                        {/* Left: Neon Glow Buttons */}
                         <div className="flex items-center gap-2 shrink-0">
-                            {/* Download Button (A Button) */}
+                            {/* Download Button - Cyan Neon */}
                             {onDownload && (
                                 <button
                                     onClick={onDownload}
-                                    className="group relative w-11 h-11 rounded-full transition-all active:scale-90 shadow-[0_3px_0_rgba(0,0,0,0.3)]"
+                                    className="group relative w-11 h-11 rounded-full transition-all active:scale-90"
                                 >
-                                    {/* Cyan background like Game Boy Color */}
-                                    <div className="absolute inset-0 rounded-full bg-gradient-to-b from-[#06b6d4] to-[#0891b2]"></div>
-                                    {/* Inner shadow ring */}
-                                    <div className="absolute inset-1 rounded-full shadow-[inset_0_2px_6px_rgba(0,0,0,0.3)]"></div>
-                                    {/* Shine effect */}
-                                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/30 via-transparent to-transparent"></div>
-                                    {/* Down Arrow Icon - BLACK & BOLD */}
+                                    {/* Metallic ring */}
+                                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#555] via-[#333] to-[#222] border-2 border-[#666]"></div>
+                                    {/* Inner glow ring */}
+                                    <div className="absolute inset-1 rounded-full bg-[#0a0a0a] border border-[#444]"></div>
+                                    {/* Neon glow effect */}
+                                    <div className="absolute inset-2 rounded-full bg-[#06b6d4]/20 shadow-[0_0_15px_rgba(6,182,212,0.6),inset_0_0_10px_rgba(6,182,212,0.4)] group-hover:shadow-[0_0_25px_rgba(6,182,212,0.8),inset_0_0_15px_rgba(6,182,212,0.6)] transition-all"></div>
+                                    {/* Down Arrow Icon - WHITE with neon glow */}
                                     <div className="relative flex items-center justify-center h-full">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="text-black group-hover:scale-110 transition-transform">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white drop-shadow-[0_0_8px_rgba(6,182,212,1)] group-hover:scale-110 group-hover:drop-shadow-[0_0_12px_rgba(6,182,212,1)] transition-all">
                                             <polyline points="7 10 12 15 17 10"/>
                                             <line x1="12" y1="15" x2="12" y2="3"/>
                                         </svg>
@@ -368,21 +368,21 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 </button>
                             )}
 
-                            {/* Share Button (B Button) */}
+                            {/* Share Button - Purple Neon */}
                             {onShare && (
                                 <button
                                     onClick={onShare}
-                                    className="group relative w-11 h-11 rounded-full transition-all active:scale-90 shadow-[0_3px_0_rgba(0,0,0,0.3)]"
+                                    className="group relative w-11 h-11 rounded-full transition-all active:scale-90"
                                 >
-                                    {/* Purple background like Game Boy Color */}
-                                    <div className="absolute inset-0 rounded-full bg-gradient-to-b from-[#7c3aed] to-[#6d28d9]"></div>
-                                    {/* Inner shadow ring */}
-                                    <div className="absolute inset-1 rounded-full shadow-[inset_0_2px_6px_rgba(0,0,0,0.3)]"></div>
-                                    {/* Shine effect */}
-                                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/30 via-transparent to-transparent"></div>
-                                    {/* Send Arrow Icon - BLACK & BOLD */}
+                                    {/* Metallic ring */}
+                                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#555] via-[#333] to-[#222] border-2 border-[#666]"></div>
+                                    {/* Inner glow ring */}
+                                    <div className="absolute inset-1 rounded-full bg-[#0a0a0a] border border-[#444]"></div>
+                                    {/* Neon glow effect */}
+                                    <div className="absolute inset-2 rounded-full bg-[#7c3aed]/20 shadow-[0_0_15px_rgba(124,58,237,0.6),inset_0_0_10px_rgba(124,58,237,0.4)] group-hover:shadow-[0_0_25px_rgba(124,58,237,0.8),inset_0_0_15px_rgba(124,58,237,0.6)] transition-all"></div>
+                                    {/* Send Arrow Icon - WHITE with neon glow */}
                                     <div className="relative flex items-center justify-center h-full">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="text-black group-hover:scale-110 transition-transform">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white drop-shadow-[0_0_8px_rgba(124,58,237,1)] group-hover:scale-110 group-hover:drop-shadow-[0_0_12px_rgba(124,58,237,1)] transition-all">
                                             <path d="m3 3 3 9-3 9 19-9Z"/>
                                             <path d="M6 12h16"/>
                                         </svg>
