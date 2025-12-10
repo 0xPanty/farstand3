@@ -28,8 +28,7 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
 
     if (!user) return null;
 
-    // Fetch real data from Neynar API (paid plan)
-    let castCount = 0;
+    // Fetch engagement from Neynar API (paid plan)
     let likesReceived = 0;
     let recastsReceived = 0;
     
@@ -45,7 +44,6 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
       );
       if (castsResponse.ok) {
         const castsData = await castsResponse.json();
-        castCount = castsData.casts?.length || 0;
         castsData.casts?.forEach((cast: any) => {
           likesReceived += cast.reactions?.likes_count || 0;
           recastsReceived += cast.reactions?.recasts_count || 0;
@@ -53,6 +51,27 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
       }
     } catch (e) {
       console.warn("Neynar API fetch failed:", e);
+    }
+    
+    // Fetch real cast count from Hub API (with pagination)
+    let castCount = 0;
+    try {
+      let nextPageToken: string | null = null;
+      do {
+        const url = `https://hub.pinata.cloud/v1/castsByFid?fid=${fid}&pageSize=1000${nextPageToken ? `&pageToken=${nextPageToken}` : ''}`;
+        const hubResponse = await fetch(url);
+        if (hubResponse.ok) {
+          const hubData = await hubResponse.json();
+          castCount += hubData.messages?.filter(
+            (m: any) => m.data?.type === 'MESSAGE_TYPE_CAST_ADD'
+          ).length || 0;
+          nextPageToken = hubData.nextPageToken || null;
+        } else {
+          break;
+        }
+      } while (nextPageToken);
+    } catch (e) {
+      console.warn("Hub API fetch failed:", e);
     }
 
     return {
