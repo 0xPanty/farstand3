@@ -2,11 +2,13 @@
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { Plus, X, RotateCcw, Zap, Triangle, Sparkles, Crosshair, ArrowRight, ArrowLeft } from "lucide-react";
+import { Plus, X, RotateCcw, Zap, Triangle, Sparkles, Crosshair, ArrowRight, ArrowLeft, Users } from "lucide-react";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { analyzeUserAndGenerateStand } from "./services/geminiService";
 import { fetchFarcasterUser, calculateFarcasterStats } from "./services/farcasterService";
 import { StandResult, StatValue, StandStats, FarcasterProfile, StandStatRawValues } from "./types";
+import Gallery from "./Gallery";
+import { downloadStandImage, shareOnFarcaster } from "./services/downloadService";
 
 // ==========================================
 // Helper: Radar Chart Component (Stats Panel)
@@ -741,6 +743,12 @@ export default function App() {
   // Farcaster State
   const [farcasterUser, setFarcasterUser] = useState<FarcasterProfile | null>(null);
   const [calculatedData, setCalculatedData] = useState<{ stats: StandStats; details: StandStatRawValues } | null>(null);
+  
+  // New Feature States
+  const [showGallery, setShowGallery] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [context, setContext] = useState<any>(null);
 
   // Farcaster Frame Logic
   useEffect(() => {
@@ -850,8 +858,78 @@ export default function App() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  // New Feature Handlers
+  const handleSaveToDatabase = useCallback(async () => {
+    if (!standData || !farcasterUser) {
+      alert('No Stand data to save');
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveSuccess(false);
+
+    try {
+      const response = await fetch('/api/save-stand', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          standData,
+          farcasterUser
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error: any) {
+      console.error('Save error:', error);
+      alert(`Failed to save: ${error.message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [standData, farcasterUser]);
+
+  const handleDownload = useCallback(async () => {
+    if (!standData?.standImageUrl) {
+      alert('No image to download');
+      return;
+    }
+
+    const success = await downloadStandImage(
+      standData.standImageUrl,
+      standData.standName
+    );
+
+    if (success) {
+      alert('✅ Image downloaded!');
+    } else {
+      alert('❌ Download failed');
+    }
+  }, [standData]);
+
+  const handleShare = useCallback(() => {
+    if (!standData) return;
+    
+    shareOnFarcaster(
+      standData.standName,
+      'https://farstand3.vercel.app' // 你的应用 URL
+    );
+  }, [standData]);
+
   // ==========================
-  // VIEW: PRINTER (Must be checked FIRST)
+  // VIEW: GALLERY (Check FIRST)
+  // ==========================
+  if (showGallery) {
+    return <Gallery onBack={() => setShowGallery(false)} />;
+  }
+
+  // ==========================
+  // VIEW: PRINTER (Must be checked SECOND)
   // ==========================
   if (showInteraction) {
       return <PrinterView 
@@ -870,13 +948,13 @@ export default function App() {
   // ==========================
   if (standData) {
       return (
-        <main className="h-dvh w-screen bg-black bg-noise pattern-grid flex flex-col items-center justify-center p-0 perspective-1000 overflow-hidden"
+        <main className="h-dvh w-screen bg-black bg-noise pattern-grid flex flex-col items-center justify-start p-0 perspective-1000 overflow-y-auto"
               style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
             
-            {/* Card Container with 3D flip - Full Screen Mode */}
+            {/* Card Container with 3D flip - Adjusted for buttons */}
             <div 
                 onClick={() => setIsFlipped(!isFlipped)}
-                className={`w-full h-full relative transition-transform duration-700 transform-style-3d cursor-pointer ${isFlipped ? 'rotate-y-180' : ''}`}
+                className={`w-full flex-1 min-h-0 relative transition-transform duration-700 transform-style-3d cursor-pointer ${isFlipped ? 'rotate-y-180' : ''}`}
             >
                 {/* FRONT SIDE: Art + Name Only */}
                 <div className="absolute inset-0 w-full h-full backface-hidden bg-black border-x-[4px] border-black shadow-2xl overflow-hidden flex flex-col">
@@ -1009,9 +1087,54 @@ export default function App() {
                     </div>
                 </div>
     
-                
-                
             </div>
+
+            {/* ================================ */}
+            {/* ACTION BUTTONS - Save, Download, Share */}
+            {/* ================================ */}
+            {standData && (
+              <div className="w-full px-4 py-6 flex flex-col gap-3 z-20">
+                {/* Save Button */}
+                <button
+                  onClick={handleSaveToDatabase}
+                  disabled={isSaving || saveSuccess}
+                  className={`
+                    w-full h-14 border-4 border-white font-black text-lg tracking-widest
+                    transition-all duration-200 active:scale-95
+                    ${saveSuccess 
+                      ? 'bg-green-600 text-white' 
+                      : 'bg-gradient-to-r from-[#db2777] to-[#c026d3] text-white hover:shadow-[0_0_20px_rgba(219,39,119,0.6)]'
+                    }
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                  `}
+                >
+                  {isSaving ? '💾 SAVING...' : saveSuccess ? '✅ SAVED!' : '💾 SAVE TO GALLERY'}
+                </button>
+
+                {/* Download and Share Buttons */}
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={handleDownload}
+                    className="h-14 bg-[#06b6d4] border-4 border-white font-black text-lg tracking-widest hover:bg-[#0891b2] transition-colors active:scale-95"
+                  >
+                    ⬇️ DOWNLOAD
+                  </button>
+
+                  <button
+                    onClick={handleShare}
+                    className="h-14 bg-[#7c3aed] border-4 border-white font-black text-lg tracking-widest hover:bg-[#6d28d9] transition-colors active:scale-95"
+                  >
+                    🔗 SHARE
+                  </button>
+                </div>
+
+                {saveSuccess && (
+                  <p className="text-center text-green-400 text-sm animate-pulse">
+                    ✨ Stand saved to community gallery!
+                  </p>
+                )}
+              </div>
+            )}
         </main>
       );
   }
