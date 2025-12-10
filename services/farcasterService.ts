@@ -28,26 +28,31 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
 
     if (!user) return null;
 
-    // Fetch real cast count from free Farcaster Hub API (with pagination)
+    // Fetch real data from Neynar API (paid plan)
     let castCount = 0;
+    let likesReceived = 0;
+    let recastsReceived = 0;
     
     try {
-      let nextPageToken: string | null = null;
-      do {
-        const url = `https://hub.pinata.cloud/v1/castsByFid?fid=${fid}&pageSize=1000${nextPageToken ? `&pageToken=${nextPageToken}` : ''}`;
-        const hubResponse = await fetch(url);
-        if (hubResponse.ok) {
-          const hubData = await hubResponse.json();
-          castCount += hubData.messages?.filter(
-            (m: any) => m.data?.type === 'MESSAGE_TYPE_CAST_ADD'
-          ).length || 0;
-          nextPageToken = hubData.nextPageToken || null;
-        } else {
-          break;
+      const castsResponse = await fetch(
+        `https://api.neynar.com/v2/farcaster/feed/user/casts?fid=${fid}&limit=150`,
+        {
+          headers: {
+            accept: "application/json",
+            "x-api-key": NEYNAR_API_KEY,
+          },
         }
-      } while (nextPageToken);
+      );
+      if (castsResponse.ok) {
+        const castsData = await castsResponse.json();
+        castCount = castsData.casts?.length || 0;
+        castsData.casts?.forEach((cast: any) => {
+          likesReceived += cast.reactions?.likes_count || 0;
+          recastsReceived += cast.reactions?.recasts_count || 0;
+        });
+      }
     } catch (e) {
-      console.warn("Hub API fetch failed:", e);
+      console.warn("Neynar API fetch failed:", e);
     }
 
     return {
@@ -59,6 +64,8 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
       followerCount: user.follower_count || 0,
       followingCount: user.following_count || 0,
       castCount,
+      likesReceived,
+      recastsReceived,
       verifications: user.verifications || [],
       powerBadge: user.power_badge || false,
       score: user.experimental?.neynar_user_score || user.score,
@@ -153,14 +160,15 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
 
   const precisionDetail = `Hash: ${precisionIndex}`;
 
-  // E. RANGE (Followers - Social Reach)
+  // E. RANGE (Engagement - Likes + Recasts)
+  const totalEngagement = profile.likesReceived + profile.recastsReceived;
   let range: StatValue = 'E';
-  if (profile.followerCount > 10000) range = 'A';
-  else if (profile.followerCount > 3000) range = 'B';
-  else if (profile.followerCount > 1000) range = 'C';
-  else if (profile.followerCount > 200) range = 'D';
+  if (totalEngagement > 5000) range = 'A';
+  else if (totalEngagement > 1000) range = 'B';
+  else if (totalEngagement > 200) range = 'C';
+  else if (totalEngagement > 50) range = 'D';
 
-  const rangeDetail = `${profile.followerCount} Followers`;
+  const rangeDetail = `Engage: ${totalEngagement}`;
 
   // F. POTENTIAL (FID Age)
   let potential: StatValue = 'E';

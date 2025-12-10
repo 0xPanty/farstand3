@@ -28,6 +28,8 @@ export interface FarcasterProfile {
   followerCount: number;
   followingCount: number;
   castCount: number;
+  likesReceived: number;
+  recastsReceived: number;
   verifications: string[]; // ETH addresses
   powerBadge: boolean;
 }
