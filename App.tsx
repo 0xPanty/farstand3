@@ -343,37 +343,24 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                     </div>
                     
                     {/* Control Panel */}
-                    <div className="px-4 pb-4 flex flex-col gap-3">
-                        {/* Top Row: Print Button (Full Width) */}
-                        <button 
-                            onClick={handlePrint}
-                            disabled={isPrinting || !user}
-                            className={`w-full px-5 py-3 font-black text-xs tracking-wider rounded-xl transition-all active:scale-95 ${
-                                isPrinting 
-                                    ? 'bg-[#333] text-[#666] cursor-not-allowed' 
-                                    : 'bg-gradient-to-b from-[#fbbf24] to-[#b45309] text-black shadow-[0_4px_12px_rgba(251,191,36,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_6px_20px_rgba(251,191,36,0.6)] hover:-translate-y-0.5'
-                            }`}
-                        >
-                            {isPrinting ? 'PRINTING...' : 'PRINT'}
-                        </button>
-
-                        {/* Bottom Row: Speaker Grille + Game Boy Style Buttons */}
-                        <div className="flex items-center justify-between gap-3">
-                            {/* Left: Download Button (Game Boy Style) */}
+                    <div className="px-4 pb-4 flex items-center justify-between gap-3">
+                        {/* Left: Game Boy A/B Buttons */}
+                        <div className="flex items-center gap-2 shrink-0">
+                            {/* Download Button (A Button) */}
                             {onDownload && (
                                 <button
                                     onClick={onDownload}
-                                    className="group relative w-14 h-14 rounded-full transition-all active:scale-90 border-2 border-[#444] shrink-0"
+                                    className="group relative w-11 h-11 rounded-full transition-all active:scale-90 shadow-[0_3px_0_rgba(0,0,0,0.3)]"
                                 >
-                                    {/* Metallic gradient background */}
-                                    <div className="absolute inset-0 rounded-full bg-gradient-to-b from-[#3a3a3a] via-[#2a2a2a] to-[#1a1a1a]"></div>
+                                    {/* Cyan background like Game Boy Color */}
+                                    <div className="absolute inset-0 rounded-full bg-gradient-to-b from-[#06b6d4] to-[#0891b2]"></div>
                                     {/* Inner shadow ring */}
-                                    <div className="absolute inset-1 rounded-full shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)]"></div>
+                                    <div className="absolute inset-1 rounded-full shadow-[inset_0_2px_6px_rgba(0,0,0,0.3)]"></div>
                                     {/* Shine effect */}
-                                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    {/* Down Arrow Icon */}
+                                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/30 via-transparent to-transparent"></div>
+                                    {/* Down Arrow Icon - BLACK & BOLD */}
                                     <div className="relative flex items-center justify-center h-full">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-[#06b6d4] group-hover:scale-110 transition-transform">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="text-black group-hover:scale-110 transition-transform">
                                             <polyline points="7 10 12 15 17 10"/>
                                             <line x1="12" y1="15" x2="12" y2="3"/>
                                         </svg>
@@ -381,28 +368,21 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 </button>
                             )}
 
-                            {/* Center: Speaker Grille */}
-                            <div className="flex-1 flex flex-col gap-1 items-center justify-center px-2">
-                                {[...Array(4)].map((_, i) => (
-                                    <div key={i} className="w-full max-w-[100px] h-[2px] bg-gradient-to-r from-transparent via-[#333] to-transparent rounded"></div>
-                                ))}
-                            </div>
-
-                            {/* Right: Share Button (Game Boy Style) */}
+                            {/* Share Button (B Button) */}
                             {onShare && (
                                 <button
                                     onClick={onShare}
-                                    className="group relative w-14 h-14 rounded-full transition-all active:scale-90 border-2 border-[#444] shrink-0"
+                                    className="group relative w-11 h-11 rounded-full transition-all active:scale-90 shadow-[0_3px_0_rgba(0,0,0,0.3)]"
                                 >
-                                    {/* Metallic gradient background */}
-                                    <div className="absolute inset-0 rounded-full bg-gradient-to-b from-[#3a3a3a] via-[#2a2a2a] to-[#1a1a1a]"></div>
+                                    {/* Purple background like Game Boy Color */}
+                                    <div className="absolute inset-0 rounded-full bg-gradient-to-b from-[#7c3aed] to-[#6d28d9]"></div>
                                     {/* Inner shadow ring */}
-                                    <div className="absolute inset-1 rounded-full shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)]"></div>
+                                    <div className="absolute inset-1 rounded-full shadow-[inset_0_2px_6px_rgba(0,0,0,0.3)]"></div>
                                     {/* Shine effect */}
-                                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    {/* Send Arrow Icon */}
+                                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/30 via-transparent to-transparent"></div>
+                                    {/* Send Arrow Icon - BLACK & BOLD */}
                                     <div className="relative flex items-center justify-center h-full">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-[#7c3aed] group-hover:scale-110 transition-transform">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="text-black group-hover:scale-110 transition-transform">
                                             <path d="m3 3 3 9-3 9 19-9Z"/>
                                             <path d="M6 12h16"/>
                                         </svg>
@@ -410,6 +390,26 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 </button>
                             )}
                         </div>
+
+                        {/* Center: Speaker Grille */}
+                        <div className="flex-1 flex flex-col gap-1 items-center justify-center px-2">
+                            {[...Array(4)].map((_, i) => (
+                                <div key={i} className="w-full max-w-[80px] h-[2px] bg-gradient-to-r from-transparent via-[#333] to-transparent rounded"></div>
+                            ))}
+                        </div>
+
+                        {/* Right: Print Button */}
+                        <button 
+                            onClick={handlePrint}
+                            disabled={isPrinting || !user}
+                            className={`px-5 py-2.5 font-black text-xs tracking-wider rounded-xl transition-all active:scale-95 shrink-0 ${
+                                isPrinting 
+                                    ? 'bg-[#333] text-[#666] cursor-not-allowed' 
+                                    : 'bg-gradient-to-b from-[#fbbf24] to-[#b45309] text-black shadow-[0_4px_12px_rgba(251,191,36,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_6px_20px_rgba(251,191,36,0.6)] hover:-translate-y-0.5'
+                            }`}
+                        >
+                            {isPrinting ? 'PRINTING...' : 'PRINT'}
+                        </button>
                     </div>
                     
                     {/* Paper Slot */}
