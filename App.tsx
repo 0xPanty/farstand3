@@ -350,17 +350,11 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                             {onDownload && (
                                 <button
                                     onClick={onDownload}
-                                    className="group relative w-11 h-11 rounded-full transition-all active:scale-90"
+                                    className="group relative w-11 h-11 rounded-full transition-all active:scale-90 bg-[#0a0a0a] shadow-[0_0_15px_rgba(6,182,212,0.6),inset_0_0_10px_rgba(6,182,212,0.4)] group-hover:shadow-[0_0_25px_rgba(6,182,212,0.8),inset_0_0_15px_rgba(6,182,212,0.6)]"
                                 >
-                                    {/* Metallic ring */}
-                                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#555] via-[#333] to-[#222] border-2 border-[#666]"></div>
-                                    {/* Inner glow ring */}
-                                    <div className="absolute inset-1 rounded-full bg-[#0a0a0a] border border-[#444]"></div>
-                                    {/* Neon glow effect */}
-                                    <div className="absolute inset-2 rounded-full bg-[#06b6d4]/20 shadow-[0_0_15px_rgba(6,182,212,0.6),inset_0_0_10px_rgba(6,182,212,0.4)] group-hover:shadow-[0_0_25px_rgba(6,182,212,0.8),inset_0_0_15px_rgba(6,182,212,0.6)] transition-all"></div>
                                     {/* Down Arrow Icon - WHITE with neon glow */}
                                     <div className="relative flex items-center justify-center h-full">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white drop-shadow-[0_0_8px_rgba(6,182,212,1)] group-hover:scale-110 group-hover:drop-shadow-[0_0_12px_rgba(6,182,212,1)] transition-all">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white drop-shadow-[0_0_8px_rgba(6,182,212,1)] group-hover:scale-110 group-hover:drop-shadow-[0_0_12px_rgba(6,182,212,1)] transition-all">
                                             <polyline points="7 10 12 15 17 10"/>
                                             <line x1="12" y1="15" x2="12" y2="3"/>
                                         </svg>
@@ -372,14 +366,8 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                             {onShare && (
                                 <button
                                     onClick={onShare}
-                                    className="group relative w-11 h-11 rounded-full transition-all active:scale-90"
+                                    className="group relative w-11 h-11 rounded-full transition-all active:scale-90 bg-[#0a0a0a] shadow-[0_0_15px_rgba(124,58,237,0.6),inset_0_0_10px_rgba(124,58,237,0.4)] group-hover:shadow-[0_0_25px_rgba(124,58,237,0.8),inset_0_0_15px_rgba(124,58,237,0.6)]"
                                 >
-                                    {/* Metallic ring */}
-                                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#555] via-[#333] to-[#222] border-2 border-[#666]"></div>
-                                    {/* Inner glow ring */}
-                                    <div className="absolute inset-1 rounded-full bg-[#0a0a0a] border border-[#444]"></div>
-                                    {/* Neon glow effect */}
-                                    <div className="absolute inset-2 rounded-full bg-[#7c3aed]/20 shadow-[0_0_15px_rgba(124,58,237,0.6),inset_0_0_10px_rgba(124,58,237,0.4)] group-hover:shadow-[0_0_25px_rgba(124,58,237,0.8),inset_0_0_15px_rgba(124,58,237,0.6)] transition-all"></div>
                                     {/* Send Arrow Icon - WHITE with neon glow */}
                                     <div className="relative flex items-center justify-center h-full">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white drop-shadow-[0_0_8px_rgba(124,58,237,1)] group-hover:scale-110 group-hover:drop-shadow-[0_0_12px_rgba(124,58,237,1)] transition-all">
