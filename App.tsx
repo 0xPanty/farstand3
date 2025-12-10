@@ -826,7 +826,7 @@ export default function App() {
     if (isLoading) return;
     
     // Auto-use user's PFP if no image selected
-    const imageToUse = base64Image || farcasterUser?.pfp_url;
+    const imageToUse = base64Image || farcasterUser?.pfpUrl;
     if (!imageToUse) {
       alert("No image available. Please ensure you're logged in.");
       return;
