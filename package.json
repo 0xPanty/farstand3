@@ -13,7 +13,9 @@
     "react-dom": "^19.2.0",
     "@google/genai": "^1.30.0",
     "lucide-react": "^0.555.0",
-    "@farcaster/miniapp-sdk": "latest"
+    "@farcaster/miniapp-sdk": "latest",
+    "@vercel/postgres": "^0.10.0",
+    "html2canvas": "^1.4.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
