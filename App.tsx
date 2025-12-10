@@ -342,22 +342,14 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                     
                     {/* Control Panel */}
                     <div className="px-4 pb-4 flex items-center justify-between">
-                        {/* Reset Button */}
-                        <button 
-                            onClick={handleReset}
-                            className="w-12 h-12 bg-gradient-to-b from-[#2a2a2a] to-[#1a1a1a] border border-[#444] rounded-xl flex items-center justify-center hover:border-[#fbbf24] transition-all active:scale-95 shadow-[0_4px_8px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]"
-                        >
-                            <RotateCcw className="w-4 h-4 text-[#888]" />
-                        </button>
-                        
-                        {/* Speaker Grille */}
+                        {/* Speaker Grille - Left Side */}
                         <div className="flex flex-col gap-1 px-4">
                             {[...Array(4)].map((_, i) => (
                                 <div key={i} className="w-20 h-[2px] bg-gradient-to-r from-transparent via-[#333] to-transparent rounded"></div>
                             ))}
                         </div>
                         
-                        {/* Print Button */}
+                        {/* Print Button - Right Side */}
                         <button 
                             onClick={handlePrint}
                             disabled={isPrinting || !user}
@@ -746,8 +738,6 @@ export default function App() {
   
   // New Feature States
   const [showGallery, setShowGallery] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const [context, setContext] = useState<any>(null);
 
   // Farcaster Frame Logic
@@ -886,42 +876,7 @@ export default function App() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // New Feature Handlers
-  const handleSaveToDatabase = useCallback(async () => {
-    if (!standData || !farcasterUser) {
-      alert('No Stand data to save');
-      return;
-    }
-
-    setIsSaving(true);
-    setSaveSuccess(false);
-
-    try {
-      const response = await fetch('/api/save-stand', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          standData,
-          farcasterUser
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setSaveSuccess(true);
-        setTimeout(() => setSaveSuccess(false), 3000);
-      } else {
-        throw new Error(data.error);
-      }
-    } catch (error: any) {
-      console.error('Save error:', error);
-      alert(`Failed to save: ${error.message}`);
-    } finally {
-      setIsSaving(false);
-    }
-  }, [standData, farcasterUser]);
-
+  // Action Handlers
   const handleDownload = useCallback(async () => {
     if (!standData?.standImageUrl) {
       alert('No image to download');
@@ -1125,49 +1080,29 @@ export default function App() {
             </div>
 
             {/* ================================ */}
-            {/* ACTION BUTTONS - Save, Download, Share */}
+            {/* ACTION BUTTONS - Download, Share */}
             {/* ================================ */}
             {standData && (
-              <div className="w-full px-4 py-6 flex flex-col gap-3 z-20">
-                {/* Save Button */}
-                <button
-                  onClick={handleSaveToDatabase}
-                  disabled={isSaving || saveSuccess}
-                  className={`
-                    w-full h-14 border-4 border-white font-black text-lg tracking-widest
-                    transition-all duration-200 active:scale-95
-                    ${saveSuccess 
-                      ? 'bg-green-600 text-white' 
-                      : 'bg-gradient-to-r from-[#db2777] to-[#c026d3] text-white hover:shadow-[0_0_20px_rgba(219,39,119,0.6)]'
-                    }
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                  `}
-                >
-                  {isSaving ? '💾 SAVING...' : saveSuccess ? '✅ SAVED!' : '💾 SAVE TO GALLERY'}
-                </button>
-
-                {/* Download and Share Buttons */}
+              <div className="w-full px-4 pb-6 pt-2 z-20">
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={handleDownload}
-                    className="h-14 bg-[#06b6d4] border-4 border-white font-black text-lg tracking-widest hover:bg-[#0891b2] transition-colors active:scale-95"
+                    className="h-14 bg-[#06b6d4] border-4 border-white font-black text-lg tracking-widest hover:bg-[#0891b2] transition-colors active:scale-95 text-white"
                   >
                     ⬇️ DOWNLOAD
                   </button>
 
                   <button
                     onClick={handleShare}
-                    className="h-14 bg-[#7c3aed] border-4 border-white font-black text-lg tracking-widest hover:bg-[#6d28d9] transition-colors active:scale-95"
+                    className="h-14 bg-[#7c3aed] border-4 border-white font-black text-lg tracking-widest hover:bg-[#6d28d9] transition-colors active:scale-95 text-white flex items-center justify-center gap-2"
                   >
-                    🔗 SHARE
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m3 3 3 9-3 9 19-9Z"/>
+                      <path d="M6 12h16"/>
+                    </svg>
+                    SHARE
                   </button>
                 </div>
-
-                {saveSuccess && (
-                  <p className="text-center text-green-400 text-sm animate-pulse">
-                    ✨ Stand saved to community gallery!
-                  </p>
-                )}
               </div>
             )}
         </main>
