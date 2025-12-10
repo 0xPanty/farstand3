@@ -367,25 +367,46 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                             </button>
                         </div>
 
-                        {/* Bottom Row: Download + Share Buttons */}
+                        {/* Bottom Row: Download + Share Buttons - Metallic Style */}
                         {onDownload && onShare && (
-                            <div className="grid grid-cols-2 gap-2">
+                            <div className="grid grid-cols-2 gap-2 px-2">
+                                {/* Download Button - Metallic */}
                                 <button
                                     onClick={onDownload}
-                                    className="px-4 py-2.5 font-black text-[10px] tracking-wider rounded-xl transition-all active:scale-95 bg-gradient-to-b from-[#06b6d4] to-[#0891b2] text-white shadow-[0_4px_12px_rgba(6,182,212,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_6px_20px_rgba(6,182,212,0.6)]"
+                                    className="group relative h-10 rounded-lg overflow-hidden transition-all active:scale-95 border border-[#444]"
                                 >
-                                    ⬇️ DOWNLOAD
+                                    {/* Metallic gradient background */}
+                                    <div className="absolute inset-0 bg-gradient-to-b from-[#3a3a3a] via-[#2a2a2a] to-[#1a1a1a]"></div>
+                                    {/* Shine effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    {/* Content */}
+                                    <div className="relative flex items-center justify-center gap-1 h-full">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#06b6d4]">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                            <polyline points="7 10 12 15 17 10"/>
+                                            <line x1="12" y1="15" x2="12" y2="3"/>
+                                        </svg>
+                                        <span className="text-[9px] font-black tracking-wider text-[#888] group-hover:text-[#06b6d4] transition-colors">SAVE</span>
+                                    </div>
                                 </button>
 
+                                {/* Share Button - Metallic */}
                                 <button
                                     onClick={onShare}
-                                    className="px-4 py-2.5 font-black text-[10px] tracking-wider rounded-xl transition-all active:scale-95 bg-gradient-to-b from-[#7c3aed] to-[#6d28d9] text-white shadow-[0_4px_12px_rgba(124,58,237,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_6px_20px_rgba(124,58,237,0.6)] flex items-center justify-center gap-1"
+                                    className="group relative h-10 rounded-lg overflow-hidden transition-all active:scale-95 border border-[#444]"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="m3 3 3 9-3 9 19-9Z"/>
-                                        <path d="M6 12h16"/>
-                                    </svg>
-                                    SHARE
+                                    {/* Metallic gradient background */}
+                                    <div className="absolute inset-0 bg-gradient-to-b from-[#3a3a3a] via-[#2a2a2a] to-[#1a1a1a]"></div>
+                                    {/* Shine effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    {/* Content */}
+                                    <div className="relative flex items-center justify-center gap-1 h-full">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#7c3aed]">
+                                            <path d="m3 3 3 9-3 9 19-9Z"/>
+                                            <path d="M6 12h16"/>
+                                        </svg>
+                                        <span className="text-[9px] font-black tracking-wider text-[#888] group-hover:text-[#7c3aed] transition-colors">SEND</span>
+                                    </div>
                                 </button>
                             </div>
                         )}
