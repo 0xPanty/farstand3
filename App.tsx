@@ -826,7 +826,7 @@ export default function App() {
     if (isLoading) return;
     
     // Auto-use user's PFP if no image selected
-    const imageToUse = base64Image || farcasterUser?.pfpUrl;
+    let imageToUse = base64Image || farcasterUser?.pfpUrl;
     if (!imageToUse) {
       alert("No image available. Please ensure you're logged in.");
       return;
@@ -836,15 +836,43 @@ export default function App() {
     setStandData(null); // Clear previous result to show LoadingScreen
 
     try {
+      // If using PFP URL, convert to base64 first for faster processing
+      if (!base64Image && farcasterUser?.pfpUrl) {
+        console.log("Converting PFP to base64...");
+        try {
+          const response = await fetch(farcasterUser.pfpUrl);
+          const blob = await response.blob();
+          imageToUse = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+          console.log("PFP converted successfully");
+        } catch (conversionError) {
+          console.warn("PFP conversion failed, using URL directly:", conversionError);
+          // Fall back to using URL directly
+          imageToUse = farcasterUser.pfpUrl;
+        }
+      }
+
       const result = await analyzeUserAndGenerateStand(
           imageToUse, 
           calculatedData || undefined, 
           farcasterUser?.bio || undefined
       );
-      setStandData(result);
+      
+      // Ensure we have the result before clearing loading
+      if (result) {
+        setStandData(result);
+      } else {
+        throw new Error("No result returned from generation");
+      }
     } catch (error) {
       console.error("Generation error:", error);
       alert("Stand Awakening Failed: " + (error as Error).message);
+      // Keep user on loading screen momentarily to show error
+      await new Promise(resolve => setTimeout(resolve, 1000));
     } finally {
       setIsLoading(false);
     }
