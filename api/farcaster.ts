@@ -122,6 +122,7 @@ async function fetchFarcasterUser(fid: number): Promise<any> {
 // Get On-Chain TX Count
 // ==========================================
 async function getEthTransactionCount(address: string): Promise<number> {
+  console.log("🔍 Fetching TX count for address:", address);
   try {
     const response = await fetch(ETH_RPC_URL, {
       method: "POST",
@@ -133,11 +134,30 @@ async function getEthTransactionCount(address: string): Promise<number> {
         id: 1,
       }),
     });
+    
+    if (!response.ok) {
+      console.error("❌ RPC response not OK:", response.status, response.statusText);
+      return 0;
+    }
+    
     const data = await response.json();
+    console.log("📊 RPC response data:", data);
+    
+    if (data.error) {
+      console.error("❌ RPC returned error:", data.error);
+      return 0;
+    }
+    
+    if (!data.result) {
+      console.warn("⚠️ No result in RPC response");
+      return 0;
+    }
+    
     const count = parseInt(data.result, 16);
+    console.log("✅ TX Count:", count);
     return isNaN(count) ? 0 : count;
   } catch (e) {
-    console.warn("RPC Fetch failed, using fallback speed", e);
+    console.error("❌ RPC Fetch failed:", e);
     return 0;
   }
 }

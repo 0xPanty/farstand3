@@ -344,17 +344,17 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                     
                     {/* Control Panel */}
                     <div className="px-4 pb-4 flex items-center justify-between gap-3">
-                        {/* Left: Neon Glow Buttons */}
+                        {/* Left: Solid Color Buttons */}
                         <div className="flex items-center gap-2 shrink-0">
-                            {/* Download Button - Cyan Neon */}
+                            {/* Download Button - Cyan Solid */}
                             {onDownload && (
                                 <button
                                     onClick={onDownload}
-                                    className="group relative w-11 h-11 rounded-full transition-all active:scale-90 bg-[#0a0a0a] shadow-[0_0_15px_rgba(6,182,212,0.6),inset_0_0_10px_rgba(6,182,212,0.4)] group-hover:shadow-[0_0_25px_rgba(6,182,212,0.8),inset_0_0_15px_rgba(6,182,212,0.6)]"
+                                    className="group relative w-11 h-11 rounded-full transition-all active:scale-90 bg-[#06b6d4] hover:bg-[#0891b2]"
                                 >
-                                    {/* Down Arrow Icon - WHITE with neon glow */}
+                                    {/* Down Arrow Icon - Light Cyan */}
                                     <div className="relative flex items-center justify-center h-full">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white drop-shadow-[0_0_8px_rgba(6,182,212,1)] group-hover:scale-110 group-hover:drop-shadow-[0_0_12px_rgba(6,182,212,1)] transition-all">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-100 group-hover:scale-110 transition-transform">
                                             <polyline points="7 10 12 15 17 10"/>
                                             <line x1="12" y1="15" x2="12" y2="3"/>
                                         </svg>
@@ -362,15 +362,15 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 </button>
                             )}
 
-                            {/* Share Button - Purple Neon */}
+                            {/* Share Button - Purple Solid */}
                             {onShare && (
                                 <button
                                     onClick={onShare}
-                                    className="group relative w-11 h-11 rounded-full transition-all active:scale-90 bg-[#0a0a0a] shadow-[0_0_15px_rgba(124,58,237,0.6),inset_0_0_10px_rgba(124,58,237,0.4)] group-hover:shadow-[0_0_25px_rgba(124,58,237,0.8),inset_0_0_15px_rgba(124,58,237,0.6)]"
+                                    className="group relative w-11 h-11 rounded-full transition-all active:scale-90 bg-[#7c3aed] hover:bg-[#6d28d9]"
                                 >
-                                    {/* Send Arrow Icon - WHITE with neon glow */}
+                                    {/* Send Arrow Icon - Light Purple */}
                                     <div className="relative flex items-center justify-center h-full">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white drop-shadow-[0_0_8px_rgba(124,58,237,1)] group-hover:scale-110 group-hover:drop-shadow-[0_0_12px_rgba(124,58,237,1)] transition-all">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-purple-100 group-hover:scale-110 transition-transform">
                                             <path d="m3 3 3 9-3 9 19-9Z"/>
                                             <path d="M6 12h16"/>
                                         </svg>
