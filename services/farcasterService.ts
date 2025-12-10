@@ -163,12 +163,12 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
 
   const speedDetail = `${txCount} Txns`;
 
-  // C. DURABILITY (Cast Count)
+  // C. DURABILITY (Cast Count) - 调整门槛更合理
   let durability: StatValue = 'E';
-  if (profile.castCount > 5000) durability = 'A';
-  else if (profile.castCount > 1500) durability = 'B';
-  else if (profile.castCount > 500) durability = 'C';
-  else if (profile.castCount > 100) durability = 'D';
+  if (profile.castCount > 3000) durability = 'A';
+  else if (profile.castCount > 1000) durability = 'B';
+  else if (profile.castCount > 300) durability = 'C';
+  else if (profile.castCount > 50) durability = 'D';
 
   const durabilityDetail = `${profile.castCount} Casts`;
 
@@ -179,13 +179,13 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
 
   const precisionDetail = `Hash: ${precisionIndex}`;
 
-  // E. RANGE (Engagement - Likes + Recasts)
+  // E. RANGE (Engagement - Likes + Recasts) - 调整门槛更合理
   const totalEngagement = profile.likesReceived + profile.recastsReceived;
   let range: StatValue = 'E';
-  if (totalEngagement > 5000) range = 'A';
-  else if (totalEngagement > 1000) range = 'B';
-  else if (totalEngagement > 200) range = 'C';
-  else if (totalEngagement > 50) range = 'D';
+  if (totalEngagement > 2000) range = 'A';
+  else if (totalEngagement > 500) range = 'B';
+  else if (totalEngagement > 100) range = 'C';
+  else if (totalEngagement > 20) range = 'D';
 
   const rangeDetail = `Engage: ${totalEngagement}`;
 
