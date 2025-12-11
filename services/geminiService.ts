@@ -2,6 +2,7 @@
 import { StandResult, StandStats, StandStatRawValues } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const GOOGLE_AI_API_KEY = import.meta.env.VITE_GOOGLE_AI_API_KEY || 'AIzaSyCYourApiKeyHere';
 
 export const analyzeUserAndGenerateStand = async (
   base64UserImage: string, 

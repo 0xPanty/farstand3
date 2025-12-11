@@ -215,7 +215,11 @@ async function generateStandVisuals(originalImageBase64: string, visualPrompt: s
         },
       ],
     },
-    config: {},
+    config: {
+      temperature: 1.0,
+      topP: 0.95,
+      topK: 40,
+    },
   });
 
   const parts = response.candidates?.[0]?.content?.parts;
@@ -274,7 +278,11 @@ async function generateSketchImage(standImageBase64: string): Promise<string> {
         },
       ],
     },
-    config: {},
+    config: {
+      temperature: 1.0,
+      topP: 0.95,
+      topK: 40,
+    },
   });
 
   const parts = response.candidates?.[0]?.content?.parts;
