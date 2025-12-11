@@ -218,7 +218,7 @@ async function generateStandVisuals(originalImageBase64: string, visualPrompt: s
       ],
     },
     config: {
-      temperature: 1.0,
+      temperature: 0.7, // Reduced for more consistent quality
       topP: 0.95,
       topK: 40,
     },
@@ -281,7 +281,7 @@ async function generateSketchImage(standImageBase64: string): Promise<string> {
       ],
     },
     config: {
-      temperature: 1.0,
+      temperature: 0.7, // Reduced for more consistent quality
       topP: 0.95,
       topK: 40,
     },
