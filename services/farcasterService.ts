@@ -225,7 +225,16 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
   let precisionDetail = 'No data';
   
   // Use sampledCastCount if available, otherwise fall back to total castCount
-  const castsForCalculation = (profile as any).sampledCastCount || profile.castCount;
+  const castsForCalculation = profile.sampledCastCount || profile.castCount;
+  
+  console.log('🔍 PRECISION DEBUG:', {
+    sampledCastCount: profile.sampledCastCount,
+    totalCastCount: profile.castCount,
+    castsForCalculation,
+    likes: profile.likesReceived,
+    recasts: profile.recastsReceived,
+    replies: profile.repliesReceived
+  });
   
   if (castsForCalculation > 0) {
     // Calculate weighted engagement score per cast (using sampled data)

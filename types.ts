@@ -28,6 +28,7 @@ export interface FarcasterProfile {
   followerCount: number;
   followingCount: number;
   castCount: number;
+  sampledCastCount?: number; // Number of casts actually sampled for engagement stats
   likesReceived: number;
   recastsReceived: number;
   repliesReceived: number;
