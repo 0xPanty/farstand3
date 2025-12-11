@@ -1,4 +1,9 @@
 {
+  "accountAssociation": {
+    "header": "eyJmaWQiOjI3NTY0NiwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDNiMkM5NDEzMTM2RDg0OTUxZTk0ZTZkNmE5MmFjRGEzNmQyN0Y0NEUifQ",
+    "payload": "eyJkb21haW4iOiJmYXJzdGFuZDMudmVyY2VsLmFwcCJ9",
+    "signature": "isRveZTB8I8NvOu1w5ExQaSzIwj+b9JQvlsP6LOgCToOW7HKxh6uvQLKca7Kw+bpu7LEQ0m00kGgX7rFc/XqURs="
+  },
   "miniapp": {
     "version": "1",
     "name": "Stand Maker",
