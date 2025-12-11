@@ -166,7 +166,7 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
     else if (txCount > 100) speed = 'B';
     else if (txCount > 20) speed = 'C';
     else if (txCount > 0) speed = 'D';
-    speedDetail = `${txCount} Txns`;
+    speedDetail = `${txCount} Actions`;  // "Actions" = outgoing transactions (more accurate than "Txns")
   } else {
     // Fallback: Use cast activity rate as speed indicator
     // Higher cast count = more active = faster
