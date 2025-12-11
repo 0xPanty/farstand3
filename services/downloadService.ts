@@ -159,10 +159,15 @@ export async function shareOnFarcaster(
     console.warn('navigator.share failed, falling back:', e);
   }
 
-  // Final fallback: open Warpcast compose with embed to app URL
-  const win = window.open(shareUrl, '_blank', 'noopener,noreferrer');
-  if (!win) {
+  // Final fallback: navigate same tab to enable iOS Universal Link → open Warpcast app
+  try {
     window.location.href = shareUrl;
+  } catch {
+    // As a last resort try a popup
+    const win = window.open(shareUrl, '_blank', 'noopener,noreferrer');
+    if (!win) {
+      // No-op; the user can manually copy/share
+    }
   }
   return false;
 }
