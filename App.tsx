@@ -226,7 +226,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
     ) : 0;
     
     const getRank = (score: number): string => {
-        if (score >= 540) return 'S';
+        if (score >= 520) return 'S';  // Lowered: 5A + 1E = 520 (more fair for OG users)
         if (score >= 450) return 'A';
         if (score >= 360) return 'B';
         if (score >= 270) return 'C';
