@@ -507,10 +507,6 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 {/* Score Summary */}
                                 <div className="mb-4 pb-3 border-b border-double border-[#1a1a1a] relative">
                                     <div className="flex justify-between text-[11px] text-[#333] mb-1">
-                                        <span>MINT FEE</span>
-                                        <span>FREE</span>
-                                    </div>
-                                    <div className="flex justify-between text-[11px] text-[#333] mb-1">
                                         <span>RATING</span>
                                         <span className="font-black tracking-wider">{getStars(totalScore)}</span>
                                     </div>
