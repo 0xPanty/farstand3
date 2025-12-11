@@ -72,13 +72,14 @@ async function fetchFarcasterUser(fid: number): Promise<any> {
 
     // Also fetch user's casts to count them
     let castCount = 0;
+    let sampledCastCount = 0; // Track actual casts we sampled
     let likesReceived = 0;
     let recastsReceived = 0;
     let repliesReceived = 0;
     
     try {
       const castsResponse = await fetch(
-        `https://api.neynar.com/v2/farcaster/feed/user/${fid}/casts?limit=5`,
+        `https://api.neynar.com/v2/farcaster/feed/user/${fid}/casts?limit=150`,
         {
           headers: {
             accept: "application/json",
@@ -88,7 +89,8 @@ async function fetchFarcasterUser(fid: number): Promise<any> {
       );
       if (castsResponse.ok) {
         const castsData = await castsResponse.json();
-        castCount = castsData.casts?.length || 0;
+        sampledCastCount = castsData.casts?.length || 0;
+        castCount = user.cast_count || sampledCastCount; // Use API's total count if available
         castsData.casts?.forEach((cast: any) => {
           likesReceived += cast.reactions?.likes_count || 0;
           recastsReceived += cast.reactions?.recasts_count || 0;
@@ -219,23 +221,20 @@ async function calculateFarcasterStats(profile: any): Promise<any> {
   let precision = 'E';
   let precisionDetail = 'No data';
   
-  // Use sampledCastCount for calculation to avoid sampling bias
-  const castsForCalculation = (profile as any).sampledCastCount || profile.castCount;
-  
-  if (castsForCalculation > 0) {
-    // Calculate weighted engagement score per cast (using sampled data)
+  if (profile.castCount > 0) {
+    // Calculate weighted engagement score per cast
     // Replies are most valuable (show discussion), Recasts are medium, Likes are baseline
     const weightedScore = (
       (profile.likesReceived || 0) + 
       (profile.recastsReceived || 0) * 2 + 
       (profile.repliesReceived || 0) * 3
-    ) / castsForCalculation;
+    ) / profile.castCount;
     
-    // Determine precision grade based on weighted quality score
-    if (weightedScore >= 50) precision = 'A';       // Viral quality content
-    else if (weightedScore >= 25) precision = 'B';  // High quality engagement
-    else if (weightedScore >= 10) precision = 'C';  // Good engagement
-    else if (weightedScore >= 5) precision = 'D';   // Moderate engagement
+    // Determine precision grade based on weighted quality score (adjusted for Farcaster reality)
+    if (weightedScore >= 20) precision = 'A';       // Viral quality content (top 5%)
+    else if (weightedScore >= 10) precision = 'B';  // High quality engagement (top 15%)
+    else if (weightedScore >= 5) precision = 'C';   // Good engagement (top 40%)
+    else if (weightedScore >= 2) precision = 'D';   // Moderate engagement (above average)
     else precision = 'E';                           // Low engagement
     
     precisionDetail = `Quality: ${weightedScore.toFixed(1)}`;

@@ -246,11 +246,11 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
       (profile.repliesReceived || 0) * 3
     ) / castsForCalculation;
     
-    // Determine precision grade based on weighted quality score
-    if (weightedScore >= 50) precision = 'A';       // Viral quality content
-    else if (weightedScore >= 25) precision = 'B';  // High quality engagement
-    else if (weightedScore >= 10) precision = 'C';  // Good engagement
-    else if (weightedScore >= 5) precision = 'D';   // Moderate engagement
+    // Determine precision grade based on weighted quality score (adjusted for Farcaster reality)
+    if (weightedScore >= 20) precision = 'A';       // Viral quality content (top 5%)
+    else if (weightedScore >= 10) precision = 'B';  // High quality engagement (top 15%)
+    else if (weightedScore >= 5) precision = 'C';   // Good engagement (top 40%)
+    else if (weightedScore >= 2) precision = 'D';   // Moderate engagement (above average)
     else precision = 'E';                           // Low engagement
     
     precisionDetail = `Quality: ${weightedScore.toFixed(1)}`;
