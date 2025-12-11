@@ -33,6 +33,7 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
     let likesReceived = 0;
     let recastsReceived = 0;
     let repliesReceived = 0;
+    let sampledCastCount = 0; // Track actual number of casts we sampled
     
     try {
       const castsResponse = await fetch(
@@ -46,6 +47,7 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
       );
       if (castsResponse.ok) {
         const castsData = await castsResponse.json();
+        sampledCastCount = castsData.casts?.length || 0;
         castsData.casts?.forEach((cast: any) => {
           likesReceived += cast.reactions?.likes_count || 0;
           recastsReceived += cast.reactions?.recasts_count || 0;
@@ -222,14 +224,17 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
   let precision: StatValue = 'E';
   let precisionDetail = 'No data';
   
-  if (profile.castCount > 0) {
-    // Calculate weighted engagement score per cast
+  // Use sampledCastCount if available, otherwise fall back to total castCount
+  const castsForCalculation = (profile as any).sampledCastCount || profile.castCount;
+  
+  if (castsForCalculation > 0) {
+    // Calculate weighted engagement score per cast (using sampled data)
     // Replies are most valuable (show discussion), Recasts are medium, Likes are baseline
     const weightedScore = (
       (profile.likesReceived || 0) + 
       (profile.recastsReceived || 0) * 2 + 
       (profile.repliesReceived || 0) * 3
-    ) / profile.castCount;
+    ) / castsForCalculation;
     
     // Determine precision grade based on weighted quality score
     if (weightedScore >= 50) precision = 'A';       // Viral quality content

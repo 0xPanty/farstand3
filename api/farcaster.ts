@@ -219,14 +219,17 @@ async function calculateFarcasterStats(profile: any): Promise<any> {
   let precision = 'E';
   let precisionDetail = 'No data';
   
-  if (profile.castCount > 0) {
-    // Calculate weighted engagement score per cast
+  // Use sampledCastCount for calculation to avoid sampling bias
+  const castsForCalculation = (profile as any).sampledCastCount || profile.castCount;
+  
+  if (castsForCalculation > 0) {
+    // Calculate weighted engagement score per cast (using sampled data)
     // Replies are most valuable (show discussion), Recasts are medium, Likes are baseline
     const weightedScore = (
       (profile.likesReceived || 0) + 
       (profile.recastsReceived || 0) * 2 + 
       (profile.repliesReceived || 0) * 3
-    ) / profile.castCount;
+    ) / castsForCalculation;
     
     // Determine precision grade based on weighted quality score
     if (weightedScore >= 50) precision = 'A';       // Viral quality content
