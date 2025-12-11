@@ -722,7 +722,7 @@ interface PrinterViewProps {
 
 const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDetails, standName, standImageUrl, sketchImageUrl, onDownload, onShare }) => {
     return (
-        <main className="absolute inset-0 bg-black bg-noise pattern-flowing-checkers flex flex-col overflow-y-scroll" 
+        <main className="absolute inset-0 w-full max-w-md mx-auto bg-black bg-noise pattern-flowing-checkers flex flex-col overflow-y-scroll" 
               style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)', WebkitOverflowScrolling: 'touch' }}>
              
              {/* Background */}
@@ -1137,7 +1137,7 @@ export default function App() {
   return (
     // Use h-dvh (dynamic viewport height) for mobile browsers
     // REMOVED paddingBottom here to allow background to flow to bottom
-    <main className="h-dvh w-screen bg-black bg-noise pattern-flowing-checkers flex flex-col relative overflow-hidden" 
+    <main className="h-dvh w-full max-w-md mx-auto bg-black bg-noise pattern-flowing-checkers flex flex-col relative overflow-hidden" 
           style={{ paddingTop: 'env(safe-area-inset-top)' }}>
             
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden"/>
