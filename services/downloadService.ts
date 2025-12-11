@@ -155,6 +155,30 @@ export async function shareOnFarcaster(
       await (navigator as any).share({ title: 'JoJo Stand Maker', text: plainText, url: appUrl });
       return true;
     }
+
+    // Fallback++: if we have image data but cannot native-share files, upload it to a public URL and open Warpcast compose with that image embedded
+    if (imageUrlOrData) {
+      try {
+        const resp = await fetch('/api/upload-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            dataUrl: imageUrlOrData.startsWith('data:') ? imageUrlOrData : undefined,
+            url: imageUrlOrData.startsWith('data:') ? undefined : imageUrlOrData,
+            filename: `${standName.replace(/[『』\s]/g, '_')}_Stand.png`,
+          }),
+        });
+        const json = await resp.json();
+        if (json?.url) {
+          const imageEmbed = encodeURIComponent(json.url);
+          const composeUrl = `https://warpcast.com/~/compose?text=${text}&embeds[]=${imageEmbed}&embeds[]=${url}`;
+          window.location.href = composeUrl; // use same-tab for iOS universal link
+          return false;
+        }
+      } catch (err) {
+        console.warn('upload-image fallback failed:', err);
+      }
+    }
   } catch (e) {
     console.warn('navigator.share failed, falling back:', e);
   }
