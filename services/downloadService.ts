@@ -3,30 +3,44 @@
  */
 export async function downloadStandImage(imageUrl: string, standName: string) {
   try {
-    // Fetch the image
-    const response = await fetch(imageUrl);
+    const filename = `${standName.replace(/[『』\s]/g, '_')}_Stand.png`;
+
+    // Fast path for data URLs (no network, no CORS issues)
+    if (imageUrl.startsWith('data:')) {
+      const a = document.createElement('a');
+      a.href = imageUrl;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      return true;
+    }
+
+    // Fallback: fetch as blob and download (best-effort if same-origin/CORS-enabled)
+    const response = await fetch(imageUrl, { mode: 'cors' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const blob = await response.blob();
-    
-    // Create download link
+
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    
-    // Clean filename
-    const filename = `${standName.replace(/[『』\s]/g, '_')}_Stand.png`;
     link.download = filename;
-    
-    // Trigger download
+    link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
-    // Cleanup
     window.URL.revokeObjectURL(url);
-    
+
     return true;
   } catch (error) {
     console.error('Download error:', error);
+
+    // Last-resort: try opening the image in a new tab so the user can save manually
+    try {
+      const win = window.open(imageUrl, '_blank', 'noopener,noreferrer');
+      if (!win) window.location.href = imageUrl;
+    } catch {}
     return false;
   }
 }
@@ -84,12 +98,29 @@ export async function downloadStandCard(cardElementId: string, standName: string
 /**
  * Share Stand on Farcaster
  */
-export function shareOnFarcaster(standName: string, appUrl: string) {
-  const text = encodeURIComponent(`I just awakened my Stand: ${standName}! ✨\n\nDiscover yours:`);
+export async function shareOnFarcaster(standName: string, appUrl: string) {
+  const plainText = `I just awakened my Stand: ${standName}! ✨\n\nDiscover yours:`;
+  const text = encodeURIComponent(plainText);
   const url = encodeURIComponent(appUrl);
-  
-  // Warpcast share URL
+
+  // Warpcast compose link
   const shareUrl = `https://warpcast.com/~/compose?text=${text}&embeds[]=${url}`;
-  
-  window.open(shareUrl, '_blank');
+
+  // Prefer native Web Share when available (mobile-friendly)
+  try {
+    // @ts-ignore - navigator.share is not in all TS lib targets
+    if (navigator.share) {
+      // Use plain values for native share
+      await (navigator as any).share({ title: 'JoJo Stand Maker', text: plainText, url: appUrl });
+      return;
+    }
+  } catch (e) {
+    console.warn('navigator.share failed, falling back:', e);
+  }
+
+  // Fallbacks: open new tab or navigate current tab (in-app browsers often block window.open)
+  const win = window.open(shareUrl, '_blank', 'noopener,noreferrer');
+  if (!win) {
+    window.location.href = shareUrl;
+  }
 }
