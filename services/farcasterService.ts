@@ -239,29 +239,27 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
         // Calculate engagement metrics
         let totalLikes = 0;
         let totalRecasts = 0;
-        let totalReplies = 0;
         
         casts.forEach((cast: any) => {
           totalLikes += cast.reactions?.likes_count || 0;
           totalRecasts += cast.reactions?.recasts_count || 0;
-          totalReplies += cast.replies?.count || 0;
         });
         
-        // Calculate engagement rate (weighted: likes 1x, recasts 2x, replies 3x)
-        const engagementScore = totalLikes + (totalRecasts * 2) + (totalReplies * 3);
+        // Calculate engagement rate (weighted: likes 1x, recasts 2x)
+        const engagementScore = totalLikes + (totalRecasts * 2);
         const avgEngagement = engagementScore / casts.length;
         
         // Calculate like rate (likes per cast)
         const likeRate = totalLikes / casts.length;
         
-        // Determine precision grade based on engagement quality
-        if (avgEngagement > 50 || likeRate > 30) precision = 'A';
-        else if (avgEngagement > 25 || likeRate > 15) precision = 'B';
-        else if (avgEngagement > 10 || likeRate > 7) precision = 'C';
-        else if (avgEngagement > 3 || likeRate > 2) precision = 'D';
+        // Determine precision grade based on like rate (primary metric)
+        if (likeRate > 30) precision = 'A';
+        else if (likeRate > 15) precision = 'B';
+        else if (likeRate > 7) precision = 'C';
+        else if (likeRate > 2) precision = 'D';
         else precision = 'E';
         
-        precisionDetail = `Engage: ${avgEngagement.toFixed(1)}/cast`;
+        precisionDetail = `Likes: ${likeRate.toFixed(1)}/cast`;
       }
     }
   } catch (e) {
