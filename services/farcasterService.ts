@@ -240,13 +240,25 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
         let totalLikes = 0;
         let totalRecasts = 0;
         
-        casts.forEach((cast: any) => {
-          // Neynar API returns likes/recasts as ARRAYS, not counts
-          const likesArray = cast.reactions?.likes || [];
-          const recastsArray = cast.reactions?.recasts || [];
+        casts.forEach((cast: any, index: number) => {
+          // DEBUG: Print the ENTIRE cast object for first cast only
+          if (index === 0) {
+            console.log('🔍 FULL CAST OBJECT:', JSON.stringify(cast, null, 2));
+          }
           
-          const likes = Array.isArray(likesArray) ? likesArray.length : 0;
-          const recasts = Array.isArray(recastsArray) ? recastsArray.length : 0;
+          // Try ALL possible field locations
+          const likes = cast.reactions?.likes_count || 
+                       cast.reactions?.likes?.length ||
+                       cast.likes_count ||
+                       cast.likes ||
+                       0;
+          const recasts = cast.reactions?.recasts_count || 
+                         cast.reactions?.recasts?.length ||
+                         cast.recasts_count ||
+                         cast.recasts ||
+                         0;
+          
+          console.log(`Cast ${index}: likes=${likes}, recasts=${recasts}`);
           
           totalLikes += likes;
           totalRecasts += recasts;
