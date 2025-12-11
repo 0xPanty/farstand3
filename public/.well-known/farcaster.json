@@ -13,15 +13,16 @@
     "splashBackgroundColor": "#0f0015",
     "subtitle": "Awaken Your Onchain Stand",
     "description": "Upload your photo to generate a unique Stand character. AI analyzes your Farcaster profile and creates personalized stats, abilities, and anime-style artwork.",
+    "heroImageUrl": "https://farstand3.vercel.app/screenshots/hero.png.webp",
     "screenshotUrls": [
-      "https://farstand3.vercel.app/logo.png"
+      "https://farstand3.vercel.app/screenshots/home.png.webp",
+      "https://farstand3.vercel.app/screenshots/result.png.webp"
     ],
     "primaryCategory": "entertainment",
     "tags": ["ai", "art", "anime", "generator", "farcaster"],
-    "heroImageUrl": "https://farstand3.vercel.app/logo.png",
     "tagline": "Create Your Stand Character",
     "ogTitle": "I Created My Stand Character",
     "ogDescription": "Upload your photo to generate a unique Stand based on your Farcaster profile and onchain data.",
-    "ogImageUrl": "https://farstand3.vercel.app/logo.png"
+    "ogImageUrl": "https://farstand3.vercel.app/screenshots/og.jpg.webp"
   }
 }

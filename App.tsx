@@ -942,7 +942,8 @@ export default function App() {
     
     shareOnFarcaster(
       standData.standName,
-      'https://farstand3.vercel.app' // 你的应用 URL
+      'https://farstand3.vercel.app', // 你的应用 URL
+      standData.standImageUrl || undefined
     );
   }, [standData]);
 
