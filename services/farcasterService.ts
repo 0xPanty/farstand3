@@ -97,11 +97,32 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
 };
 
 // ==========================================
-// 2. Get On-Chain TX Count from Base L2 (Speed)
+// 2. Get ALL Transaction Count from Base L2 (both sent and received)
 // ==========================================
 const getBaseTransactionCount = async (address: string): Promise<number> => {
   try {
-    const response = await fetch(BASE_RPC_URL, {
+    // Use BaseScan API to get total transaction count (including received transactions)
+    // Fetch max 10000 transactions to get a good estimate
+    const response = await fetch(
+      `https://api.basescan.org/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc`
+    );
+    
+    if (!response.ok) {
+      throw new Error("BaseScan API request failed");
+    }
+    
+    const data = await response.json();
+    
+    // BaseScan API returns status "1" for success, even without API key (rate limited but works)
+    if (data.status === "1" && Array.isArray(data.result)) {
+      // Return actual transaction count
+      // If it's exactly 10000, there might be more, but that's already a lot
+      return data.result.length;
+    }
+    
+    // If API rate limit or other error, fallback to RPC method (only outgoing transactions)
+    console.warn("BaseScan API response not OK, falling back to RPC", data.message);
+    const rpcResponse = await fetch(BASE_RPC_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -111,12 +132,19 @@ const getBaseTransactionCount = async (address: string): Promise<number> => {
         id: 1,
       }),
     });
-    const data = await response.json();
-    const count = parseInt(data.result, 16);
-    // Return 0 if NaN
-    return isNaN(count) ? 0 : count;
+    
+    if (rpcResponse.ok) {
+      const rpcData = await rpcResponse.json();
+      if (rpcData.result) {
+        const count = parseInt(rpcData.result, 16);
+        return isNaN(count) ? 0 : count;
+      }
+    }
+    
+    return 0;
+    
   } catch (e) {
-    console.warn("Base RPC Fetch failed, using fallback speed", e);
+    console.warn("Base transaction fetch failed, using fallback", e);
     return 0;
   }
 };
@@ -166,7 +194,7 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
     else if (txCount > 100) speed = 'B';
     else if (txCount > 20) speed = 'C';
     else if (txCount > 0) speed = 'D';
-    speedDetail = `${txCount} Actions`;  // "Actions" = outgoing transactions (more accurate than "Txns")
+    speedDetail = `${txCount} Txns`;  // All transactions (sent + received) from BaseScan
   } else {
     // Fallback: Use cast activity rate as speed indicator
     // Higher cast count = more active = faster
