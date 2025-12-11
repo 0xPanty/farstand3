@@ -203,20 +203,11 @@ export async function shareOnFarcaster(
       }
     }
 
-    // Try Farcaster Mini App SDK first (best for mobile in Warpcast)
-    try {
-      const { sdk } = await import('@farcaster/miniapp-sdk');
-      await sdk.actions.openUrl(shareUrl);
-      console.log('✅ Share opened via Farcaster SDK');
-      return true;
-    } catch (sdkError) {
-      console.log('ℹ️ SDK not available, trying fallback methods');
-    }
-
-    // Fallback 1: Native Web Share API (good for mobile browsers)
+    // Priority 1: Try Web Share API first (works best in mobile browsers and Warpcast)
     try {
       // @ts-ignore - navigator.share not in all TS lib targets
       if (navigator.share) {
+        // On mobile, prefer sharing the text + URL (Web Share API handles it natively)
         await (navigator as any).share({ 
           title: 'JoJo Stand Maker', 
           text: plainText, 
@@ -225,21 +216,36 @@ export async function shareOnFarcaster(
         console.log('✅ Shared via Web Share API');
         return true;
       }
-    } catch (e) {
-      console.log('ℹ️ Web Share API not available or cancelled');
+    } catch (shareError: any) {
+      // User cancelled or not supported
+      if (shareError.name === 'AbortError') {
+        console.log('ℹ️ User cancelled share');
+        return false;
+      }
+      console.log('ℹ️ Web Share API not available, trying fallback methods');
     }
 
-    // Fallback 2: Direct link (works on both PC and mobile)
+    // Priority 2: Try opening Warpcast compose URL
+    // For PC browsers or environments where Web Share is not available
     try {
-      // Open in new window/tab
+      // Try Farcaster SDK openUrl (for Mini App environment on PC)
+      try {
+        const { sdk } = await import('@farcaster/miniapp-sdk');
+        await sdk.actions.openUrl(shareUrl);
+        console.log('✅ Share opened via Farcaster SDK');
+        return true;
+      } catch (sdkError) {
+        console.log('ℹ️ SDK not available, trying window.open');
+      }
+
+      // Fallback: Open in new window/tab (for PC browsers)
       const opened = window.open(shareUrl, '_blank', 'noopener,noreferrer');
       if (opened) {
         console.log('✅ Opened share in new window');
         return true;
       }
       
-      // If popup blocked, DON'T use window.location.href in Mini App
-      // because it will navigate the Mini App itself away
+      // If popup blocked, show friendly message
       console.warn('⚠️ Popup blocked. Please allow popups for this site.');
       alert('⚠️ Please allow popups to share. Check your browser settings.');
       return false;
