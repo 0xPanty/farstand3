@@ -981,6 +981,10 @@ export default function App() {
   // VIEW: RESULT SCREEN (Flip Card)
   // ==========================
   if (standData) {
+      // Use REAL Farcaster data for display
+      const stats = calculatedData?.stats || null;
+      const statDetails = calculatedData?.details;
+      
       return (
         <main className="h-dvh w-full max-w-md mx-auto bg-black bg-noise pattern-grid flex flex-col items-center justify-start p-0 perspective-1000 overflow-y-auto"
               style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
@@ -1057,14 +1061,14 @@ export default function App() {
                                 </p>
                              </div>
     
-                             {/* Grid - Compact layout */}
+                             {/* Grid - Compact layout - Use REAL Farcaster data, not AI generated */}
                              <div className="grid grid-cols-3 gap-x-2 gap-y-4 px-2 w-full">
-                                 <StatCircle label="破壊力" subLabel="POWER" value={standData.stats.power} detail={standData.statDetails?.power} />
-                                 <StatCircle label="スピード" subLabel="SPEED" value={standData.stats.speed} detail={standData.statDetails?.speed} />
-                                 <StatCircle label="持続力" subLabel="DURABILITY" value={standData.stats.durability} detail={standData.statDetails?.durability} />
-                                 <StatCircle label="精密動作" subLabel="PRECISION" value={standData.stats.precision} detail={standData.statDetails?.precision} />
-                                 <StatCircle label="射程距離" subLabel="RANGE" value={standData.stats.range} detail={standData.statDetails?.range} />
-                                 <StatCircle label="成長性" subLabel="POTENTIAL" value={standData.stats.potential} detail={standData.statDetails?.potential} />
+                                 <StatCircle label="破壊力" subLabel="POWER" value={stats?.power || 'E'} detail={statDetails?.power} />
+                                 <StatCircle label="スピード" subLabel="SPEED" value={stats?.speed || 'E'} detail={statDetails?.speed} />
+                                 <StatCircle label="持続力" subLabel="DURABILITY" value={stats?.durability || 'E'} detail={statDetails?.durability} />
+                                 <StatCircle label="精密動作" subLabel="PRECISION" value={stats?.precision || 'E'} detail={statDetails?.precision} />
+                                 <StatCircle label="射程距離" subLabel="RANGE" value={stats?.range || 'E'} detail={statDetails?.range} />
+                                 <StatCircle label="成長性" subLabel="POTENTIAL" value={stats?.potential || 'E'} detail={statDetails?.potential} />
                              </div>
                         </div>
     
