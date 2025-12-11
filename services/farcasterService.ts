@@ -148,20 +148,34 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
     ? `Score: ${scorePercent.toFixed(0)}%` 
     : (profile.powerBadge ? "Power Badge" : `Followers: ${profile.followerCount}`);
 
-  // B. SPEED (Chain TXs)
+  // B. SPEED (Activity Rate - Cast frequency or Chain TXs)
   let txCount = 0;
+  let speedDetail = 'No data';
+  
+  // Try to get on-chain transaction count first
   if (profile.verifications.length > 0) {
     txCount = await getEthTransactionCount(profile.verifications[0]);
   }
-  
-  let speed: StatValue = 'E';
-  if (txCount > 500) speed = 'A';
-  else if (txCount > 100) speed = 'B';
-  else if (txCount > 20) speed = 'C';
-  else if (txCount > 0) speed = 'D';
-  if (speed === 'E' && profile.verifications.length > 2) speed = 'C';
 
-  const speedDetail = `${txCount} Txns`;
+  let speed: StatValue = 'E';
+  
+  // If we have transaction data, use it
+  if (txCount > 0) {
+    if (txCount > 500) speed = 'A';
+    else if (txCount > 100) speed = 'B';
+    else if (txCount > 20) speed = 'C';
+    else if (txCount > 0) speed = 'D';
+    speedDetail = `${txCount} Txns`;
+  } else {
+    // Fallback: Use cast activity rate as speed indicator
+    // Higher cast count = more active = faster
+    const castCount = profile.castCount || 0;
+    if (castCount > 5000) speed = 'A';
+    else if (castCount > 2000) speed = 'B';
+    else if (castCount > 500) speed = 'C';
+    else if (castCount > 100) speed = 'D';
+    speedDetail = `${castCount} Casts`;
+  }
 
   // C. DURABILITY (Cast Count) - 调整门槛更合理
   let durability: StatValue = 'E';
@@ -172,12 +186,66 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
 
   const durabilityDetail = `${profile.castCount} Casts`;
 
-  // D. PRECISION (Hash Algorithm - Deterministic)
-  const precisionMap: StatValue[] = ['A', 'B', 'C', 'D', 'E'];
-  const precisionIndex = profile.fid % 5; 
-  const precision = precisionMap[precisionIndex];
-
-  const precisionDetail = `Hash: ${precisionIndex}`;
+  // D. PRECISION (Engagement Quality - Based on last 5 casts interaction rate)
+  let precision: StatValue = 'E';
+  let precisionDetail = 'No data';
+  
+  try {
+    // Fetch last 5 casts for engagement quality
+    const recentCastsResponse = await fetch(
+      `https://api.neynar.com/v2/farcaster/feed/user/casts?fid=${profile.fid}&limit=5`,
+      {
+        headers: {
+          accept: "application/json",
+          "x-api-key": NEYNAR_API_KEY,
+        },
+      }
+    );
+    
+    if (recentCastsResponse.ok) {
+      const recentData = await recentCastsResponse.json();
+      const casts = recentData.casts || [];
+      
+      if (casts.length > 0) {
+        // Calculate engagement metrics
+        let totalLikes = 0;
+        let totalRecasts = 0;
+        let totalReplies = 0;
+        
+        casts.forEach((cast: any) => {
+          totalLikes += cast.reactions?.likes_count || 0;
+          totalRecasts += cast.reactions?.recasts_count || 0;
+          totalReplies += cast.replies?.count || 0;
+        });
+        
+        // Calculate engagement rate (weighted: likes 1x, recasts 2x, replies 3x)
+        const engagementScore = totalLikes + (totalRecasts * 2) + (totalReplies * 3);
+        const avgEngagement = engagementScore / casts.length;
+        
+        // Calculate like rate (likes per cast)
+        const likeRate = totalLikes / casts.length;
+        
+        // Determine precision grade based on engagement quality
+        if (avgEngagement > 50 || likeRate > 30) precision = 'A';
+        else if (avgEngagement > 25 || likeRate > 15) precision = 'B';
+        else if (avgEngagement > 10 || likeRate > 7) precision = 'C';
+        else if (avgEngagement > 3 || likeRate > 2) precision = 'D';
+        else precision = 'E';
+        
+        precisionDetail = `Engage: ${avgEngagement.toFixed(1)}/cast`;
+      }
+    }
+  } catch (e) {
+    console.warn("Failed to fetch recent casts for precision:", e);
+    // Fallback: use follower ratio as precision indicator
+    const ratio = profile.followerCount / Math.max(profile.followingCount, 1);
+    if (ratio > 5) precision = 'A';
+    else if (ratio > 2) precision = 'B';
+    else if (ratio > 1) precision = 'C';
+    else if (ratio > 0.5) precision = 'D';
+    else precision = 'E';
+    precisionDetail = `Ratio: ${ratio.toFixed(2)}`;
+  }
 
   // E. RANGE (Engagement - Likes + Recasts)
   const totalEngagement = profile.likesReceived + profile.recastsReceived;
