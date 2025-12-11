@@ -112,14 +112,21 @@ async function generateStandProfile(
   const prompt = `
     Analyze this image.
     
-    1. Is it Human or Non-Human?
-    2. Define Gender & Stats.
-    3. Create Stand Name & Ability.
-    4. **Construct 'visualPrompt'**:
-       - **Subject**: "A [Male/Female] Stand User in Hirohiko Araki style. Lean, angular, fashion model physique."
+    1. **IDENTIFY GENDER FIRST (CRITICAL)**: Carefully analyze the person in the image to determine their gender.
+       - Look at facial features, hairstyle, clothing, body structure.
+       - Set gender to either "MALE" or "FEMALE" based on your analysis.
+    
+    2. Is it Human or Non-Human?
+    3. Define Stats.
+    4. Create Stand Name & Ability.
+    5. **Construct 'visualPrompt'** - GENDER MUST MATCH THE INPUT:
+       - **Subject**: "A [MALE/FEMALE - MUST MATCH INPUT GENDER] Stand User in Hirohiko Araki style. Lean, angular, fashion model physique."
+       - **Gender Consistency Rule**: 
+         * If input is MALE → User MUST be male, Stand MUST have masculine features
+         * If input is FEMALE → User MUST be female, Stand MUST have feminine features
        - **Clothing**: Describe high-fashion gear inspired by input. **Avoid bulky/puffy clothes.**
        - **User Pose**: "Striking an impossible fashion pose, angular limbs, dramatic hands."
-       - **Stand Visuals**: "A Spirit Stand [Stand Name] appearing behind/around the user. [Stand Description]."
+       - **Stand Visuals**: "A [Gender-matching] Spirit Stand [Stand Name] appearing behind/around the user. [Stand Description]."
        - **Stand Action**: "The Stand is striking a wild, contorted JoJo pose that complements the user. It is [punching/posing/yelling/floating dynamically]."
        - **Composition**: "The Stand and User are visually connected, creating a cohesive silhouette. Thick black contour lines, vibrant colors, heavy manga shading."
        - **Background**: "Psychadelic patterns, manga speed lines, floating Katakana SFX 'ゴゴゴ'."
