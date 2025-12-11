@@ -944,8 +944,31 @@ export default function App() {
     }
     
     try {
-      // First, save the stand to database so share page can fetch it
-      console.log('💾 Saving stand before share...');
+      // Step 1: Upload image to get public URL (if it's a data URL)
+      let publicImageUrl = standData.standImageUrl;
+      
+      if (standData.standImageUrl?.startsWith('data:')) {
+        console.log('📤 Uploading image to get public URL...');
+        const uploadResponse = await fetch('/api/upload-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            dataUrl: standData.standImageUrl,
+            filename: `${standData.standName.replace(/[『』\s]/g, '_')}_Stand.png`,
+          }),
+        });
+        
+        if (uploadResponse.ok) {
+          const uploadData = await uploadResponse.json();
+          publicImageUrl = uploadData.url;
+          console.log('✅ Image uploaded:', publicImageUrl);
+        } else {
+          console.warn('⚠️ Image upload failed');
+        }
+      }
+      
+      // Step 2: Save stand to database with public image URL
+      console.log('💾 Saving stand to database...');
       const saveResponse = await fetch('/api/save-stand', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -959,7 +982,7 @@ export default function App() {
             battleCry: standData.battleCry,
             stats: calculatedData?.stats,
             statDetails: calculatedData?.details,
-            standImageUrl: standData.standImageUrl,
+            standImageUrl: publicImageUrl,  // Use public URL
             sketchImageUrl: standData.sketchImageUrl,
             visualPrompt: standData.visualPrompt,
           },
@@ -973,12 +996,12 @@ export default function App() {
       });
       
       if (!saveResponse.ok) {
-        console.warn('⚠️ Failed to save stand, sharing anyway');
+        console.warn('⚠️ Failed to save stand');
       } else {
         console.log('✅ Stand saved successfully');
       }
       
-      // Share using the share page URL which has proper OG tags
+      // Step 3: Share using the share page URL
       await shareOnFarcaster(
         standData.standName,
         'https://farstand3.vercel.app',
