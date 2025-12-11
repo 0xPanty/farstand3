@@ -163,67 +163,53 @@ export async function downloadStandCard(cardElementId: string, standName: string
  * @param standName - Name of the Stand
  * @param appUrl - Base app URL (e.g., https://farstand3.vercel.app)
  * @param fid - User's Farcaster ID (required for share page with OG image)
- * @param imageUrlOrData - Optional image URL or data URL for upload
  */
 export async function shareOnFarcaster(
   standName: string,
   appUrl: string,
-  fid?: number,
-  imageUrlOrData?: string
+  fid?: number
 ) {
   try {
     const plainText = `I just awakened my Stand: ${standName}! ✨\n\nDiscover yours:`;
     
     // Build the share URL with OpenGraph metadata
-    // This URL will show the Stand image in the cast preview
     const sharePageUrl = fid ? `${appUrl}/api/share/${fid}` : appUrl;
     
     console.log('🔗 Share page URL:', sharePageUrl);
     
-    // Priority 1: Try Farcaster Mini App SDK composeCast (BEST for Warpcast)
+    // Import SDK
+    const { sdk } = await import('@farcaster/miniapp-sdk');
+    
+    // Check if we're inside a Mini App (Warpcast)
+    let isInMiniApp = false;
     try {
-      const { sdk } = await import('@farcaster/miniapp-sdk');
-      
-      // Use share page as the embed - it has proper OG tags for image preview
-      // The share page will redirect users to the app
-      const embeds: [string] = [sharePageUrl];
-      
-      // Use composeCast to open the native cast composer
-      const result = await sdk.actions.composeCast({
-        text: plainText,
-        embeds: embeds,
-      });
-      
-      console.log('✅ Cast composed via SDK:', result);
-      return true;
-    } catch (sdkError) {
-      console.log('ℹ️ SDK composeCast not available, trying fallback methods:', sdkError);
+      const context = await sdk.context;
+      isInMiniApp = !!context?.user?.fid;
+      console.log('📱 Mini App context:', isInMiniApp ? 'YES' : 'NO');
+    } catch (e) {
+      console.log('📱 Not in Mini App context');
     }
-
-    // Priority 2: Try Web Share API (for mobile browsers outside Warpcast)
-    try {
-      // @ts-ignore - navigator.share not in all TS lib targets
-      if (navigator.share) {
-        await (navigator as any).share({ 
-          title: `${standName} - Farstand`, 
-          text: plainText, 
-          url: sharePageUrl 
+    
+    // If in Mini App, ONLY use SDK composeCast
+    if (isInMiniApp) {
+      try {
+        const result = await sdk.actions.composeCast({
+          text: plainText,
+          embeds: [sharePageUrl],
         });
-        console.log('✅ Shared via Web Share API');
+        console.log('✅ Cast composed via SDK:', result);
         return true;
-      }
-    } catch (shareError: any) {
-      if (shareError.name === 'AbortError') {
-        console.log('ℹ️ User cancelled share');
+      } catch (sdkError) {
+        console.error('❌ SDK composeCast failed:', sdkError);
+        alert('分享失败，请重试');
         return false;
       }
-      console.log('ℹ️ Web Share API not available');
     }
-
-    // Priority 3: Fallback to opening Warpcast compose URL (for PC browsers)
+    
+    // Not in Mini App - use browser fallbacks
+    // Try opening Warpcast compose URL
     const text = encodeURIComponent(plainText);
     const sharePageUrlEncoded = encodeURIComponent(sharePageUrl);
-    
     const warpcastUrl = `https://warpcast.com/~/compose?text=${text}&embeds[]=${sharePageUrlEncoded}`;
 
     const opened = window.open(warpcastUrl, '_blank', 'noopener,noreferrer');
@@ -232,9 +218,15 @@ export async function shareOnFarcaster(
       return true;
     }
     
-    console.warn('⚠️ Popup blocked. Please allow popups for this site.');
-    alert('⚠️ Please allow popups to share. Check your browser settings.');
-    return false;
+    // Fallback: copy to clipboard
+    try {
+      await navigator.clipboard.writeText(`${plainText}\n${sharePageUrl}`);
+      alert('链接已复制，请手动粘贴到 Warpcast');
+      return true;
+    } catch (e) {
+      alert('请手动复制分享链接');
+      return false;
+    }
     
   } catch (error) {
     console.error('❌ Share function error:', error);
