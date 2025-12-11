@@ -88,6 +88,7 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
       followerCount: user.follower_count || 0,
       followingCount: user.following_count || 0,
       castCount,
+      sampledCastCount, // CRITICAL: Must return this!
       likesReceived,
       recastsReceived,
       repliesReceived,
