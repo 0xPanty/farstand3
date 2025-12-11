@@ -167,12 +167,11 @@ export async function shareOnFarcaster(
 ) {
   try {
     const plainText = `I just awakened my Stand: ${standName}! ✨\n\nDiscover yours:`;
-    const text = encodeURIComponent(plainText);
-    const appUrlEncoded = encodeURIComponent(appUrl);
     
-    let shareUrl = `https://warpcast.com/~/compose?text=${text}&embeds[]=${appUrlEncoded}`;
+    // Prepare embeds array (max 2 embeds)
+    let imageUrl: string | undefined = undefined;
     
-    // If we have an image, upload it to get a public URL and add to embeds
+    // If we have an image, upload it to get a public URL
     if (imageUrlOrData) {
       try {
         console.log('📤 Uploading image for share...');
@@ -189,9 +188,7 @@ export async function shareOnFarcaster(
         if (response.ok) {
           const data = await response.json();
           if (data?.url) {
-            // Add image as first embed, then app URL
-            const imageUrlEncoded = encodeURIComponent(data.url);
-            shareUrl = `https://warpcast.com/~/compose?text=${text}&embeds[]=${imageUrlEncoded}&embeds[]=${appUrlEncoded}`;
+            imageUrl = data.url;
             console.log('✅ Image uploaded:', data.url);
           }
         } else {
@@ -199,15 +196,34 @@ export async function shareOnFarcaster(
         }
       } catch (uploadError) {
         console.warn('⚠️ Image upload error:', uploadError);
-        // Continue with text-only share
       }
     }
 
-    // Priority 1: Try Web Share API first (works best in mobile browsers and Warpcast)
+    // Priority 1: Try Farcaster Mini App SDK composeCast (BEST for Warpcast)
+    try {
+      const { sdk } = await import('@farcaster/miniapp-sdk');
+      
+      // Build embeds array (image first, then app URL)
+      const embeds: [string] | [string, string] | [] = imageUrl 
+        ? [imageUrl, appUrl]
+        : [appUrl];
+      
+      // Use composeCast to open the native cast composer
+      const result = await sdk.actions.composeCast({
+        text: plainText,
+        embeds: embeds as any,
+      });
+      
+      console.log('✅ Cast composed via SDK:', result);
+      return true;
+    } catch (sdkError) {
+      console.log('ℹ️ SDK composeCast not available, trying fallback methods:', sdkError);
+    }
+
+    // Priority 2: Try Web Share API (for mobile browsers outside Warpcast)
     try {
       // @ts-ignore - navigator.share not in all TS lib targets
       if (navigator.share) {
-        // On mobile, prefer sharing the text + URL (Web Share API handles it natively)
         await (navigator as any).share({ 
           title: 'JoJo Stand Maker', 
           text: plainText, 
@@ -217,42 +233,31 @@ export async function shareOnFarcaster(
         return true;
       }
     } catch (shareError: any) {
-      // User cancelled or not supported
       if (shareError.name === 'AbortError') {
         console.log('ℹ️ User cancelled share');
         return false;
       }
-      console.log('ℹ️ Web Share API not available, trying fallback methods');
+      console.log('ℹ️ Web Share API not available');
     }
 
-    // Priority 2: Try opening Warpcast compose URL
-    // For PC browsers or environments where Web Share is not available
-    try {
-      // Try Farcaster SDK openUrl (for Mini App environment on PC)
-      try {
-        const { sdk } = await import('@farcaster/miniapp-sdk');
-        await sdk.actions.openUrl(shareUrl);
-        console.log('✅ Share opened via Farcaster SDK');
-        return true;
-      } catch (sdkError) {
-        console.log('ℹ️ SDK not available, trying window.open');
-      }
+    // Priority 3: Fallback to opening Warpcast compose URL (for PC browsers)
+    const text = encodeURIComponent(plainText);
+    const appUrlEncoded = encodeURIComponent(appUrl);
+    const imageUrlEncoded = imageUrl ? encodeURIComponent(imageUrl) : '';
+    
+    const shareUrl = imageUrl
+      ? `https://warpcast.com/~/compose?text=${text}&embeds[]=${imageUrlEncoded}&embeds[]=${appUrlEncoded}`
+      : `https://warpcast.com/~/compose?text=${text}&embeds[]=${appUrlEncoded}`;
 
-      // Fallback: Open in new window/tab (for PC browsers)
-      const opened = window.open(shareUrl, '_blank', 'noopener,noreferrer');
-      if (opened) {
-        console.log('✅ Opened share in new window');
-        return true;
-      }
-      
-      // If popup blocked, show friendly message
-      console.warn('⚠️ Popup blocked. Please allow popups for this site.');
-      alert('⚠️ Please allow popups to share. Check your browser settings.');
-      return false;
-    } catch {
-      console.error('❌ All share methods failed');
-      return false;
+    const opened = window.open(shareUrl, '_blank', 'noopener,noreferrer');
+    if (opened) {
+      console.log('✅ Opened share in new window');
+      return true;
     }
+    
+    console.warn('⚠️ Popup blocked. Please allow popups for this site.');
+    alert('⚠️ Please allow popups to share. Check your browser settings.');
+    return false;
     
   } catch (error) {
     console.error('❌ Share function error:', error);
