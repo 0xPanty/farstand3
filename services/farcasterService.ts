@@ -215,77 +215,24 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
 
   const durabilityDetail = `${profile.castCount} Casts`;
 
-  // D. PRECISION (Engagement Quality - Based on last 5 casts interaction rate)
+  // D. PRECISION (Engagement Quality - Overall average likes per cast)
   let precision: StatValue = 'E';
   let precisionDetail = 'No data';
   
-  try {
-    // Fetch last 5 casts for engagement quality
-    const recentCastsResponse = await fetch(
-      `https://api.neynar.com/v2/farcaster/feed/user/casts?fid=${profile.fid}&limit=5`,
-      {
-        headers: {
-          accept: "application/json",
-          "x-api-key": NEYNAR_API_KEY,
-        },
-      }
-    );
+  // Use TOTAL likes / TOTAL casts for overall quality (faster, no extra API call)
+  if (profile.castCount > 0) {
+    const avgLikesPerCast = profile.likesReceived / profile.castCount;
     
-    if (recentCastsResponse.ok) {
-      const recentData = await recentCastsResponse.json();
-      const casts = recentData.casts || [];
-      
-      if (casts.length > 0) {
-        // Calculate engagement metrics
-        let totalLikes = 0;
-        let totalRecasts = 0;
-        
-        casts.forEach((cast: any, index: number) => {
-          // DEBUG: Print the ENTIRE cast object for first cast only
-          if (index === 0) {
-            console.log('🔍 FULL CAST OBJECT:', JSON.stringify(cast, null, 2));
-          }
-          
-          // Try ALL possible field locations
-          const likes = cast.reactions?.likes_count || 
-                       cast.reactions?.likes?.length ||
-                       cast.likes_count ||
-                       cast.likes ||
-                       0;
-          const recasts = cast.reactions?.recasts_count || 
-                         cast.reactions?.recasts?.length ||
-                         cast.recasts_count ||
-                         cast.recasts ||
-                         0;
-          
-          console.log(`Cast ${index}: likes=${likes}, recasts=${recasts}`);
-          
-          totalLikes += likes;
-          totalRecasts += recasts;
-        });
-        
-        console.log(`Total likes: ${totalLikes}, Total recasts: ${totalRecasts}, Casts: ${casts.length}`);
-        
-        // Calculate engagement rate (weighted: likes 1x, recasts 2x)
-        const engagementScore = totalLikes + (totalRecasts * 2);
-        const avgEngagement = engagementScore / casts.length;
-        
-        // Calculate like rate (likes per cast)
-        const likeRate = totalLikes / casts.length;
-        
-        // Determine precision grade based on like rate (primary metric)
-        if (likeRate > 30) precision = 'A';
-        else if (likeRate > 15) precision = 'B';
-        else if (likeRate > 7) precision = 'C';
-        else if (likeRate > 2) precision = 'D';
-        else precision = 'E';
-        
-        precisionDetail = `Likes: ${likeRate.toFixed(1)}/cast`;
-      }
-    }
-  } catch (e) {
-    console.warn("Failed to fetch recent casts for precision:", e);
-    // Fallback: use follower ratio as precision indicator
+    // Determine precision grade based on average likes per cast
+    if (avgLikesPerCast > 30) precision = 'A';
+    else if (avgLikesPerCast > 15) precision = 'B';
+    else if (avgLikesPerCast > 7) precision = 'C';
+    else if (avgLikesPerCast > 2) precision = 'D';
+    else precision = 'E';
+    
+    precisionDetail = `Avg: ${avgLikesPerCast.toFixed(1)}/cast`;
+  } else {
+    // Fallback: use follower ratio if no casts
     const ratio = profile.followerCount / Math.max(profile.followingCount, 1);
     if (ratio > 5) precision = 'A';
     else if (ratio > 2) precision = 'B';
