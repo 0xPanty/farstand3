@@ -1,0 +1,19 @@
+{
+  "name": "JoJo Stand Maker",
+  "short_name": "Stand Maker",
+  "description": "Create your JOJO Stand based on Farcaster profile",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#2e003e",
+  "theme_color": "#2e003e",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
