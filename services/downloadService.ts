@@ -1,47 +1,109 @@
 /**
- * Download Stand image in high quality
+ * Download Stand image in high quality (supports both PC and mobile)
  */
 export async function downloadStandImage(imageUrl: string, standName: string) {
   try {
     const filename = `${standName.replace(/[『』\s]/g, '_')}_Stand.png`;
 
-    // Fast path for data URLs (no network, no CORS issues)
-    if (imageUrl.startsWith('data:')) {
-      const a = document.createElement('a');
-      a.href = imageUrl;
-      a.download = filename;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      return true;
+    // Detect if we're on mobile
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    
+    console.log(`📥 Download started - Device: ${isMobile ? 'Mobile' : 'PC'}, iOS: ${isIOS}`);
+
+    // Method 1: Try native Web Share API for mobile (best UX on mobile)
+    if (isMobile && navigator.share) {
+      try {
+        // Get blob from image URL
+        let blob: Blob;
+        if (imageUrl.startsWith('data:')) {
+          const [meta, b64] = imageUrl.split(',');
+          const mime = meta.match(/data:([^;]+);/i)?.[1] || 'image/png';
+          const bin = atob(b64);
+          const arr = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+          blob = new Blob([arr], { type: mime });
+        } else {
+          const response = await fetch(imageUrl, { mode: 'cors' });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          blob = await response.blob();
+        }
+
+        // Create file from blob
+        const file = new File([blob], filename, { type: blob.type || 'image/png' });
+
+        // Check if we can share files
+        // @ts-ignore - canShare might not be in all TS definitions
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'JoJo Stand',
+            text: `My Stand: ${standName}`,
+          });
+          console.log('✅ Shared via Web Share API');
+          return true;
+        }
+      } catch (shareError: any) {
+        // User cancelled share or share not supported
+        if (shareError.name !== 'AbortError') {
+          console.log('ℹ️ Web Share API failed, trying download method:', shareError.message);
+        } else {
+          console.log('ℹ️ User cancelled share');
+          return false;
+        }
+      }
     }
 
-    // Fallback: fetch as blob and download (best-effort if same-origin/CORS-enabled)
-    const response = await fetch(imageUrl, { mode: 'cors' });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const blob = await response.blob();
+    // Method 2: Standard download for PC and fallback for mobile
+    let blobUrl: string;
+    
+    if (imageUrl.startsWith('data:')) {
+      // Data URL can be used directly
+      blobUrl = imageUrl;
+    } else {
+      // Fetch and create blob URL
+      const response = await fetch(imageUrl, { mode: 'cors' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const blob = await response.blob();
+      blobUrl = window.URL.createObjectURL(blob);
+    }
 
-    const url = window.URL.createObjectURL(blob);
+    // Create download link
     const link = document.createElement('a');
-    link.href = url;
+    link.href = blobUrl;
     link.download = filename;
     link.style.display = 'none';
     document.body.appendChild(link);
+    
+    // Trigger download
     link.click();
+    
+    // Cleanup
     document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    if (!imageUrl.startsWith('data:')) {
+      // Only revoke object URLs we created
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
+    }
 
+    console.log('✅ Download triggered successfully');
     return true;
-  } catch (error) {
-    console.error('Download error:', error);
 
-    // Last-resort: try opening the image in a new tab so the user can save manually
+  } catch (error) {
+    console.error('❌ Download error:', error);
+
+    // Method 3: Last resort - open in new tab for manual save
     try {
+      console.log('⚠️ Attempting fallback: open in new tab');
       const win = window.open(imageUrl, '_blank', 'noopener,noreferrer');
-      if (!win) window.location.href = imageUrl;
-    } catch {}
-    return false;
+      if (!win) {
+        // If popup blocked, try same-window navigation
+        window.location.href = imageUrl;
+      }
+      return true;
+    } catch (finalError) {
+      console.error('❌ All download methods failed:', finalError);
+      return false;
+    }
   }
 }
 
@@ -96,70 +158,25 @@ export async function downloadStandCard(cardElementId: string, standName: string
 }
 
 /**
- * Share Stand on Farcaster
+ * Share Stand on Farcaster with image (supports both PC and mobile)
  */
 export async function shareOnFarcaster(
   standName: string,
   appUrl: string,
   imageUrlOrData?: string
 ) {
-  const plainText = `I just awakened my Stand: ${standName}! ✨\n\nDiscover yours:`;
-  const text = encodeURIComponent(plainText);
-  const url = encodeURIComponent(appUrl);
-
-  // Warpcast compose link (fallback)
-  const shareUrl = `https://warpcast.com/~/compose?text=${text}&embeds[]=${url}`;
-
-  // Try native share with image attachment when possible
   try {
-    // Only attempt file share if we have an image provided
-    if (imageUrlOrData) {
-      // Get blob from data URL or fetch
-      let blob: Blob;
-      if (imageUrlOrData.startsWith('data:')) {
-        const [meta, b64] = imageUrlOrData.split(',');
-        const mime = meta.match(/data:([^;]+);/i)?.[1] || 'image/png';
-        const bin = atob(b64);
-        const arr = new Uint8Array(bin.length);
-        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-        blob = new Blob([arr], { type: mime });
-      } else {
-        const resp = await fetch(imageUrlOrData, { mode: 'cors' });
-        blob = await resp.blob();
-      }
-
-      const filename = `${standName.replace(/[『』\s]/g, '_')}_Stand.png`;
-      // Some browsers require File instead of Blob
-      // @ts-ignore File constructor exists in modern browsers
-      const file = new File([blob], filename, { type: blob.type || 'image/png' });
-
-      // @ts-ignore - canShare not on all TS targets
-      const canShareFiles = typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [file] });
-
-      // @ts-ignore - navigator.share not in all TS lib targets
-      if (canShareFiles && navigator.share) {
-        await (navigator as any).share({
-          title: 'JoJo Stand Maker',
-          text: plainText,
-          files: [file],
-          // Note: including url is fine; some platforms ignore it when files present
-          url: appUrl,
-        });
-        return true;
-      }
-    }
-
-    // Fallback to text+url share without files
-    // @ts-ignore - navigator.share not in all TS lib targets
-    if (navigator.share) {
-      await (navigator as any).share({ title: 'JoJo Stand Maker', text: plainText, url: appUrl });
-      return true;
-    }
-
-    // Fallback++: if we have image data but cannot native-share files, upload it to a public URL and open Warpcast compose with that image embedded
+    const plainText = `I just awakened my Stand: ${standName}! ✨\n\nDiscover yours:`;
+    const text = encodeURIComponent(plainText);
+    const appUrlEncoded = encodeURIComponent(appUrl);
+    
+    let shareUrl = `https://warpcast.com/~/compose?text=${text}&embeds[]=${appUrlEncoded}`;
+    
+    // If we have an image, upload it to get a public URL and add to embeds
     if (imageUrlOrData) {
       try {
-        const resp = await fetch('/api/upload-image', {
+        console.log('📤 Uploading image for share...');
+        const response = await fetch('/api/upload-image', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -168,30 +185,69 @@ export async function shareOnFarcaster(
             filename: `${standName.replace(/[『』\s]/g, '_')}_Stand.png`,
           }),
         });
-        const json = await resp.json();
-        if (json?.url) {
-          const imageEmbed = encodeURIComponent(json.url);
-          const composeUrl = `https://warpcast.com/~/compose?text=${text}&embeds[]=${imageEmbed}&embeds[]=${url}`;
-          window.location.href = composeUrl; // use same-tab for iOS universal link
-          return false;
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.url) {
+            // Add image as first embed, then app URL
+            const imageUrlEncoded = encodeURIComponent(data.url);
+            shareUrl = `https://warpcast.com/~/compose?text=${text}&embeds[]=${imageUrlEncoded}&embeds[]=${appUrlEncoded}`;
+            console.log('✅ Image uploaded:', data.url);
+          }
+        } else {
+          console.warn('⚠️ Image upload failed, sharing without image');
         }
-      } catch (err) {
-        console.warn('upload-image fallback failed:', err);
+      } catch (uploadError) {
+        console.warn('⚠️ Image upload error:', uploadError);
+        // Continue with text-only share
       }
     }
-  } catch (e) {
-    console.warn('navigator.share failed, falling back:', e);
-  }
 
-  // Final fallback: navigate same tab to enable iOS Universal Link → open Warpcast app
-  try {
-    window.location.href = shareUrl;
-  } catch {
-    // As a last resort try a popup
-    const win = window.open(shareUrl, '_blank', 'noopener,noreferrer');
-    if (!win) {
-      // No-op; the user can manually copy/share
+    // Try Farcaster Mini App SDK first (best for mobile in Warpcast)
+    try {
+      const { sdk } = await import('@farcaster/miniapp-sdk');
+      await sdk.actions.openUrl(shareUrl);
+      console.log('✅ Share opened via Farcaster SDK');
+      return true;
+    } catch (sdkError) {
+      console.log('ℹ️ SDK not available, trying fallback methods');
     }
+
+    // Fallback 1: Native Web Share API (good for mobile browsers)
+    try {
+      // @ts-ignore - navigator.share not in all TS lib targets
+      if (navigator.share) {
+        await (navigator as any).share({ 
+          title: 'JoJo Stand Maker', 
+          text: plainText, 
+          url: appUrl 
+        });
+        console.log('✅ Shared via Web Share API');
+        return true;
+      }
+    } catch (e) {
+      console.log('ℹ️ Web Share API not available or cancelled');
+    }
+
+    // Fallback 2: Direct link (works on both PC and mobile)
+    try {
+      // Open in new window/tab
+      const opened = window.open(shareUrl, '_blank', 'noopener,noreferrer');
+      if (opened) {
+        console.log('✅ Opened share in new window');
+        return true;
+      }
+      
+      // If popup blocked, try same window navigation
+      window.location.href = shareUrl;
+      return true;
+    } catch {
+      console.error('❌ All share methods failed');
+      return false;
+    }
+    
+  } catch (error) {
+    console.error('❌ Share function error:', error);
+    return false;
   }
-  return false;
 }
