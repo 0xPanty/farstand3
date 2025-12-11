@@ -1112,10 +1112,10 @@ export default function App() {
                         </div>
                     </div>
     
-                    {/* Footer: Battle Cry - UPDATED WITH ARROW */}
-                    <div className="bg-black pt-6 pb-12 shrink-0 border-t-4 border-[#db2777] relative overflow-hidden group flex flex-col items-center justify-center">
-                        <div className="text-white text-[10px] tracking-[0.4em] uppercase text-center mb-1 font-bold">BATTLE CRY</div>
-                        <p className="text-white font-black italic text-center text-3xl leading-none relative z-10 font-jojo drop-shadow-[0_2px_0_rgba(0,0,0,1)] filter drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] px-4">
+                    {/* Footer: Battle Cry - Compact version */}
+                    <div className="bg-black pt-3 pb-6 shrink-0 border-t-4 border-[#db2777] relative overflow-hidden group flex flex-col items-center justify-center">
+                        <div className="text-white text-[9px] tracking-[0.3em] uppercase text-center mb-1 font-bold">BATTLE CRY</div>
+                        <p className="text-white font-black italic text-center text-xl leading-tight relative z-10 font-jojo drop-shadow-[0_2px_0_rgba(0,0,0,1)] filter drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] px-6 max-w-xs">
                             "{standData.battleCry}"
                         </p>
                     </div>
