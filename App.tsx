@@ -937,14 +937,36 @@ export default function App() {
     }
   }, [standData]);
 
-  const handleShare = useCallback(() => {
+  const handleShare = useCallback(async () => {
     if (!standData) return;
     
-    shareOnFarcaster(
-      standData.standName,
-      'https://farstand3.vercel.app', // 你的应用 URL
-      standData.standImageUrl || undefined
-    );
+    try {
+      // Convert image URL to data URL for reliable upload
+      let imageData: string | undefined = undefined;
+      if (standData.standImageUrl) {
+        try {
+          const response = await fetch(standData.standImageUrl, { mode: 'cors' });
+          const blob = await response.blob();
+          imageData = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(blob);
+          });
+          console.log('🖼️ Image converted to data URL for sharing');
+        } catch (conversionError) {
+          console.warn('⚠️ Failed to convert image, sharing without image:', conversionError);
+        }
+      }
+      
+      await shareOnFarcaster(
+        standData.standName,
+        'https://farstand3.vercel.app', // 你的应用 URL
+        imageData
+      );
+    } catch (error) {
+      console.error('❌ Share failed:', error);
+      alert('❌ Share failed. Please try again.');
+    }
   }, [standData]);
 
   // ==========================

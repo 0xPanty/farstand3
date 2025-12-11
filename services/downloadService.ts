@@ -238,9 +238,11 @@ export async function shareOnFarcaster(
         return true;
       }
       
-      // If popup blocked, try same window navigation
-      window.location.href = shareUrl;
-      return true;
+      // If popup blocked, DON'T use window.location.href in Mini App
+      // because it will navigate the Mini App itself away
+      console.warn('⚠️ Popup blocked. Please allow popups for this site.');
+      alert('⚠️ Please allow popups to share. Check your browser settings.');
+      return false;
     } catch {
       console.error('❌ All share methods failed');
       return false;
