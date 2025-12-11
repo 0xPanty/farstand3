@@ -182,7 +182,7 @@ async function generateStandProfile(
 // Generate Stand Visuals (Image-to-Image)
 // ==========================================
 async function generateStandVisuals(originalImageBase64: string, visualPrompt: string): Promise<string> {
-  const modelId = "gemini-2.0-flash-thinking-exp-01-21"; // Upgraded to 2.0 Experimental for better image quality
+  const modelId = "gemini-2.5-flash-image"; // Stable version - works reliably with your $300 credit
 
   const cleanBase64 = originalImageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
 
