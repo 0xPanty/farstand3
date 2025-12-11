@@ -241,9 +241,12 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
         let totalRecasts = 0;
         
         casts.forEach((cast: any) => {
-          // Neynar API v2 standard structure
-          const likes = cast.reactions?.likes_count || 0;
-          const recasts = cast.reactions?.recasts_count || 0;
+          // Neynar API returns likes/recasts as ARRAYS, not counts
+          const likesArray = cast.reactions?.likes || [];
+          const recastsArray = cast.reactions?.recasts || [];
+          
+          const likes = Array.isArray(likesArray) ? likesArray.length : 0;
+          const recasts = Array.isArray(recastsArray) ? recastsArray.length : 0;
           
           totalLikes += likes;
           totalRecasts += recasts;
