@@ -190,14 +190,16 @@ async function generateStandVisuals(originalImageBase64: string, visualPrompt: s
     ${visualPrompt}
     
     CRITICAL ART DIRECTION (ARAKI STYLE):
-    1. **PHYSIQUE**: Characters must be LEAN, ANGULAR, and FASHIONABLE (Golden Wind / Stone Ocean style). **NO** puffy jackets, **NO** mascot suits, **NO** round bodies.
-    2. **DOUBLE POSE**: BOTH the User AND the Stand must be posing dramatically. 
+    1. **MANDATORY: FULL COLOR ILLUSTRATION** - This MUST be a vibrant, fully colored artwork. NO black-and-white sketches, NO grayscale. Use rich, saturated colors.
+    2. **PHYSIQUE**: Characters must be LEAN, ANGULAR, and FASHIONABLE (Golden Wind / Stone Ocean style). **NO** puffy jackets, **NO** mascot suits, **NO** round bodies.
+    3. **DOUBLE POSE**: BOTH the User AND the Stand must be posing dramatically. 
        - The Stand should NOT be static. It must look alive, menacing, and active (e.g. winding around user, punching forward, or mirroring the user's contortion).
-    3. **INTEGRATION**: The Stand should feel connected to the user, not just pasted in the background.
-    4. **COMPOSITION**: Vertical Manga Illustration.
-    5. **SFX**: Visible Japanese sound effects (Katakana 'ゴゴゴ') integrated into the art are okay.
-    6. **FACE**: Sharp jawline, detailed eyes, heavy shading lines on face.
-    7. **COLORS**: Bizarre, high-contrast color palettes (e.g. green lips, purple skies).
+    4. **INTEGRATION**: The Stand should feel connected to the user, not just pasted in the background.
+    5. **COMPOSITION**: Vertical Manga Illustration with detailed cross-hatching shading.
+    6. **SFX**: Visible Japanese sound effects (Katakana 'ゴゴゴ') integrated into the art are okay.
+    7. **FACE**: Sharp jawline, detailed eyes, heavy shading lines on face with full color rendering.
+    8. **COLORS**: Bizarre, high-contrast color palettes (e.g. green lips, purple skies, bold outfit colors).
+    9. **RENDERING QUALITY**: Professional manga colorization with cell-shading, highlights, and shadows. NOT a rough sketch.
   `;
 
   const response = await ai.models.generateContent({
