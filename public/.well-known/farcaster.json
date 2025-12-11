@@ -6,7 +6,7 @@
   },
   "miniapp": {
     "version": "1",
-    "name": "Stand Maker",
+    "name": "Farstand",
     "homeUrl": "https://farstand3.vercel.app",
     "iconUrl": "https://farstand3.vercel.app/logo.png",
     "splashImageUrl": "https://farstand3.vercel.app/logo.png",
