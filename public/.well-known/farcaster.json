@@ -1,0 +1,27 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjEyMzQ1LCJ0eXBlIjoiY3VzdG9keSIsImtleSI6IjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCJ9",
+    "payload": "eyJkb21haW4iOiJmYXJzdGFuZDMudmVyY2VsLmFwcCJ9",
+    "signature": "MHhhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkw"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "JoJo Stand Maker",
+    "homeUrl": "https://farstand3.vercel.app",
+    "iconUrl": "https://farstand3.vercel.app/logo.png",
+    "splashImageUrl": "https://farstand3.vercel.app/logo.png",
+    "splashBackgroundColor": "#0f0015",
+    "subtitle": "觉醒你的链上&社交 Stand",
+    "description": "Upload your photo to awaken your unique JoJo Stand! AI analyzes your Farcaster profile and on-chain activity to generate a personalized Stand with custom stats, abilities, and Araki-style artwork.",
+    "screenshotUrls": [
+      "https://farstand3.vercel.app/logo.png"
+    ],
+    "primaryCategory": "entertainment",
+    "tags": ["jojo", "stand", "ai", "art", "generator", "anime", "manga", "farcaster", "onchain"],
+    "heroImageUrl": "https://farstand3.vercel.app/logo.png",
+    "tagline": "Awaken Your Stand. Unleash Your Power.",
+    "ogTitle": "I Just Awakened My JoJo Stand!",
+    "ogDescription": "Upload your photo and discover your unique Stand based on your Farcaster profile and on-chain data. What's your Stand's power?",
+    "ogImageUrl": "https://farstand3.vercel.app/logo.png"
+  }
+}
