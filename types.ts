@@ -30,6 +30,7 @@ export interface FarcasterProfile {
   castCount: number;
   likesReceived: number;
   recastsReceived: number;
+  repliesReceived: number;
   verifications: string[]; // ETH addresses
   powerBadge: boolean;
 }

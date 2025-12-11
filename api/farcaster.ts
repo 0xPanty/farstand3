@@ -74,6 +74,7 @@ async function fetchFarcasterUser(fid: number): Promise<any> {
     let castCount = 0;
     let likesReceived = 0;
     let recastsReceived = 0;
+    let repliesReceived = 0;
     
     try {
       const castsResponse = await fetch(
@@ -91,6 +92,7 @@ async function fetchFarcasterUser(fid: number): Promise<any> {
         castsData.casts?.forEach((cast: any) => {
           likesReceived += cast.reactions?.likes_count || 0;
           recastsReceived += cast.reactions?.recasts_count || 0;
+          repliesReceived += cast.replies?.count || 0;
         });
       }
     } catch (e) {
@@ -108,6 +110,7 @@ async function fetchFarcasterUser(fid: number): Promise<any> {
       castCount,
       likesReceived,
       recastsReceived,
+      repliesReceived,
       verifications: user.verifications || [],
       powerBadge: user.power_badge || false,
       score: user.experimental?.neynar_user_score || user.score,
@@ -212,17 +215,30 @@ async function calculateFarcasterStats(profile: any): Promise<any> {
 
   const durabilityDetail = `${profile.castCount} Casts`;
 
-  // D. PRECISION (Weighted Engagement Ratio - recasts×2 + likes×1, last 5 casts)
-  const weightedInteractions = (profile.recastsReceived * 2) + (profile.likesReceived * 1);
-  const engagementRatio = profile.castCount > 0 ? weightedInteractions / profile.castCount : 0;
+  // D. PRECISION (Engagement Quality Score - Weighted: Likes + Recasts×2 + Replies×3)
+  let precision = 'E';
+  let precisionDetail = 'No data';
   
-  let precision: StatValue = 'E';
-  if (engagementRatio > 30) precision = 'A';
-  else if (engagementRatio > 20) precision = 'B';
-  else if (engagementRatio > 10) precision = 'C';
-  else if (engagementRatio > 5) precision = 'D';
-  
-  const precisionDetail = `${engagementRatio.toFixed(1)} per Cast`;
+  if (profile.castCount > 0) {
+    // Calculate weighted engagement score per cast
+    // Replies are most valuable (show discussion), Recasts are medium, Likes are baseline
+    const weightedScore = (
+      (profile.likesReceived || 0) + 
+      (profile.recastsReceived || 0) * 2 + 
+      (profile.repliesReceived || 0) * 3
+    ) / profile.castCount;
+    
+    // Determine precision grade based on weighted quality score
+    if (weightedScore >= 50) precision = 'A';       // Viral quality content
+    else if (weightedScore >= 25) precision = 'B';  // High quality engagement
+    else if (weightedScore >= 10) precision = 'C';  // Good engagement
+    else if (weightedScore >= 5) precision = 'D';   // Moderate engagement
+    else precision = 'E';                           // Low engagement
+    
+    precisionDetail = `Quality: ${weightedScore.toFixed(1)}`;
+  } else {
+    precisionDetail = 'No casts';
+  }
 
   // E. RANGE
   const totalEngagement = profile.likesReceived + profile.recastsReceived;

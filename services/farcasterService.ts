@@ -32,6 +32,7 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
     // Fetch engagement from Neynar API (paid plan)
     let likesReceived = 0;
     let recastsReceived = 0;
+    let repliesReceived = 0;
     
     try {
       const castsResponse = await fetch(
@@ -48,6 +49,7 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
         castsData.casts?.forEach((cast: any) => {
           likesReceived += cast.reactions?.likes_count || 0;
           recastsReceived += cast.reactions?.recasts_count || 0;
+          repliesReceived += cast.replies?.count || 0;
         });
       }
     } catch (e) {
@@ -86,6 +88,7 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
       castCount,
       likesReceived,
       recastsReceived,
+      repliesReceived,
       verifications: user.verifications || [],
       powerBadge: user.power_badge || false,
       score: user.experimental?.neynar_user_score || user.score,
@@ -215,57 +218,30 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
 
   const durabilityDetail = `${profile.castCount} Casts`;
 
-  // D. PRECISION (Engagement Quality - Reply rate from last 5 casts)
+  // D. PRECISION (Engagement Quality Score - Weighted: Likes + Recasts×2 + Replies×3)
   let precision: StatValue = 'E';
   let precisionDetail = 'No data';
   
-  try {
-    // Fetch last 5 casts to calculate reply rate
-    const recentCastsResponse = await fetch(
-      `https://api.neynar.com/v2/farcaster/feed/user/casts?fid=${profile.fid}&limit=5`,
-      {
-        headers: {
-          accept: "application/json",
-          "x-api-key": NEYNAR_API_KEY,
-        },
-      }
-    );
+  if (profile.castCount > 0) {
+    // Calculate weighted engagement score per cast
+    // Replies are most valuable (show discussion), Recasts are medium, Likes are baseline
+    const weightedScore = (
+      (profile.likesReceived || 0) + 
+      (profile.recastsReceived || 0) * 2 + 
+      (profile.repliesReceived || 0) * 3
+    ) / profile.castCount;
     
-    if (recentCastsResponse.ok) {
-      const recentData = await recentCastsResponse.json();
-      const casts = recentData.casts || [];
-      
-      if (casts.length > 0) {
-        // Calculate total replies from last 5 casts
-        let totalReplies = 0;
-        
-        casts.forEach((cast: any) => {
-          totalReplies += cast.replies?.count || 0;
-        });
-        
-        // Calculate reply rate (replies per cast)
-        const replyRate = totalReplies / casts.length;
-        
-        // Determine precision grade based on reply rate (discussion quality)
-        if (replyRate > 10) precision = 'A';      // Super high discussion
-        else if (replyRate > 5) precision = 'B';  // High discussion
-        else if (replyRate > 2) precision = 'C';  // Normal discussion
-        else if (replyRate > 1) precision = 'D';  // Low discussion
-        else precision = 'E';                      // Very low discussion
-        
-        precisionDetail = `Replies: ${replyRate.toFixed(1)}/cast`;
-      }
-    }
-  } catch (e) {
-    console.warn("Failed to fetch recent casts for precision:", e);
-    // Fallback: use follower ratio as precision indicator
-    const ratio = profile.followerCount / Math.max(profile.followingCount, 1);
-    if (ratio > 5) precision = 'A';
-    else if (ratio > 2) precision = 'B';
-    else if (ratio > 1) precision = 'C';
-    else if (ratio > 0.5) precision = 'D';
-    else precision = 'E';
-    precisionDetail = `Ratio: ${ratio.toFixed(2)}`;
+    // Determine precision grade based on weighted quality score
+    if (weightedScore >= 50) precision = 'A';       // Viral quality content
+    else if (weightedScore >= 25) precision = 'B';  // High quality engagement
+    else if (weightedScore >= 10) precision = 'C';  // Good engagement
+    else if (weightedScore >= 5) precision = 'D';   // Moderate engagement
+    else precision = 'E';                           // Low engagement
+    
+    precisionDetail = `Quality: ${weightedScore.toFixed(1)}`;
+  } else {
+    // Fallback for users with no casts
+    precisionDetail = 'No casts';
   }
 
   // E. RANGE (Engagement - Likes + Recasts)
