@@ -241,9 +241,26 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
         let totalRecasts = 0;
         
         casts.forEach((cast: any) => {
-          totalLikes += cast.reactions?.likes_count || 0;
-          totalRecasts += cast.reactions?.recasts_count || 0;
+          // Debug: Log the structure to see what we're getting
+          console.log('Cast reactions:', cast.reactions);
+          
+          // Try multiple possible field names from Neynar API
+          const likes = cast.reactions?.likes_count || 
+                       cast.reactions?.likes || 
+                       cast.likes_count || 
+                       cast.likes || 
+                       0;
+          const recasts = cast.reactions?.recasts_count || 
+                         cast.reactions?.recasts || 
+                         cast.recasts_count || 
+                         cast.recasts || 
+                         0;
+          
+          totalLikes += likes;
+          totalRecasts += recasts;
         });
+        
+        console.log(`Total likes: ${totalLikes}, Total recasts: ${totalRecasts}, Casts: ${casts.length}`);
         
         // Calculate engagement rate (weighted: likes 1x, recasts 2x)
         const engagementScore = totalLikes + (totalRecasts * 2);
