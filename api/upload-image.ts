@@ -49,7 +49,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Generate id
     const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
 
-    await sql`INSERT INTO stand_uploads (id, mime, data, filename) VALUES (${id}, ${mime}, ${buffer}, ${filename || null})`;
+    // Convert buffer to hex string for PostgreSQL BYTEA
+    const hexData = '\\x' + buffer.toString('hex');
+
+    await sql`INSERT INTO stand_uploads (id, mime, data, filename) VALUES (${id}, ${mime}, ${hexData}::bytea, ${filename || null})`;
 
     const host = (req.headers['x-forwarded-host'] || req.headers.host) as string;
     const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
