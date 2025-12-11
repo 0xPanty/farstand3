@@ -2,7 +2,8 @@
 import { FarcasterProfile, StandStats, StatValue, StandStatRawValues } from "../types";
 
 const NEYNAR_API_KEY = import.meta.env.VITE_NEYNAR_API_KEY || "BDED1C34-E2A9-43FA-B973-38C4B938008D";
-const ETH_RPC_URL = "https://cloudflare-eth.com";
+// Use Base chain RPC instead of Ethereum mainnet (Farcaster users are more active on Base)
+const BASE_RPC_URL = "https://mainnet.base.org";
 
 // ==========================================
 // 1. Fetch User Data (with extended viewer_fid for more stats)
@@ -96,11 +97,11 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
 };
 
 // ==========================================
-// 2. Get On-Chain TX Count (Speed)
+// 2. Get On-Chain TX Count from Base L2 (Speed)
 // ==========================================
-const getEthTransactionCount = async (address: string): Promise<number> => {
+const getBaseTransactionCount = async (address: string): Promise<number> => {
   try {
-    const response = await fetch(ETH_RPC_URL, {
+    const response = await fetch(BASE_RPC_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -115,7 +116,7 @@ const getEthTransactionCount = async (address: string): Promise<number> => {
     // Return 0 if NaN
     return isNaN(count) ? 0 : count;
   } catch (e) {
-    console.warn("RPC Fetch failed, using fallback speed", e);
+    console.warn("Base RPC Fetch failed, using fallback speed", e);
     return 0;
   }
 };
@@ -148,13 +149,13 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
     ? `Score: ${scorePercent.toFixed(0)}%` 
     : (profile.powerBadge ? "Power Badge" : `Followers: ${profile.followerCount}`);
 
-  // B. SPEED (Activity Rate - Cast frequency or Chain TXs)
+  // B. SPEED (Activity Rate - Base L2 transaction count or Cast frequency)
   let txCount = 0;
   let speedDetail = 'No data';
   
-  // Try to get on-chain transaction count first
+  // Try to get Base L2 transaction count first (using first verified wallet)
   if (profile.verifications.length > 0) {
-    txCount = await getEthTransactionCount(profile.verifications[0]);
+    txCount = await getBaseTransactionCount(profile.verifications[0]);
   }
 
   let speed: StatValue = 'E';
