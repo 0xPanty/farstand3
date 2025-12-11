@@ -38,7 +38,7 @@ const RadarChart: React.FC<{ stats: StandStats }> = ({ stats }) => {
   const polyPoints = keys.map((k, i) => getPoint(i, gradeToVal(stats[k as keyof StandStats]))).join(" ");
 
   return (
-    <div className="relative flex items-center justify-center scale-90 md:scale-100" style={{ width: containerSize, height: containerSize }}>
+    <div className="relative flex items-center justify-center scale-90" style={{ width: containerSize, height: containerSize }}>
       
       {/* 1. Black Background Circle (Centered) */}
       <div 
@@ -111,12 +111,12 @@ const StatCircle: React.FC<StatCircleProps> = ({ label, subLabel, value, detail 
     
     return (
         <div className="flex flex-col items-center justify-center transform hover:scale-110 transition-transform duration-300">
-            <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full border-[4px] ${borderColor} flex items-center justify-center bg-white shadow-[4px_4px_0_rgba(0,0,0,0.1)] mb-2`}>
-                <span className={`text-3xl md:text-4xl font-black italic font-jojo leading-none ${textColor}`}>{value}</span>
+            <div className={`w-16 h-16 rounded-full border-[4px] ${borderColor} flex items-center justify-center bg-white shadow-[4px_4px_0_rgba(0,0,0,0.1)] mb-2`}>
+                <span className={`text-3xl font-black italic font-jojo leading-none ${textColor}`}>{value}</span>
             </div>
             <div className="flex flex-col items-center leading-none">
-                 <span className="text-xs md:text-sm font-black text-black">{label}</span>
-                 <span className="text-[8px] md:text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-0.5">{subLabel}</span>
+                 <span className="text-xs font-black text-black">{label}</span>
+                 <span className="text-[8px] font-bold text-gray-500 uppercase tracking-wider mt-0.5">{subLabel}</span>
             </div>
         </div>
     );
@@ -687,9 +687,9 @@ const LoadingScreen = () => {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)] pointer-events-none"></div>
 
             <div className="flex gap-4 mb-16 relative z-10">
-                <span className="text-[#db2777] font-black text-6xl md:text-8xl menacing-text animate-rumble" style={{ animationDelay: '0s' }}>ゴ</span>
-                <span className="text-[#db2777] font-black text-6xl md:text-8xl menacing-text animate-rumble" style={{ animationDelay: '0.1s' }}>ゴ</span>
-                <span className="text-[#db2777] font-black text-6xl md:text-8xl menacing-text animate-rumble" style={{ animationDelay: '0.2s' }}>ゴ</span>
+                <span className="text-[#db2777] font-black text-6xl menacing-text animate-rumble" style={{ animationDelay: '0s' }}>ゴ</span>
+                <span className="text-[#db2777] font-black text-6xl menacing-text animate-rumble" style={{ animationDelay: '0.1s' }}>ゴ</span>
+                <span className="text-[#db2777] font-black text-6xl menacing-text animate-rumble" style={{ animationDelay: '0.2s' }}>ゴ</span>
             </div>
 
             <div className="w-64 border-2 border-[#701a75] bg-black/80 rounded-lg p-3 shadow-[0_0_20px_rgba(112,26,117,0.5)] relative z-10">
@@ -722,7 +722,7 @@ interface PrinterViewProps {
 
 const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDetails, standName, standImageUrl, sketchImageUrl, onDownload, onShare }) => {
     return (
-        <main className="absolute inset-0 w-full max-w-md mx-auto bg-black bg-noise pattern-flowing-checkers flex flex-col overflow-y-scroll" 
+        <main className="absolute inset-0 bg-black bg-noise pattern-flowing-checkers flex flex-col overflow-y-scroll" 
               style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)', WebkitOverflowScrolling: 'touch' }}>
              
              {/* Background */}
@@ -986,7 +986,7 @@ export default function App() {
   // ==========================
   if (standData) {
       return (
-        <main className="h-dvh w-screen bg-black bg-noise pattern-grid flex flex-col items-center justify-start p-0 perspective-1000 overflow-y-auto"
+        <main className="h-dvh w-full max-w-md mx-auto bg-black bg-noise pattern-grid flex flex-col items-center justify-start p-0 perspective-1000 overflow-y-auto"
               style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
             
             {/* Card Container with 3D flip - Adjusted for buttons */}
@@ -1119,7 +1119,7 @@ export default function App() {
                     {/* Footer: Battle Cry - UPDATED WITH ARROW */}
                     <div className="bg-black pt-6 pb-12 shrink-0 border-t-4 border-[#db2777] relative overflow-hidden group flex flex-col items-center justify-center">
                         <div className="text-white text-[10px] tracking-[0.4em] uppercase text-center mb-1 font-bold">BATTLE CRY</div>
-                        <p className="text-white font-black italic text-center text-3xl md:text-5xl leading-none relative z-10 font-jojo drop-shadow-[0_2px_0_rgba(0,0,0,1)] filter drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] px-4">
+                        <p className="text-white font-black italic text-center text-3xl leading-none relative z-10 font-jojo drop-shadow-[0_2px_0_rgba(0,0,0,1)] filter drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] px-4">
                             "{standData.battleCry}"
                         </p>
                     </div>
@@ -1156,7 +1156,7 @@ export default function App() {
                 <div className="inline-block bg-[#fbbf24] px-4 py-0.5 transform -skew-x-12 mb-4 shadow-[0_0_10px_#fbbf24]">
                     <span className="text-black font-black text-xs tracking-widest transform skew-x-12 inline-block">THE ARROW AWAITS</span>
                 </div>
-                <h1 className="text-6xl md:text-7xl font-jojo text-white drop-shadow-[4px_4px_0_#db2777] tracking-tight leading-[0.9]">
+                <h1 className="text-6xl font-jojo text-white drop-shadow-[4px_4px_0_#db2777] tracking-tight leading-[0.9]">
                     AWAKEN<br/><span className="text-[#fbbf24] text-outline-thick">STAND</span>
                 </h1>
                 
@@ -1186,7 +1186,7 @@ export default function App() {
                         <button 
                         onClick={handleGenerate}
                         disabled={isLoading || !farcasterUser}
-                        className="relative w-48 h-48 md:w-56 md:h-56 group outline-none active:scale-95 transition-transform"
+                        className="relative w-48 h-48 group outline-none active:scale-95 transition-transform"
                         >
                         {/* 1. Diamond Background */}
                         <div className="absolute inset-0 bg-gradient-to-br from-[#fbbf24] to-[#b45309] shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300 transform rotate-45 border-4 border-white group-hover:scale-105"></div>
@@ -1255,4 +1255,6 @@ export default function App() {
     </main>
   );
 }
+
+
 
