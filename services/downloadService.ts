@@ -178,29 +178,25 @@ export async function shareOnFarcaster(
     console.log('🔗 Share page URL:', sharePageUrl);
     
     // Import SDK
-    const { sdk } = await import('@farcaster/miniapp-sdk');
+    const { sdk, isInMiniApp } = await import('@farcaster/miniapp-sdk');
     
     // Check if we're inside a Mini App (Warpcast)
-    let isInMiniApp = false;
-    try {
-      const context = await sdk.context;
-      isInMiniApp = !!context?.user?.fid;
-      console.log('📱 Mini App context:', isInMiniApp ? 'YES' : 'NO');
-    } catch (e) {
-      console.log('📱 Not in Mini App context');
-    }
+    const inMiniApp = isInMiniApp();
+    console.log('📱 Mini App context:', inMiniApp ? 'YES' : 'NO');
     
-    // If in Mini App, ONLY use SDK composeCast
-    if (isInMiniApp) {
-      try {
-        const result = await sdk.actions.composeCast({
-          text: plainText,
-          embeds: [sharePageUrl],
-        });
-        console.log('✅ Cast composed via SDK:', result);
-        return true;
-      } catch (sdkError) {
-        console.error('❌ SDK composeCast failed:', sdkError);
+    // Always try SDK composeCast first (works in Mini App)
+    try {
+      const result = await sdk.actions.composeCast({
+        text: plainText,
+        embeds: [sharePageUrl],
+      });
+      console.log('✅ Cast composed via SDK:', result);
+      return true;
+    } catch (sdkError) {
+      console.log('ℹ️ SDK composeCast failed, trying fallback:', sdkError);
+      
+      // Only show error in Mini App context (shouldn't fail there)
+      if (inMiniApp) {
         alert('分享失败，请重试');
         return false;
       }
