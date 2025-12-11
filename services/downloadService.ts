@@ -159,59 +159,39 @@ export async function downloadStandCard(cardElementId: string, standName: string
 
 /**
  * Share Stand on Farcaster with image (supports both PC and mobile)
+ * 
+ * @param standName - Name of the Stand
+ * @param appUrl - Base app URL (e.g., https://farstand3.vercel.app)
+ * @param fid - User's Farcaster ID (required for share page with OG image)
+ * @param imageUrlOrData - Optional image URL or data URL for upload
  */
 export async function shareOnFarcaster(
   standName: string,
   appUrl: string,
+  fid?: number,
   imageUrlOrData?: string
 ) {
   try {
     const plainText = `I just awakened my Stand: ${standName}! ✨\n\nDiscover yours:`;
     
-    // Prepare embeds array (max 2 embeds)
-    let imageUrl: string | undefined = undefined;
+    // Build the share URL with OpenGraph metadata
+    // This URL will show the Stand image in the cast preview
+    const sharePageUrl = fid ? `${appUrl}/api/share/${fid}` : appUrl;
     
-    // If we have an image, upload it to get a public URL
-    if (imageUrlOrData) {
-      try {
-        console.log('📤 Uploading image for share...');
-        const response = await fetch('/api/upload-image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            dataUrl: imageUrlOrData.startsWith('data:') ? imageUrlOrData : undefined,
-            url: imageUrlOrData.startsWith('data:') ? undefined : imageUrlOrData,
-            filename: `${standName.replace(/[『』\s]/g, '_')}_Stand.png`,
-          }),
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data?.url) {
-            imageUrl = data.url;
-            console.log('✅ Image uploaded:', data.url);
-          }
-        } else {
-          console.warn('⚠️ Image upload failed, sharing without image');
-        }
-      } catch (uploadError) {
-        console.warn('⚠️ Image upload error:', uploadError);
-      }
-    }
-
+    console.log('🔗 Share page URL:', sharePageUrl);
+    
     // Priority 1: Try Farcaster Mini App SDK composeCast (BEST for Warpcast)
     try {
       const { sdk } = await import('@farcaster/miniapp-sdk');
       
-      // Build embeds array (image first, then app URL)
-      const embeds: [string] | [string, string] | [] = imageUrl 
-        ? [imageUrl, appUrl]
-        : [appUrl];
+      // Use share page as the embed - it has proper OG tags for image preview
+      // The share page will redirect users to the app
+      const embeds: [string] = [sharePageUrl];
       
       // Use composeCast to open the native cast composer
       const result = await sdk.actions.composeCast({
         text: plainText,
-        embeds: embeds as any,
+        embeds: embeds,
       });
       
       console.log('✅ Cast composed via SDK:', result);
@@ -225,9 +205,9 @@ export async function shareOnFarcaster(
       // @ts-ignore - navigator.share not in all TS lib targets
       if (navigator.share) {
         await (navigator as any).share({ 
-          title: 'JoJo Stand Maker', 
+          title: `${standName} - Farstand`, 
           text: plainText, 
-          url: appUrl 
+          url: sharePageUrl 
         });
         console.log('✅ Shared via Web Share API');
         return true;
@@ -242,14 +222,11 @@ export async function shareOnFarcaster(
 
     // Priority 3: Fallback to opening Warpcast compose URL (for PC browsers)
     const text = encodeURIComponent(plainText);
-    const appUrlEncoded = encodeURIComponent(appUrl);
-    const imageUrlEncoded = imageUrl ? encodeURIComponent(imageUrl) : '';
+    const sharePageUrlEncoded = encodeURIComponent(sharePageUrl);
     
-    const shareUrl = imageUrl
-      ? `https://warpcast.com/~/compose?text=${text}&embeds[]=${imageUrlEncoded}&embeds[]=${appUrlEncoded}`
-      : `https://warpcast.com/~/compose?text=${text}&embeds[]=${appUrlEncoded}`;
+    const warpcastUrl = `https://warpcast.com/~/compose?text=${text}&embeds[]=${sharePageUrlEncoded}`;
 
-    const opened = window.open(shareUrl, '_blank', 'noopener,noreferrer');
+    const opened = window.open(warpcastUrl, '_blank', 'noopener,noreferrer');
     if (opened) {
       console.log('✅ Opened share in new window');
       return true;

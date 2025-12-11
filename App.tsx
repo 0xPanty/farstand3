@@ -938,36 +938,57 @@ export default function App() {
   }, [standData]);
 
   const handleShare = useCallback(async () => {
-    if (!standData) return;
+    if (!standData || !farcasterUser?.fid) {
+      alert('Please wait for data to load');
+      return;
+    }
     
     try {
-      // Convert image URL to data URL for reliable upload
-      let imageData: string | undefined = undefined;
-      if (standData.standImageUrl) {
-        try {
-          const response = await fetch(standData.standImageUrl, { mode: 'cors' });
-          const blob = await response.blob();
-          imageData = await new Promise<string>((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.readAsDataURL(blob);
-          });
-          console.log('🖼️ Image converted to data URL for sharing');
-        } catch (conversionError) {
-          console.warn('⚠️ Failed to convert image, sharing without image:', conversionError);
-        }
+      // First, save the stand to database so share page can fetch it
+      console.log('💾 Saving stand before share...');
+      const saveResponse = await fetch('/api/save-stand', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          standData: {
+            standName: standData.standName,
+            gender: standData.gender,
+            userAnalysis: standData.userAnalysis,
+            standDescription: standData.standDescription,
+            ability: standData.ability,
+            battleCry: standData.battleCry,
+            stats: calculatedData?.stats,
+            statDetails: calculatedData?.details,
+            standImageUrl: standData.standImageUrl,
+            sketchImageUrl: standData.sketchImageUrl,
+            visualPrompt: standData.visualPrompt,
+          },
+          farcasterUser: {
+            fid: farcasterUser.fid,
+            username: farcasterUser.username,
+            displayName: farcasterUser.displayName,
+            pfpUrl: farcasterUser.pfpUrl,
+          }
+        }),
+      });
+      
+      if (!saveResponse.ok) {
+        console.warn('⚠️ Failed to save stand, sharing anyway');
+      } else {
+        console.log('✅ Stand saved successfully');
       }
       
+      // Share using the share page URL which has proper OG tags
       await shareOnFarcaster(
         standData.standName,
-        'https://farstand3.vercel.app', // 你的应用 URL
-        imageData
+        'https://farstand3.vercel.app',
+        farcasterUser.fid
       );
     } catch (error) {
       console.error('❌ Share failed:', error);
       alert('❌ Share failed. Please try again.');
     }
-  }, [standData]);
+  }, [standData, farcasterUser, calculatedData]);
 
   // ==========================
   // VIEW: LOADING (Check FIRST)
