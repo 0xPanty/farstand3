@@ -98,29 +98,71 @@ export async function downloadStandCard(cardElementId: string, standName: string
 /**
  * Share Stand on Farcaster
  */
-export async function shareOnFarcaster(standName: string, appUrl: string) {
+export async function shareOnFarcaster(
+  standName: string,
+  appUrl: string,
+  imageUrlOrData?: string
+) {
   const plainText = `I just awakened my Stand: ${standName}! ✨\n\nDiscover yours:`;
   const text = encodeURIComponent(plainText);
   const url = encodeURIComponent(appUrl);
 
-  // Warpcast compose link
+  // Warpcast compose link (fallback)
   const shareUrl = `https://warpcast.com/~/compose?text=${text}&embeds[]=${url}`;
 
-  // Prefer native Web Share when available (mobile-friendly)
+  // Try native share with image attachment when possible
   try {
-    // @ts-ignore - navigator.share is not in all TS lib targets
+    // Only attempt file share if we have an image provided
+    if (imageUrlOrData) {
+      // Get blob from data URL or fetch
+      let blob: Blob;
+      if (imageUrlOrData.startsWith('data:')) {
+        const [meta, b64] = imageUrlOrData.split(',');
+        const mime = meta.match(/data:([^;]+);/i)?.[1] || 'image/png';
+        const bin = atob(b64);
+        const arr = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        blob = new Blob([arr], { type: mime });
+      } else {
+        const resp = await fetch(imageUrlOrData, { mode: 'cors' });
+        blob = await resp.blob();
+      }
+
+      const filename = `${standName.replace(/[『』\s]/g, '_')}_Stand.png`;
+      // Some browsers require File instead of Blob
+      // @ts-ignore File constructor exists in modern browsers
+      const file = new File([blob], filename, { type: blob.type || 'image/png' });
+
+      // @ts-ignore - canShare not on all TS targets
+      const canShareFiles = typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [file] });
+
+      // @ts-ignore - navigator.share not in all TS lib targets
+      if (canShareFiles && navigator.share) {
+        await (navigator as any).share({
+          title: 'JoJo Stand Maker',
+          text: plainText,
+          files: [file],
+          // Note: including url is fine; some platforms ignore it when files present
+          url: appUrl,
+        });
+        return true;
+      }
+    }
+
+    // Fallback to text+url share without files
+    // @ts-ignore - navigator.share not in all TS lib targets
     if (navigator.share) {
-      // Use plain values for native share
       await (navigator as any).share({ title: 'JoJo Stand Maker', text: plainText, url: appUrl });
-      return;
+      return true;
     }
   } catch (e) {
     console.warn('navigator.share failed, falling back:', e);
   }
 
-  // Fallbacks: open new tab or navigate current tab (in-app browsers often block window.open)
+  // Final fallback: open Warpcast compose with embed to app URL
   const win = window.open(shareUrl, '_blank', 'noopener,noreferrer');
   if (!win) {
     window.location.href = shareUrl;
   }
+  return false;
 }
