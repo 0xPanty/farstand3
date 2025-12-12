@@ -204,9 +204,10 @@ interface StandPrinterProps {
     sketchImageUrl?: string;
     onDownload?: () => void;
     onShare?: () => void;
+    isSharing?: boolean;
 }
 
-const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, standName, onDownload, onShare }) => {
+const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, standName, onDownload, onShare, isSharing }) => {
     const [isPrinting, setIsPrinting] = useState(false);
     const [showPaper, setShowPaper] = useState(false);
     
@@ -366,14 +367,23 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                             {onShare && (
                                 <button
                                     onClick={onShare}
-                                    className="group relative w-9 h-9 rounded-full transition-all active:scale-90 bg-gradient-to-b from-[#7c3aed] to-[#6d28d9] shadow-[0_3px_10px_rgba(124,58,237,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_5px_16px_rgba(124,58,237,0.6)] hover:-translate-y-0.5"
+                                    disabled={isSharing}
+                                    className={`group relative w-9 h-9 rounded-full transition-all active:scale-90 ${
+                                        isSharing 
+                                            ? 'bg-gray-500 cursor-wait' 
+                                            : 'bg-gradient-to-b from-[#7c3aed] to-[#6d28d9] shadow-[0_3px_10px_rgba(124,58,237,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_5px_16px_rgba(124,58,237,0.6)] hover:-translate-y-0.5'
+                                    }`}
                                 >
-                                    {/* Send Arrow Icon - White */}
+                                    {/* Send Arrow Icon or Loading Spinner */}
                                     <div className="relative flex items-center justify-center h-full">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white group-hover:scale-110 transition-transform">
-                                            <path d="m3 3 3 9-3 9 19-9Z"/>
-                                            <path d="M6 12h16"/>
-                                        </svg>
+                                        {isSharing ? (
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                        ) : (
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white group-hover:scale-110 transition-transform">
+                                                <path d="m3 3 3 9-3 9 19-9Z"/>
+                                                <path d="M6 12h16"/>
+                                            </svg>
+                                        )}
                                     </div>
                                 </button>
                             )}
@@ -714,9 +724,10 @@ interface PrinterViewProps {
     sketchImageUrl?: string;
     onDownload?: () => void;
     onShare?: () => void;
+    isSharing?: boolean;
 }
 
-const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDetails, standName, standImageUrl, sketchImageUrl, onDownload, onShare }) => {
+const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDetails, standName, standImageUrl, sketchImageUrl, onDownload, onShare, isSharing }) => {
     return (
         <main className="absolute inset-0 bg-black bg-noise pattern-flowing-checkers flex flex-col overflow-y-scroll" 
               style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)', WebkitOverflowScrolling: 'touch' }}>
@@ -753,6 +764,7 @@ const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDeta
                      standName={standName}
                      onDownload={onDownload}
                      onShare={onShare}
+                     isSharing={isSharing}
                  />
              </div>
         </main>
@@ -770,6 +782,7 @@ export default function App() {
   const [preview, setPreview] = useState<string | null>(null);
   const [standData, setStandData] = useState<StandResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   
   // Navigation State
@@ -1026,43 +1039,54 @@ export default function App() {
       return;
     }
     
+    if (isSharing) return; // 防止重复点击
+    setIsSharing(true);
+    
     const appUrl = 'https://farstand3.vercel.app';
     const castText = `I just awakened my Farstand: ${standData.standName}! ✨\n\nAwaken your dormant abilities now! ⚡️\n\nCreated by @xqc`;
     
     try {
-      // Step 1: 上传替身图片
-      let standImageUrl = standData.standImageUrl;
+      // 并行处理：截取小票 + 准备上传
+      const [receiptImage, _] = await Promise.all([
+        captureReceiptAsImage(),
+        Promise.resolve() // placeholder
+      ]);
+      
+      // 并行上传：替身图片 + 小票图片
+      const uploadPromises: Promise<string | null>[] = [];
+      
+      // 上传替身图片
       if (standData.standImageUrl?.startsWith('data:')) {
-        const uploadRes = await fetch('/api/upload-image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ dataUrl: standData.standImageUrl }),
-        });
-        if (uploadRes.ok) {
-          const data = await uploadRes.json();
-          standImageUrl = data.url;
-        }
+        uploadPromises.push(
+          fetch('/api/upload-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dataUrl: standData.standImageUrl }),
+          }).then(res => res.ok ? res.json().then(d => d.url) : standData.standImageUrl)
+            .catch(() => standData.standImageUrl)
+        );
+      } else {
+        uploadPromises.push(Promise.resolve(standData.standImageUrl));
       }
       
-      // Step 2: 尝试截取并上传小票图片（如果在打印机页面）
-      let receiptImageUrl: string | null = null;
-      const receiptImage = await captureReceiptAsImage();
+      // 上传小票图片（如果有）
       if (receiptImage) {
-        console.log('📸 Receipt captured, uploading...');
-        const uploadRes = await fetch('/api/upload-image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ dataUrl: receiptImage }),
-        });
-        if (uploadRes.ok) {
-          const data = await uploadRes.json();
-          receiptImageUrl = data.url;
-          console.log('✅ Receipt uploaded:', receiptImageUrl);
-        }
+        uploadPromises.push(
+          fetch('/api/upload-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dataUrl: receiptImage }),
+          }).then(res => res.ok ? res.json().then(d => d.url) : null)
+            .catch(() => null)
+        );
+      } else {
+        uploadPromises.push(Promise.resolve(null));
       }
       
-      // Step 3: 保存Stand到数据库
-      await fetch('/api/save-stand', {
+      const [standImageUrl, receiptImageUrl] = await Promise.all(uploadPromises);
+      
+      // 保存到数据库（后台执行，不等待）
+      fetch('/api/save-stand', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1074,13 +1098,13 @@ export default function App() {
             pfpUrl: farcasterUser.pfpUrl,
           }
         }),
-      });
+      }).catch(console.error); // 不等待，后台执行
       
-      // Step 4: 构建embeds数组（最多2个）
+      // 构建embeds数组（最多2个）
       const sharePageUrl = `${appUrl}/api/share/${farcasterUser.fid}`;
       const embeds: string[] = [sharePageUrl];
       if (receiptImageUrl) {
-        embeds.push(receiptImageUrl); // 添加小票图片作为第二个embed
+        embeds.push(receiptImageUrl);
       }
       console.log('📤 Sharing with embeds:', embeds);
       
@@ -1109,8 +1133,10 @@ export default function App() {
     } catch (error) {
       console.error('Share error:', error);
       window.open(`https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}&embeds[]=${encodeURIComponent(appUrl)}`, '_blank');
+    } finally {
+      setIsSharing(false);
     }
-  }, [standData, farcasterUser]);
+  }, [standData, farcasterUser, isSharing]);
 
   // ==========================
   // VIEW: LOADING (Check FIRST)
@@ -1140,6 +1166,7 @@ export default function App() {
           sketchImageUrl={standData?.sketchImageUrl}
           onDownload={handleDownload}
           onShare={handleShare}
+          isSharing={isSharing}
       />;
   }
   
