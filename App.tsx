@@ -724,6 +724,16 @@ const FarcasterGateBackground = () => {
                         transform: scale(1.02) skewX(-2deg);
                     }
                 }
+                @keyframes glow-border {
+                    0%, 100% { 
+                        box-shadow: 0 0 20px rgba(251,191,36,0.6), inset 0 0 20px rgba(251,191,36,0.2);
+                        border-color: #fbbf24;
+                    }
+                    50% { 
+                        box-shadow: 0 0 40px rgba(251,191,36,1), inset 0 0 40px rgba(251,191,36,0.4);
+                        border-color: #fff;
+                    }
+                }
              `}</style>
         </div>
     );
@@ -1462,27 +1472,18 @@ export default function App() {
                         {/* 3. Inner Content */}
                         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
                             {isReadyToAwaken ? (
-                                // 第二步：JOJO风格硬朗星星
-                                <div className="text-center transform transition-transform group-hover:scale-110">
-                                    <div className="relative">
-                                        {/* 硬朗的六角星 SVG */}
-                                        <svg 
-                                            className="w-24 h-24 animate-[jojo-flash_0.15s_ease-in-out_infinite] filter drop-shadow-[0_0_15px_rgba(251,191,36,0.8)]" 
-                                            viewBox="0 0 100 100"
-                                        >
-                                            {/* 六角星 - 硬朗线条 */}
-                                            <polygon 
-                                                points="50,5 61,35 95,35 68,55 79,90 50,70 21,90 32,55 5,35 39,35" 
-                                                fill="#fbbf24" 
-                                                stroke="#fff" 
-                                                strokeWidth="2"
-                                            />
-                                        </svg>
-                                        {/* ゴゴゴ 效果 */}
-                                        <span className="absolute -top-2 -right-2 text-[#db2777] font-black text-2xl animate-[jojo-menace_0.3s_ease-in-out_infinite] menacing-text">ゴ</span>
-                                        <span className="absolute -bottom-1 -left-3 text-[#db2777] font-black text-xl animate-[jojo-menace_0.3s_ease-in-out_infinite_0.1s] menacing-text">ゴ</span>
+                                // 第二步：优雅的觉醒效果 - 不遮挡头像
+                                <div className="absolute inset-0 pointer-events-none">
+                                    {/* 发光边框动画 */}
+                                    <div className="absolute inset-0 transform rotate-45 border-4 border-[#fbbf24] animate-[glow-border_1s_ease-in-out_infinite] shadow-[0_0_30px_rgba(251,191,36,0.8),inset_0_0_30px_rgba(251,191,36,0.3)]"></div>
+                                    {/* ゴゴゴ 威压效果 */}
+                                    <span className="absolute top-2 right-2 text-[#db2777] font-black text-3xl animate-[jojo-menace_0.3s_ease-in-out_infinite] menacing-text drop-shadow-[2px_2px_0_#000]">ゴ</span>
+                                    <span className="absolute bottom-2 left-2 text-[#db2777] font-black text-2xl animate-[jojo-menace_0.3s_ease-in-out_infinite_0.15s] menacing-text drop-shadow-[2px_2px_0_#000]">ゴ</span>
+                                    <span className="absolute top-1/3 left-0 text-[#db2777] font-black text-xl animate-[jojo-menace_0.3s_ease-in-out_infinite_0.1s] menacing-text drop-shadow-[2px_2px_0_#000]">ゴ</span>
+                                    {/* 底部文字 */}
+                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                                        <span className="text-[#fbbf24] font-black text-lg tracking-[0.2em] drop-shadow-[2px_2px_0_#000] animate-pulse">TAP TO AWAKEN</span>
                                     </div>
-                                    <span className="block text-[#fbbf24] font-black text-xl mt-2 tracking-[0.3em] animate-[jojo-text_0.2s_ease-in-out_infinite] drop-shadow-[2px_2px_0_#000]">AWAKEN!</span>
                                 </div>
                             ) : (
                                 // 第一步：显示头像预览提示
