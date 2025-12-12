@@ -682,14 +682,46 @@ const FarcasterGateBackground = () => {
                 .animate-pulse-slow {
                     animation: pulse-slow 6s ease-in-out infinite;
                 }
-                @keyframes shimmer-star {
+                @keyframes jojo-flash {
                     0%, 100% { 
-                        filter: drop-shadow(0 0 15px rgba(255,255,255,0.8));
-                        transform: scale(1) rotate(0deg);
+                        opacity: 1;
+                        transform: scale(1);
                     }
                     50% { 
-                        filter: drop-shadow(0 0 40px rgba(255,255,255,1)) drop-shadow(0 0 60px rgba(251,191,36,0.8));
-                        transform: scale(1.2) rotate(10deg);
+                        opacity: 0.7;
+                        transform: scale(1.05);
+                    }
+                }
+                @keyframes jojo-burst {
+                    0% { 
+                        opacity: 0;
+                        transform: scale(0.5) rotate(0deg);
+                    }
+                    50% { 
+                        opacity: 1;
+                        transform: scale(1.2) rotate(22.5deg);
+                    }
+                    100% { 
+                        opacity: 0;
+                        transform: scale(1.5) rotate(45deg);
+                    }
+                }
+                @keyframes jojo-menace {
+                    0%, 100% { 
+                        transform: translate(0, 0) scale(1);
+                        opacity: 1;
+                    }
+                    50% { 
+                        transform: translate(-2px, -2px) scale(1.1);
+                        opacity: 0.8;
+                    }
+                }
+                @keyframes jojo-text {
+                    0%, 100% { 
+                        transform: scale(1) skewX(0deg);
+                    }
+                    50% { 
+                        transform: scale(1.02) skewX(-2deg);
                     }
                 }
              `}</style>
@@ -1430,15 +1462,23 @@ export default function App() {
                         {/* 3. Inner Content */}
                         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
                             {isReadyToAwaken ? (
-                                // 第二步：显示闪耀的星星特效
-                                <div className="text-center transform transition-transform group-hover:scale-110 drop-shadow-md">
+                                // 第二步：JOJO风格的酷炫特效
+                                <div className="text-center transform transition-transform group-hover:scale-110">
                                     <div className="relative">
-                                        {/* 多层发光效果 */}
-                                        <div className="absolute inset-0 blur-2xl bg-white/60 animate-ping"></div>
-                                        <div className="absolute inset-0 blur-lg bg-[#fbbf24]/40 animate-pulse"></div>
-                                        <Sparkles className="w-20 h-20 text-white fill-white animate-[shimmer-star_0.8s_ease-in-out_infinite] filter drop-shadow-[0_0_30px_rgba(255,255,255,1)]" />
+                                        {/* 爆发光芒 */}
+                                        <div className="absolute inset-[-20px] animate-[jojo-burst_0.5s_ease-out_infinite]">
+                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-16 bg-gradient-to-b from-transparent via-white to-transparent rotate-0"></div>
+                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-16 bg-gradient-to-b from-transparent via-white to-transparent rotate-45"></div>
+                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-16 bg-gradient-to-b from-transparent via-white to-transparent rotate-90"></div>
+                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-16 bg-gradient-to-b from-transparent via-white to-transparent rotate-[135deg]"></div>
+                                        </div>
+                                        {/* 闪电图标 */}
+                                        <Zap className="w-20 h-20 text-[#fbbf24] fill-[#fbbf24] animate-[jojo-flash_0.15s_ease-in-out_infinite] filter drop-shadow-[0_0_20px_rgba(251,191,36,1)]" />
+                                        {/* ゴゴゴ 效果 */}
+                                        <span className="absolute -top-4 -right-4 text-[#db2777] font-black text-2xl animate-[jojo-menace_0.3s_ease-in-out_infinite] menacing-text">ゴ</span>
+                                        <span className="absolute -bottom-2 -left-4 text-[#db2777] font-black text-xl animate-[jojo-menace_0.3s_ease-in-out_infinite_0.1s] menacing-text">ゴ</span>
                                     </div>
-                                    <span className="block text-white font-black text-lg mt-2 text-shadow-black tracking-wider animate-pulse">AWAKEN!</span>
+                                    <span className="block text-[#fbbf24] font-black text-xl mt-3 tracking-[0.3em] animate-[jojo-text_0.2s_ease-in-out_infinite] drop-shadow-[2px_2px_0_#000]">AWAKEN!</span>
                                 </div>
                             ) : (
                                 // 第一步：显示头像预览提示
