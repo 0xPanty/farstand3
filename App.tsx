@@ -1248,9 +1248,9 @@ export default function App() {
                                  {/* Print Button */}
                                  <button 
                                      onClick={(e) => { e.stopPropagation(); setShowInteraction(true); }}
-                                     className="flex items-center gap-2 px-3 py-1.5 bg-black text-[#fbbf24] rounded-full text-xs font-bold active:scale-95 transition-transform border border-[#fbbf24]/50 hover:bg-[#fbbf24] hover:text-black"
+                                     className="flex items-center gap-2 px-5 py-2.5 bg-black text-[#fbbf24] rounded-full text-sm font-black active:scale-95 transition-transform border-2 border-[#fbbf24] hover:bg-[#fbbf24] hover:text-black shadow-[0_0_15px_rgba(251,191,36,0.3)]"
                                  >
-                                     <span>🖨️</span>
+                                     <span className="text-lg">🖨️</span>
                                      <span>PRINT DATA</span>
                                  </button>
                             </div>
