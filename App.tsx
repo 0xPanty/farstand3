@@ -1462,23 +1462,27 @@ export default function App() {
                         {/* 3. Inner Content */}
                         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
                             {isReadyToAwaken ? (
-                                // 第二步：JOJO风格的酷炫特效
+                                // 第二步：JOJO风格硬朗星星
                                 <div className="text-center transform transition-transform group-hover:scale-110">
                                     <div className="relative">
-                                        {/* 爆发光芒 */}
-                                        <div className="absolute inset-[-20px] animate-[jojo-burst_0.5s_ease-out_infinite]">
-                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-16 bg-gradient-to-b from-transparent via-white to-transparent rotate-0"></div>
-                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-16 bg-gradient-to-b from-transparent via-white to-transparent rotate-45"></div>
-                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-16 bg-gradient-to-b from-transparent via-white to-transparent rotate-90"></div>
-                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-16 bg-gradient-to-b from-transparent via-white to-transparent rotate-[135deg]"></div>
-                                        </div>
-                                        {/* 闪电图标 */}
-                                        <Zap className="w-20 h-20 text-[#fbbf24] fill-[#fbbf24] animate-[jojo-flash_0.15s_ease-in-out_infinite] filter drop-shadow-[0_0_20px_rgba(251,191,36,1)]" />
+                                        {/* 硬朗的六角星 SVG */}
+                                        <svg 
+                                            className="w-24 h-24 animate-[jojo-flash_0.15s_ease-in-out_infinite] filter drop-shadow-[0_0_15px_rgba(251,191,36,0.8)]" 
+                                            viewBox="0 0 100 100"
+                                        >
+                                            {/* 六角星 - 硬朗线条 */}
+                                            <polygon 
+                                                points="50,5 61,35 95,35 68,55 79,90 50,70 21,90 32,55 5,35 39,35" 
+                                                fill="#fbbf24" 
+                                                stroke="#fff" 
+                                                strokeWidth="2"
+                                            />
+                                        </svg>
                                         {/* ゴゴゴ 效果 */}
-                                        <span className="absolute -top-4 -right-4 text-[#db2777] font-black text-2xl animate-[jojo-menace_0.3s_ease-in-out_infinite] menacing-text">ゴ</span>
-                                        <span className="absolute -bottom-2 -left-4 text-[#db2777] font-black text-xl animate-[jojo-menace_0.3s_ease-in-out_infinite_0.1s] menacing-text">ゴ</span>
+                                        <span className="absolute -top-2 -right-2 text-[#db2777] font-black text-2xl animate-[jojo-menace_0.3s_ease-in-out_infinite] menacing-text">ゴ</span>
+                                        <span className="absolute -bottom-1 -left-3 text-[#db2777] font-black text-xl animate-[jojo-menace_0.3s_ease-in-out_infinite_0.1s] menacing-text">ゴ</span>
                                     </div>
-                                    <span className="block text-[#fbbf24] font-black text-xl mt-3 tracking-[0.3em] animate-[jojo-text_0.2s_ease-in-out_infinite] drop-shadow-[2px_2px_0_#000]">AWAKEN!</span>
+                                    <span className="block text-[#fbbf24] font-black text-xl mt-2 tracking-[0.3em] animate-[jojo-text_0.2s_ease-in-out_infinite] drop-shadow-[2px_2px_0_#000]">AWAKEN!</span>
                                 </div>
                             ) : (
                                 // 第一步：显示头像预览提示
