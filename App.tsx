@@ -8,7 +8,7 @@ import { analyzeUserAndGenerateStand } from "./services/geminiService";
 import { fetchFarcasterUser, calculateFarcasterStats } from "./services/farcasterService";
 import { StandResult, StatValue, StandStats, FarcasterProfile, StandStatRawValues } from "./types";
 import Gallery from "./Gallery";
-import { downloadStandImage, shareOnFarcaster } from "./services/downloadService";
+import { downloadStandImage, shareOnFarcaster, captureReceiptAsImage } from "./services/downloadService";
 
 // ==========================================
 // Helper: Radar Chart Component (Stats Panel)
@@ -415,7 +415,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                         }}
                     >
                         {/* Paper with thermal print texture */}
-                        <div className="relative bg-[#f8f8f5] shadow-[0_15px_50px_rgba(0,0,0,0.5)]"
+                        <div id="receipt-paper" className="relative bg-[#f8f8f5] shadow-[0_15px_50px_rgba(0,0,0,0.5)]"
                              style={{
                                  backgroundImage: `
                                      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"),
@@ -993,13 +993,23 @@ export default function App() {
     const castText = `I just awakened my Farstand: ${standData.standName}! ✨\n\nAwaken your dormant abilities now! ⚡️\n\nCreated by @xqc`;
     
     try {
-      // Step 1: 上传图片获取公开URL
-      let publicImageUrl = standData.standImageUrl;
-      if (standData.standImageUrl?.startsWith('data:')) {
+      // Step 1: 尝试截取小票图片（如果在打印机页面）
+      let imageToUpload = standData.standImageUrl;
+      const receiptImage = await captureReceiptAsImage();
+      if (receiptImage) {
+        console.log('📸 Using receipt image for share');
+        imageToUpload = receiptImage;
+      } else {
+        console.log('📷 Using stand image for share (receipt not visible)');
+      }
+      
+      // Step 2: 上传图片获取公开URL
+      let publicImageUrl = imageToUpload;
+      if (imageToUpload?.startsWith('data:')) {
         const uploadRes = await fetch('/api/upload-image', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ dataUrl: standData.standImageUrl }),
+          body: JSON.stringify({ dataUrl: imageToUpload }),
         });
         if (uploadRes.ok) {
           const data = await uploadRes.json();
@@ -1007,7 +1017,7 @@ export default function App() {
         }
       }
       
-      // Step 2: 保存Stand到数据库（share页面需要读取）
+      // Step 3: 保存Stand到数据库（share页面需要读取）- 使用截取的图片
       await fetch('/api/save-stand', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1022,7 +1032,7 @@ export default function App() {
         }),
       });
       
-      // Step 3: Share页面URL（有fc:miniapp meta标签，Farcaster会抓取显示图片）
+      // Step 4: Share页面URL（有fc:miniapp meta标签，Farcaster会抓取显示图片）
       const sharePageUrl = `${appUrl}/api/share/${farcasterUser.fid}`;
       
       // 尝试SDK (手机Mini App)

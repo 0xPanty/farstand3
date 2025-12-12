@@ -108,6 +108,38 @@ export async function downloadStandImage(imageUrl: string, standName: string) {
 }
 
 /**
+ * Capture receipt element as base64 image
+ * Uses html2canvas to capture the receipt paper
+ */
+export async function captureReceiptAsImage(): Promise<string | null> {
+  try {
+    const html2canvas = (await import('html2canvas')).default;
+    
+    const element = document.getElementById('receipt-paper');
+    if (!element) {
+      console.error('Receipt element not found');
+      return null;
+    }
+
+    // Capture the element as canvas
+    const canvas = await html2canvas(element, {
+      backgroundColor: '#f8f8f5',
+      scale: 2, // Higher quality
+      logging: false,
+      useCORS: true,
+    });
+
+    // Convert canvas to base64
+    const dataUrl = canvas.toDataURL('image/png');
+    console.log('✅ Receipt captured successfully');
+    return dataUrl;
+  } catch (error) {
+    console.error('❌ Receipt capture error:', error);
+    return null;
+  }
+}
+
+/**
  * Download Stand card as composite image (front + back combined)
  * Uses html2canvas to capture the card element
  */
