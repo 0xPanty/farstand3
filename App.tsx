@@ -943,10 +943,12 @@ export default function App() {
       return;
     }
     
+    const appUrl = 'https://farstand3.vercel.app';
+    const castText = `I just awakened my Stand: ${standData.standName}! ✨\n\nDiscover yours:`;
+    
     try {
-      let imageUrl = '';
-      
-      // 上传图片获取公开URL
+      // Step 1: 上传图片获取公开URL
+      let publicImageUrl = standData.standImageUrl;
       if (standData.standImageUrl?.startsWith('data:')) {
         const uploadRes = await fetch('/api/upload-image', {
           method: 'POST',
@@ -955,37 +957,43 @@ export default function App() {
         });
         if (uploadRes.ok) {
           const data = await uploadRes.json();
-          imageUrl = data.url;
+          publicImageUrl = data.url;
         }
-      } else if (standData.standImageUrl) {
-        imageUrl = standData.standImageUrl;
       }
       
-      const castText = `I just awakened my Stand: ${standData.standName}! ✨\n\nDiscover yours:`;
-      const appUrl = 'https://farstand3.vercel.app';
+      // Step 2: 保存Stand到数据库（share页面需要读取）
+      await fetch('/api/save-stand', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          standData: { ...standData, standImageUrl: publicImageUrl },
+          farcasterUser: {
+            fid: farcasterUser.fid,
+            username: farcasterUser.username,
+            displayName: farcasterUser.displayName,
+            pfpUrl: farcasterUser.pfpUrl,
+          }
+        }),
+      });
       
-      // 尝试用SDK (手机Mini App内)
+      // Step 3: Share页面URL（有fc:miniapp meta标签，Farcaster会抓取显示图片）
+      const sharePageUrl = `${appUrl}/api/share/${farcasterUser.fid}`;
+      
+      // 尝试SDK (手机Mini App)
       try {
         const { sdk } = await import('@farcaster/miniapp-sdk');
-        const embeds: [string] | [string, string] = imageUrl 
-          ? [imageUrl, appUrl] 
-          : [appUrl];
-        await sdk.actions.composeCast({ text: castText, embeds });
+        await sdk.actions.composeCast({ text: castText, embeds: [sharePageUrl] });
         return;
       } catch (e) {
         // SDK失败，用网页版
       }
       
-      // PC网页版 fallback
-      const text = encodeURIComponent(castText);
-      const embedUrl = imageUrl || appUrl;
-      window.open(`https://warpcast.com/~/compose?text=${text}&embeds[]=${encodeURIComponent(embedUrl)}&embeds[]=${encodeURIComponent(appUrl)}`, '_blank');
+      // PC网页版
+      window.open(`https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}&embeds[]=${encodeURIComponent(sharePageUrl)}`, '_blank');
       
     } catch (error) {
       console.error('Share error:', error);
-      // 最后的fallback - 直接打开
-      const text = encodeURIComponent(`I just awakened my Stand: ${standData.standName}! ✨`);
-      window.open(`https://warpcast.com/~/compose?text=${text}&embeds[]=${encodeURIComponent('https://farstand3.vercel.app')}`, '_blank');
+      window.open(`https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}&embeds[]=${encodeURIComponent(appUrl)}`, '_blank');
     }
   }, [standData, farcasterUser]);
 
