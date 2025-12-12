@@ -35,25 +35,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!buffer) return res.status(400).json({ error: 'No image data' });
 
-    // Create table if not exists (with base64_data column)
-    await sql`
-      CREATE TABLE IF NOT EXISTS stand_uploads (
-        id VARCHAR(40) PRIMARY KEY,
-        mime TEXT NOT NULL,
-        base64_data TEXT,
-        filename TEXT,
-        created_at TIMESTAMP DEFAULT NOW()
-      )
-    `;
-
     // Generate id
     const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
 
     // Store as base64 string
     const base64Data = buffer.toString('base64');
 
-    // Insert image data
-    await sql`INSERT INTO stand_uploads (id, mime, base64_data, filename) VALUES (${id}, ${mime}, ${base64Data}, ${filename || null})`;
+    // Try to create table with new schema
+    try {
+      await sql`
+        CREATE TABLE IF NOT EXISTS stand_uploads_v2 (
+          id VARCHAR(40) PRIMARY KEY,
+          mime TEXT NOT NULL,
+          base64_data TEXT NOT NULL,
+          filename TEXT,
+          created_at TIMESTAMP DEFAULT NOW()
+        )
+      `;
+    } catch (e) {
+      // Table might exist, ignore
+    }
+
+    // Insert image data into v2 table
+    await sql`INSERT INTO stand_uploads_v2 (id, mime, base64_data, filename) VALUES (${id}, ${mime}, ${base64Data}, ${filename || null})`;
 
     const host = (req.headers['x-forwarded-host'] || req.headers.host) as string;
     const proto = (req.headers['x-forwarded-proto'] as string) || 'https';

@@ -54,6 +54,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       button: {
         title: "Awaken Your Stand",
         action: {
+          type: "launch_miniapp",
+          name: "Farstand",
+          url: baseUrl,
+          splashImageUrl: `${baseUrl}/logo.png`,
+          splashBackgroundColor: "#0f0015"
+        }
+      }
+    });
+    
+    // Build fc:frame embed JSON (backward compatibility)
+    const frameEmbed = JSON.stringify({
+      version: "1",
+      imageUrl: imageUrl,
+      button: {
+        title: "Awaken Your Stand",
+        action: {
           type: "launch_frame",
           name: "Farstand",
           url: baseUrl,
@@ -89,6 +105,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   
   <!-- Farcaster Mini App Embed -->
   <meta name="fc:miniapp" content='${miniAppEmbed.replace(/'/g, "&#39;")}'>
+  <!-- Backward compatibility -->
+  <meta name="fc:frame" content='${frameEmbed.replace(/'/g, "&#39;")}'>
   
   <!-- Redirect to app after brief delay -->
   <meta http-equiv="refresh" content="0;url=${baseUrl}">
