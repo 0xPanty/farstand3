@@ -1161,8 +1161,8 @@ export default function App() {
         }),
       }).catch(console.error); // 不等待，后台执行
       
-      // 构建embeds数组（最多2个）
-      const sharePageUrl = `${appUrl}/api/share/${farcasterUser.fid}`;
+      // 构建embeds数组（最多2个）- 使用 Universal Link
+      const sharePageUrl = `https://farcaster.xyz/miniapps/ekpKBe5wqvLJ/farstand`;
       const embeds: string[] = [sharePageUrl];
       if (receiptImageUrl) {
         embeds.push(receiptImageUrl);
@@ -1193,7 +1193,7 @@ export default function App() {
       
     } catch (error) {
       console.error('Share error:', error);
-      window.open(`https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}&embeds[]=${encodeURIComponent(appUrl)}`, '_blank');
+      window.open(`https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}&embeds[]=${encodeURIComponent('https://farcaster.xyz/miniapps/ekpKBe5wqvLJ/farstand')}`, '_blank');
     } finally {
       setIsSharing(false);
     }
