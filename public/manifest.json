@@ -1,6 +1,6 @@
 {
-  "name": "JoJo Stand Maker",
-  "short_name": "Stand Maker",
+  "name": "Farstand",
+  "short_name": "Farstand",
   "description": "Create your JOJO Stand based on Farcaster profile",
   "start_url": "/",
   "display": "standalone",
