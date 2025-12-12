@@ -785,7 +785,7 @@ interface PrinterViewProps {
 const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDetails, standName, standImageUrl, sketchImageUrl, onDownload, onShare, isSharing }) => {
     return (
         <main className="absolute inset-0 bg-black bg-noise pattern-flowing-checkers flex flex-col overflow-y-scroll" 
-              style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)', WebkitOverflowScrolling: 'touch' }}>
+              style={{ WebkitOverflowScrolling: 'touch' }}>
              
              {/* Background */}
              <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(251,191,36,0.1)_0%,transparent_70%)] pointer-events-none z-0"></div>
@@ -1241,7 +1241,7 @@ export default function App() {
       
       return (
         <main className="h-dvh w-full max-w-md mx-auto bg-black bg-noise pattern-grid flex flex-col items-center justify-start p-0 perspective-1000 overflow-y-auto"
-              style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+              style={{}}>
             
             {/* Card Container with 3D flip - Adjusted for buttons */}
             <div 
@@ -1392,7 +1392,7 @@ export default function App() {
     // Use h-dvh (dynamic viewport height) for mobile browsers
     // REMOVED paddingBottom here to allow background to flow to bottom
     <main className="h-dvh w-full max-w-md mx-auto bg-black bg-noise pattern-flowing-checkers flex flex-col relative overflow-hidden" 
-          style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+          style={{}}>
             
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden"/>
             
