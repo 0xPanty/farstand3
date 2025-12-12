@@ -1161,12 +1161,15 @@ export default function App() {
         }),
       }).catch(console.error); // 不等待，后台执行
       
-      // 构建embeds数组（最多2个）- 使用 Universal Link
-      const sharePageUrl = `https://farcaster.xyz/miniapps/ekpKBe5wqvLJ/farstand`;
-      const embeds: string[] = [sharePageUrl];
-      if (receiptImageUrl) {
-        embeds.push(receiptImageUrl);
+      // 构建embeds数组（最多2个）
+      // 1. 替身图片 URL（显示图片）
+      // 2. Universal Link（点击打开 Mini App）
+      const universalLink = `https://farcaster.xyz/miniapps/ekpKBe5wqvLJ/farstand`;
+      const embeds: string[] = [];
+      if (standImageUrl) {
+        embeds.push(standImageUrl);
       }
+      embeds.push(universalLink);
       console.log('📤 Sharing with embeds:', embeds);
       
       // 尝试SDK (手机Mini App)
@@ -1185,10 +1188,10 @@ export default function App() {
       }
       
       // PC网页版
-      let warpcastUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}&embeds[]=${encodeURIComponent(sharePageUrl)}`;
-      if (receiptImageUrl) {
-        warpcastUrl += `&embeds[]=${encodeURIComponent(receiptImageUrl)}`;
-      }
+      let warpcastUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}`;
+      embeds.forEach(embed => {
+        warpcastUrl += `&embeds[]=${encodeURIComponent(embed)}`;
+      });
       window.open(warpcastUrl, '_blank');
       
     } catch (error) {
