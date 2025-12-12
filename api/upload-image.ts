@@ -35,6 +35,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!buffer) return res.status(400).json({ error: 'No image data' });
 
+    // Check size limit (max 4MB for Vercel)
+    if (buffer.length > 4 * 1024 * 1024) {
+      return res.status(413).json({ error: 'Image too large, max 4MB' });
+    }
+
     // Generate id
     const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
 
