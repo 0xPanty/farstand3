@@ -990,7 +990,7 @@ export default function App() {
     }
     
     const appUrl = 'https://farstand3.vercel.app';
-    const castText = `I just awakened my Stand: ${standData.standName}! ✨\n\nDiscover yours:`;
+    const castText = `I just awakened my Farstand: ${standData.standName}! ✨\n\nAwaken your dormant abilities now! ⚡️\n\nCreated by @xqc`;
     
     try {
       // Step 1: 上传图片获取公开URL
