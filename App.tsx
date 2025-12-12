@@ -909,11 +909,8 @@ export default function App() {
                 };
                 setFarcasterUser(quickUser);
                 
-                // 并行加载详细数据
-                const [profile, existingStand] = await Promise.all([
-                    fetchFarcasterUser(fid),
-                    fid !== OWNER_FID ? loadExistingStand(fid) : Promise.resolve(false)
-                ]);
+                // 加载详细用户数据
+                const profile = await fetchFarcasterUser(fid);
                 
                 if (profile) {
                     setFarcasterUser(profile);
@@ -980,12 +977,6 @@ export default function App() {
   const handleGenerate = useCallback(async () => {
     if (isLoading) return;
     
-    // 检查是否已经生成过（管理员除外）
-    if (standData && farcasterUser?.fid !== OWNER_FID) {
-      alert('你已经唤醒过替身了！每人只能生成一次。');
-      return;
-    }
-    
     // Auto-use user's PFP if no image selected
     let imageToUse = base64Image || farcasterUser?.pfpUrl;
     if (!imageToUse) {
@@ -1027,8 +1018,8 @@ export default function App() {
       if (result) {
         setStandData(result);
         
-        // 立即保存到数据库（管理员除外，管理员每次都可以重新生成）
-        if (farcasterUser?.fid && farcasterUser.fid !== OWNER_FID) {
+        // 保存到数据库
+        if (farcasterUser?.fid) {
           try {
             // 上传图片获取公开URL
             let publicImageUrl = result.standImageUrl;
