@@ -843,16 +843,30 @@ export default function App() {
             const context = await sdk.context;
             if (context?.user?.fid) {
                 const fid = context.user.fid;
-                const profile = await fetchFarcasterUser(fid);
+                
+                // 立即使用 SDK 提供的基本用户信息（更快显示）
+                const quickUser: FarcasterProfile = {
+                    fid: fid,
+                    username: context.user.username || '',
+                    displayName: context.user.displayName || context.user.username || '',
+                    pfpUrl: context.user.pfpUrl || '',
+                    bio: '',
+                    followerCount: 0,
+                    followingCount: 0,
+                };
+                setFarcasterUser(quickUser);
+                
+                // 并行加载详细数据
+                const [profile, existingStand] = await Promise.all([
+                    fetchFarcasterUser(fid),
+                    fid !== OWNER_FID ? loadExistingStand(fid) : Promise.resolve(false)
+                ]);
+                
                 if (profile) {
-                   setFarcasterUser(profile);
-                   const data = await calculateFarcasterStats(profile);
-                   setCalculatedData(data);
-                   
-                   // 如果不是管理员，加载已有的Stand
-                   if (fid !== OWNER_FID) {
-                     await loadExistingStand(fid);
-                   }
+                    setFarcasterUser(profile);
+                    // 计算统计数据
+                    const data = await calculateFarcasterStats(profile);
+                    setCalculatedData(data);
                 }
             } else {
                 // FALLBACK: Load a demo user so stats are visible for testing/preview
