@@ -943,6 +943,43 @@ export default function App() {
       // Ensure we have the result before clearing loading
       if (result) {
         setStandData(result);
+        
+        // 立即保存到数据库（管理员除外，管理员每次都可以重新生成）
+        if (farcasterUser?.fid && farcasterUser.fid !== OWNER_FID) {
+          try {
+            // 上传图片获取公开URL
+            let publicImageUrl = result.standImageUrl;
+            if (result.standImageUrl?.startsWith('data:')) {
+              const uploadRes = await fetch('/api/upload-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dataUrl: result.standImageUrl }),
+              });
+              if (uploadRes.ok) {
+                const data = await uploadRes.json();
+                publicImageUrl = data.url;
+              }
+            }
+            
+            // 保存到数据库
+            await fetch('/api/save-stand', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                standData: { ...result, standImageUrl: publicImageUrl },
+                farcasterUser: {
+                  fid: farcasterUser.fid,
+                  username: farcasterUser.username,
+                  displayName: farcasterUser.displayName,
+                  pfpUrl: farcasterUser.pfpUrl,
+                }
+              }),
+            });
+            console.log('✅ Stand saved to database');
+          } catch (saveError) {
+            console.error('Failed to save stand:', saveError);
+          }
+        }
       } else {
         throw new Error("No result returned from generation");
       }
