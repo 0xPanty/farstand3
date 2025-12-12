@@ -682,14 +682,14 @@ const FarcasterGateBackground = () => {
                 .animate-pulse-slow {
                     animation: pulse-slow 6s ease-in-out infinite;
                 }
-                @keyframes shimmer-arrow {
+                @keyframes shimmer-star {
                     0%, 100% { 
-                        filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
-                        transform: scale(1) translateX(0);
+                        filter: drop-shadow(0 0 15px rgba(255,255,255,0.8));
+                        transform: scale(1) rotate(0deg);
                     }
                     50% { 
-                        filter: drop-shadow(0 0 30px rgba(255,255,255,1));
-                        transform: scale(1.1) translateX(5px);
+                        filter: drop-shadow(0 0 40px rgba(255,255,255,1)) drop-shadow(0 0 60px rgba(251,191,36,0.8));
+                        transform: scale(1.2) rotate(10deg);
                     }
                 }
              `}</style>
@@ -1430,14 +1430,15 @@ export default function App() {
                         {/* 3. Inner Content */}
                         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
                             {isReadyToAwaken ? (
-                                // 第二步：显示闪耀的箭头
-                                <div className="text-center transform transition-transform group-hover:scale-110 drop-shadow-md animate-pulse">
+                                // 第二步：显示闪耀的星星特效
+                                <div className="text-center transform transition-transform group-hover:scale-110 drop-shadow-md">
                                     <div className="relative">
-                                        {/* 发光效果 */}
-                                        <div className="absolute inset-0 blur-xl bg-white/50 animate-ping"></div>
-                                        <ArrowRight className="w-20 h-20 text-white fill-white/30 filter drop-shadow-[0_0_20px_rgba(255,255,255,0.8)] animate-[shimmer-arrow_1s_ease-in-out_infinite]" />
+                                        {/* 多层发光效果 */}
+                                        <div className="absolute inset-0 blur-2xl bg-white/60 animate-ping"></div>
+                                        <div className="absolute inset-0 blur-lg bg-[#fbbf24]/40 animate-pulse"></div>
+                                        <Sparkles className="w-20 h-20 text-white fill-white animate-[shimmer-star_0.8s_ease-in-out_infinite] filter drop-shadow-[0_0_30px_rgba(255,255,255,1)]" />
                                     </div>
-                                    <span className="block text-white font-black text-base mt-2 text-shadow-black tracking-wider animate-pulse">AWAKEN!</span>
+                                    <span className="block text-white font-black text-lg mt-2 text-shadow-black tracking-wider animate-pulse">AWAKEN!</span>
                                 </div>
                             ) : (
                                 // 第一步：显示头像预览提示
