@@ -133,17 +133,18 @@ export async function captureReceiptAsImage(): Promise<string | null> {
       // 动态导入 html2canvas
       const html2canvas = (await import('html2canvas')).default;
       
-      // 使用最简配置，减少 CSP 问题
+      // 使用最简配置
       const canvas = await html2canvas(element, {
         backgroundColor: '#f8f8f5',
-        scale: 1.5,
+        scale: 1, // 降低分辨率
         logging: false,
         useCORS: true,
         allowTaint: true,
-        foreignObjectRendering: false, // 禁用可能触发 CSP 的功能
+        foreignObjectRendering: false,
       });
 
-      const dataUrl = canvas.toDataURL('image/png', 0.8);
+      // 使用 JPEG 格式，更小的文件
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
       console.log('✅ Receipt captured, size:', dataUrl.length);
       return dataUrl;
     } catch (error) {
