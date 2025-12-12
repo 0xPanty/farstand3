@@ -32,9 +32,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const stand = result.rows[0];
-    const host = (req.headers['x-forwarded-host'] || req.headers.host) as string;
-    const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
-    const baseUrl = `${proto}://${host}`;
+    const baseUrl = 'https://farstand3.vercel.app';
     
     // Use the stand image or fallback to logo
     const imageUrl = stand.stand_image_url || `${baseUrl}/logo.png`;
