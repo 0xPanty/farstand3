@@ -939,79 +939,55 @@ export default function App() {
 
   const handleShare = useCallback(async () => {
     if (!standData || !farcasterUser?.fid) {
-      alert('Please wait for data to load');
+      alert('请等待数据加载完成');
       return;
     }
     
     try {
-      // Step 1: Upload image to get public URL (if it's a data URL)
-      let publicImageUrl = standData.standImageUrl;
+      let imageUrl = '';
       
+      // 上传图片获取公开URL
       if (standData.standImageUrl?.startsWith('data:')) {
-        console.log('📤 Uploading image to get public URL...');
-        const uploadResponse = await fetch('/api/upload-image', {
+        const uploadRes = await fetch('/api/upload-image', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            dataUrl: standData.standImageUrl,
-            filename: `${standData.standName.replace(/[『』\s]/g, '_')}_Stand.png`,
-          }),
+          body: JSON.stringify({ dataUrl: standData.standImageUrl }),
         });
-        
-        if (uploadResponse.ok) {
-          const uploadData = await uploadResponse.json();
-          publicImageUrl = uploadData.url;
-          console.log('✅ Image uploaded:', publicImageUrl);
-        } else {
-          console.warn('⚠️ Image upload failed');
+        if (uploadRes.ok) {
+          const data = await uploadRes.json();
+          imageUrl = data.url;
         }
+      } else if (standData.standImageUrl) {
+        imageUrl = standData.standImageUrl;
       }
       
-      // Step 2: Save stand to database with public image URL
-      console.log('💾 Saving stand to database...');
-      const saveResponse = await fetch('/api/save-stand', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          standData: {
-            standName: standData.standName,
-            gender: standData.gender,
-            userAnalysis: standData.userAnalysis,
-            standDescription: standData.standDescription,
-            ability: standData.ability,
-            battleCry: standData.battleCry,
-            stats: calculatedData?.stats,
-            statDetails: calculatedData?.details,
-            standImageUrl: publicImageUrl,  // Use public URL
-            sketchImageUrl: standData.sketchImageUrl,
-            visualPrompt: standData.visualPrompt,
-          },
-          farcasterUser: {
-            fid: farcasterUser.fid,
-            username: farcasterUser.username,
-            displayName: farcasterUser.displayName,
-            pfpUrl: farcasterUser.pfpUrl,
-          }
-        }),
-      });
+      const castText = `I just awakened my Stand: ${standData.standName}! ✨\n\nDiscover yours:`;
+      const appUrl = 'https://farstand3.vercel.app';
       
-      if (!saveResponse.ok) {
-        console.warn('⚠️ Failed to save stand');
-      } else {
-        console.log('✅ Stand saved successfully');
+      // 尝试用SDK (手机Mini App内)
+      try {
+        const { sdk } = await import('@farcaster/miniapp-sdk');
+        const embeds: [string] | [string, string] = imageUrl 
+          ? [imageUrl, appUrl] 
+          : [appUrl];
+        await sdk.actions.composeCast({ text: castText, embeds });
+        return;
+      } catch (e) {
+        // SDK失败，用网页版
       }
       
-      // Step 3: Share using the share page URL
-      await shareOnFarcaster(
-        standData.standName,
-        'https://farstand3.vercel.app',
-        farcasterUser.fid
-      );
+      // PC网页版 fallback
+      const text = encodeURIComponent(castText);
+      const embedUrl = imageUrl || appUrl;
+      window.open(`https://warpcast.com/~/compose?text=${text}&embeds[]=${encodeURIComponent(embedUrl)}&embeds[]=${encodeURIComponent(appUrl)}`, '_blank');
+      
     } catch (error) {
-      console.error('❌ Share failed:', error);
-      alert('❌ Share failed. Please try again.');
+      console.error('Share error:', error);
+      // 最后的fallback - 直接打开
+      const text = encodeURIComponent(`I just awakened my Stand: ${standData.standName}! ✨`);
+      window.open(`https://warpcast.com/~/compose?text=${text}&embeds[]=${encodeURIComponent('https://farstand3.vercel.app')}`, '_blank');
     }
-  }, [standData, farcasterUser, calculatedData]);
+  }, [standData, farcasterUser]);
 
   // ==========================
   // VIEW: LOADING (Check FIRST)
