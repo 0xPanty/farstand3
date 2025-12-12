@@ -106,9 +106,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   <!-- Backward compatibility -->
   <meta name="fc:frame" content='${frameEmbed.replace(/'/g, "&#39;")}'>
   
-  <!-- Redirect to app after brief delay -->
-  <meta http-equiv="refresh" content="0;url=${baseUrl}">
-  
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
