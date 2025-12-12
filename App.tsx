@@ -347,21 +347,24 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                     <div className="px-4 pb-4 flex items-center justify-between gap-3">
                         {/* Left: Glossy 3D Buttons */}
                         <div className="flex items-center gap-2 shrink-0">
-                            {/* Download Button - Cyan with Glossy Effect */}
-                            {onDownload && (
-                                <button
-                                    onClick={onDownload}
-                                    className="group relative w-9 h-9 rounded-full transition-all active:scale-90 bg-gradient-to-b from-[#06b6d4] to-[#0891b2] shadow-[0_3px_10px_rgba(6,182,212,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_5px_16px_rgba(6,182,212,0.6)] hover:-translate-y-0.5"
-                                >
-                                    {/* Down Arrow Icon - White */}
-                                    <div className="relative flex items-center justify-center h-full">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white group-hover:scale-110 transition-transform">
-                                            <polyline points="7 10 12 15 17 10"/>
-                                            <line x1="12" y1="15" x2="12" y2="3"/>
-                                        </svg>
-                                    </div>
-                                </button>
-                            )}
+                            {/* Reset Button - Cyan with Glossy Effect */}
+                            <button
+                                onClick={handleReset}
+                                disabled={!showPaper}
+                                className={`group relative w-9 h-9 rounded-full transition-all active:scale-90 ${
+                                    showPaper 
+                                        ? 'bg-gradient-to-b from-[#06b6d4] to-[#0891b2] shadow-[0_3px_10px_rgba(6,182,212,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_5px_16px_rgba(6,182,212,0.6)] hover:-translate-y-0.5'
+                                        : 'bg-gray-600 opacity-50 cursor-not-allowed'
+                                }`}
+                            >
+                                {/* Reset/Refresh Icon - White */}
+                                <div className="relative flex items-center justify-center h-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-white group-hover:scale-110 transition-transform">
+                                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                                        <path d="M3 3v5h5"/>
+                                    </svg>
+                                </div>
+                            </button>
 
                             {/* Share Button - Purple with Glossy Effect */}
                             {onShare && (
