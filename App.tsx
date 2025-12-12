@@ -1103,8 +1103,28 @@ export default function App() {
     if (isSharing) return; // 防止重复点击
     setIsSharing(true);
     
+    // 计算评分
+    const gradeToScore = (g: string): number => {
+      const map: Record<string, number> = { 'A': 100, 'B': 80, 'C': 60, 'D': 40, 'E': 20, 'N/A': 0 };
+      return map[g] || 0;
+    };
+    const getRank = (score: number): string => {
+      if (score >= 520) return 'S';
+      if (score >= 450) return 'A';
+      if (score >= 360) return 'B';
+      if (score >= 270) return 'C';
+      if (score >= 180) return 'D';
+      return 'E';
+    };
+    const stats = calculatedData?.stats;
+    const totalScore = stats ? (
+      gradeToScore(stats.power) + gradeToScore(stats.speed) + gradeToScore(stats.range) +
+      gradeToScore(stats.durability) + gradeToScore(stats.precision) + gradeToScore(stats.potential)
+    ) : 0;
+    const rank = getRank(totalScore);
+    
     const appUrl = 'https://farstand3.vercel.app';
-    const castText = `I just awakened my Farstand: ${standData.standName}! ✨\n\nAwaken your dormant abilities now! ⚡️\n\nCreated by @xqc`;
+    const castText = `I just awakened my Farstand: ${standData.standName}! ✨ Rank: ${rank}\n\nAwaken your dormant abilities now! ⚡️\n\nCreated by @xqc`;
     
     try {
       console.log('🔄 Starting share...');
