@@ -1049,9 +1049,19 @@ export default function App() {
     const castText = `I just awakened my Farstand: ${standData.standName}! ✨\n\nAwaken your dormant abilities now! ⚡️\n\nCreated by @xqc`;
     
     try {
-      // 截取小票
+      // 截取小票 - 先检查元素是否存在
       console.log('🔄 Starting share process...');
-      const receiptImage = await captureReceiptAsImage();
+      
+      // 检查小票元素是否存在
+      const receiptElement = document.getElementById('receipt-paper');
+      console.log('🔄 Receipt element check:', receiptElement ? 'EXISTS' : 'NOT FOUND');
+      
+      let receiptImage: string | null = null;
+      if (receiptElement) {
+        // 等待一小段时间确保渲染完成
+        await new Promise(resolve => setTimeout(resolve, 100));
+        receiptImage = await captureReceiptAsImage();
+      }
       console.log('🔄 Receipt capture result:', receiptImage ? `SUCCESS (${receiptImage.length} bytes)` : 'NULL - no receipt');
       
       // 并行上传：替身图片 + 小票图片
