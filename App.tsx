@@ -682,6 +682,16 @@ const FarcasterGateBackground = () => {
                 .animate-pulse-slow {
                     animation: pulse-slow 6s ease-in-out infinite;
                 }
+                @keyframes shimmer-arrow {
+                    0%, 100% { 
+                        filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+                        transform: scale(1) translateX(0);
+                    }
+                    50% { 
+                        filter: drop-shadow(0 0 30px rgba(255,255,255,1));
+                        transform: scale(1.1) translateX(5px);
+                    }
+                }
              `}</style>
         </div>
     );
@@ -787,6 +797,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isReadyToAwaken, setIsReadyToAwaken] = useState(false); // 两步流程：第一次点击确认头像
   
   // Navigation State
   const [showInteraction, setShowInteraction] = useState(false);
@@ -1392,28 +1403,49 @@ export default function App() {
                         <div className="absolute inset-0 border-2 border-dashed border-[#db2777] rounded-full animate-[spin_30s_linear_infinite] opacity-50"></div>
                         <div className="absolute inset-4 border border-dotted border-[#fbbf24] rounded-full animate-[spin_20s_linear_infinite_reverse] opacity-50"></div>
                         
-                        {/* Main Button - Auto-uses user avatar */}
+                        {/* Main Button - 两步流程 */}
                         <button 
-                        onClick={handleGenerate}
+                        onClick={() => {
+                            if (!isReadyToAwaken) {
+                                // 第一次点击：确认头像
+                                setIsReadyToAwaken(true);
+                            } else {
+                                // 第二次点击：开始生成
+                                handleGenerate();
+                            }
+                        }}
                         disabled={isLoading || !farcasterUser}
                         className="relative w-48 h-48 group outline-none active:scale-95 transition-transform"
                         >
                         {/* 1. Diamond Background */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-[#fbbf24] to-[#b45309] shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300 transform rotate-45 border-4 border-white group-hover:scale-105"></div>
+                        <div className={`absolute inset-0 bg-gradient-to-br from-[#fbbf24] to-[#b45309] transition-all duration-300 transform rotate-45 border-4 border-white group-hover:scale-105 ${isReadyToAwaken ? 'shadow-[0_0_50px_rgba(251,191,36,0.8)]' : 'shadow-[0_0_30px_rgba(251,191,36,0.4)]'}`}></div>
                         
                         {/* 2. User Avatar Preview Overlay */}
                         {farcasterUser?.pfpUrl && !isLoading && (
                             <div className="absolute inset-0 overflow-hidden transform rotate-45 border-4 border-black z-0">
-                                <img src={farcasterUser.pfpUrl} className="w-full h-full object-cover transform -rotate-45 scale-150 opacity-60 group-hover:opacity-100 transition-opacity" alt="Your Avatar" />
+                                <img src={farcasterUser.pfpUrl} className={`w-full h-full object-cover transform -rotate-45 scale-150 transition-opacity ${isReadyToAwaken ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'}`} alt="Your Avatar" />
                             </div>
                         )}
 
                         {/* 3. Inner Content */}
                         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                            <div className="text-center transform transition-transform group-hover:scale-110 drop-shadow-md">
-                                <Sparkles className="w-16 h-16 text-white fill-white/50 animate-pulse filter drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" />
-                                <span className="block text-white font-black text-base mt-2 text-shadow-black tracking-wider">AWAKEN NOW</span>
-                            </div>
+                            {isReadyToAwaken ? (
+                                // 第二步：显示闪耀的箭头
+                                <div className="text-center transform transition-transform group-hover:scale-110 drop-shadow-md animate-pulse">
+                                    <div className="relative">
+                                        {/* 发光效果 */}
+                                        <div className="absolute inset-0 blur-xl bg-white/50 animate-ping"></div>
+                                        <ArrowRight className="w-20 h-20 text-white fill-white/30 filter drop-shadow-[0_0_20px_rgba(255,255,255,0.8)] animate-[shimmer-arrow_1s_ease-in-out_infinite]" />
+                                    </div>
+                                    <span className="block text-white font-black text-base mt-2 text-shadow-black tracking-wider animate-pulse">AWAKEN!</span>
+                                </div>
+                            ) : (
+                                // 第一步：显示头像预览提示
+                                <div className="text-center transform transition-transform group-hover:scale-110 drop-shadow-md">
+                                    <Sparkles className="w-16 h-16 text-white fill-white/50 animate-pulse filter drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" />
+                                    <span className="block text-white font-black text-base mt-2 text-shadow-black tracking-wider">AWAKEN NOW</span>
+                                </div>
+                            )}
                         </div>
                         </button>
                 </div>
@@ -1422,12 +1454,14 @@ export default function App() {
             {/* FOOTER AREA */}
             <div className="w-full flex flex-col items-center z-20">
                 <div className="mb-4 h-12 flex items-center justify-center">
-                    {preview ? (
-                        <button onClick={() => { setPreview(null); setBase64Image(null); }} className="text-[#db2777] text-sm font-bold active:text-white uppercase tracking-widest border-b border-[#db2777] py-2 px-4">
-                            Release Soul / Retake
+                    {isReadyToAwaken ? (
+                        <button onClick={() => { setIsReadyToAwaken(false); }} className="text-[#db2777] text-sm font-bold active:text-white uppercase tracking-widest border-b border-[#db2777] py-2 px-4">
+                            Cancel / Change Avatar
                         </button>
                     ) : (
-                        <span className="text-[#fbbf24] text-xs tracking-widest animate-pulse font-bold">TOUCH THE ARROW TO BEGIN</span>
+                        <span className="text-[#fbbf24] text-xs tracking-widest animate-pulse font-bold">
+                            {farcasterUser ? 'TOUCH TO CONFIRM YOUR SOUL' : 'CONNECTING...'}
+                        </span>
                     )}
                 </div>
 
