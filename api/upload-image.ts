@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { sql } from '@vercel/postgres';
+import { put } from '@vercel/blob';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS
@@ -35,36 +35,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!buffer) return res.status(400).json({ error: 'No image data' });
 
-    // Check size limit (max 4MB for Vercel)
+    // Check size limit (max 4MB)
     if (buffer.length > 4 * 1024 * 1024) {
       return res.status(413).json({ error: 'Image too large, max 4MB' });
     }
 
-    // Generate id
-    const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+    // Generate filename
+    const ext = mime.split('/')[1] || 'png';
+    const blobFilename = filename || `stand_${Date.now()}.${ext}`;
 
-    // Store as base64 string
-    const base64Data = buffer.toString('base64');
+    // Upload to Vercel Blob
+    const blob = await put(blobFilename, buffer, {
+      access: 'public',
+      contentType: mime,
+    });
 
-    // Create table if not exists
-    await sql`
-      CREATE TABLE IF NOT EXISTS stand_uploads_v2 (
-        id VARCHAR(40) PRIMARY KEY,
-        mime TEXT NOT NULL,
-        base64_data TEXT NOT NULL,
-        filename TEXT,
-        created_at TIMESTAMP DEFAULT NOW()
-      )
-    `;
-
-    // Insert image data
-    await sql`INSERT INTO stand_uploads_v2 (id, mime, base64_data, filename) VALUES (${id}, ${mime}, ${base64Data}, ${filename || null})`;
-
-    const host = (req.headers['x-forwarded-host'] || req.headers.host) as string;
-    const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
-    const publicUrl = `${proto}://${host}/api/i/${id}`;
-
-    return res.status(200).json({ url: publicUrl, id });
+    return res.status(200).json({ url: blob.url, id: blob.url });
   } catch (err: any) {
     console.error('upload-image error:', err);
     return res.status(500).json({ error: 'Upload failed', details: err?.message });
