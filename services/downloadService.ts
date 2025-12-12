@@ -113,25 +113,37 @@ export async function downloadStandImage(imageUrl: string, standName: string) {
  */
 export async function captureReceiptAsImage(): Promise<string | null> {
   try {
+    console.log('📸 Starting receipt capture...');
     const html2canvas = (await import('html2canvas')).default;
     
     const element = document.getElementById('receipt-paper');
+    console.log('📸 Receipt element:', element ? 'FOUND' : 'NOT FOUND');
+    
     if (!element) {
-      console.error('Receipt element not found');
+      console.error('Receipt element not found - make sure you printed first!');
       return null;
     }
+
+    // 确保元素可见
+    const rect = element.getBoundingClientRect();
+    console.log('📸 Element position:', rect.top, rect.left, rect.width, rect.height);
 
     // Capture the element as canvas
     const canvas = await html2canvas(element, {
       backgroundColor: '#f8f8f5',
-      scale: 2, // Higher quality
-      logging: false,
+      scale: 2,
+      logging: true, // 开启日志
       useCORS: true,
+      allowTaint: true,
+      scrollX: 0,
+      scrollY: -window.scrollY, // 处理滚动偏移
     });
+
+    console.log('📸 Canvas size:', canvas.width, canvas.height);
 
     // Convert canvas to base64
     const dataUrl = canvas.toDataURL('image/png');
-    console.log('✅ Receipt captured successfully');
+    console.log('✅ Receipt captured successfully, length:', dataUrl.length);
     return dataUrl;
   } catch (error) {
     console.error('❌ Receipt capture error:', error);

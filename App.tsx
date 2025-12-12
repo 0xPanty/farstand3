@@ -1049,11 +1049,10 @@ export default function App() {
     const castText = `I just awakened my Farstand: ${standData.standName}! ✨\n\nAwaken your dormant abilities now! ⚡️\n\nCreated by @xqc`;
     
     try {
-      // 并行处理：截取小票 + 准备上传
-      const [receiptImage, _] = await Promise.all([
-        captureReceiptAsImage(),
-        Promise.resolve() // placeholder
-      ]);
+      // 截取小票
+      console.log('🔄 Starting share process...');
+      const receiptImage = await captureReceiptAsImage();
+      console.log('🔄 Receipt capture result:', receiptImage ? `SUCCESS (${receiptImage.length} bytes)` : 'NULL - no receipt');
       
       // 并行上传：替身图片 + 小票图片
       const uploadPromises: Promise<string | null>[] = [];
