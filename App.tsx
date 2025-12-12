@@ -982,9 +982,15 @@ export default function App() {
       // 尝试SDK (手机Mini App)
       try {
         const { sdk } = await import('@farcaster/miniapp-sdk');
-        await sdk.actions.composeCast({ text: castText, embeds: [sharePageUrl] });
+        console.log('SDK loaded, calling composeCast with:', sharePageUrl);
+        const result = await sdk.actions.composeCast({ 
+          text: castText, 
+          embeds: [sharePageUrl] 
+        });
+        console.log('composeCast result:', result);
         return;
-      } catch (e) {
+      } catch (e: any) {
+        console.error('SDK composeCast error:', e?.message || e);
         // SDK失败，用网页版
       }
       
