@@ -49,10 +49,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Generate id
     const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
 
-    // Convert buffer to hex string for PostgreSQL BYTEA
-    const hexData = '\\x' + buffer.toString('hex');
+    // Store as base64 string instead of BYTEA (more reliable for large images)
+    const base64Data = buffer.toString('base64');
 
-    await sql`INSERT INTO stand_uploads (id, mime, data, filename) VALUES (${id}, ${mime}, ${hexData}::bytea, ${filename || null})`;
+    // Check if we need to alter table (add base64_data column)
+    try {
+      await sql`ALTER TABLE stand_uploads ADD COLUMN IF NOT EXISTS base64_data TEXT`;
+    } catch (e) {
+      // Column might already exist, ignore error
+    }
+
+    await sql`INSERT INTO stand_uploads (id, mime, base64_data, filename) VALUES (${id}, ${mime}, ${base64Data}, ${filename || null})`;
 
     const host = (req.headers['x-forwarded-host'] || req.headers.host) as string;
     const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
