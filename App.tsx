@@ -762,6 +762,10 @@ const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDeta
 // ==========================================
 // Main Application
 // ==========================================
+
+// 管理员FID - 可以无限生成
+const OWNER_FID = 275646;
+
 export default function App() {
   const [preview, setPreview] = useState<string | null>(null);
   const [standData, setStandData] = useState<StandResult | null>(null);
@@ -782,6 +786,36 @@ export default function App() {
   const [showGallery, setShowGallery] = useState(false);
   const [context, setContext] = useState<any>(null);
 
+  // 加载已有的Stand
+  const loadExistingStand = async (fid: number) => {
+    try {
+      const res = await fetch(`/api/get-stand?fid=${fid}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.stand) {
+          const stand = data.stand;
+          setStandData({
+            standName: stand.stand_name,
+            gender: stand.gender,
+            userAnalysis: stand.user_analysis,
+            standDescription: stand.stand_description,
+            ability: stand.ability,
+            battleCry: stand.battle_cry,
+            stats: stand.stats,
+            standImageUrl: stand.stand_image_url,
+            sketchImageUrl: stand.sketch_image_url,
+            visualPrompt: stand.visual_prompt,
+          });
+          return true;
+        }
+      }
+      return false;
+    } catch (e) {
+      console.error('Failed to load existing stand:', e);
+      return false;
+    }
+  };
+
   // Farcaster Frame Logic
   useEffect(() => {
     const init = async () => {
@@ -792,11 +826,17 @@ export default function App() {
             // Context Logic
             const context = await sdk.context;
             if (context?.user?.fid) {
-                const profile = await fetchFarcasterUser(context.user.fid);
+                const fid = context.user.fid;
+                const profile = await fetchFarcasterUser(fid);
                 if (profile) {
                    setFarcasterUser(profile);
                    const data = await calculateFarcasterStats(profile);
                    setCalculatedData(data);
+                   
+                   // 如果不是管理员，加载已有的Stand
+                   if (fid !== OWNER_FID) {
+                     await loadExistingStand(fid);
+                   }
                 }
             } else {
                 // FALLBACK: Load a demo user so stats are visible for testing/preview
@@ -857,6 +897,12 @@ export default function App() {
   const handleGenerate = useCallback(async () => {
     if (isLoading) return;
     
+    // 检查是否已经生成过（管理员除外）
+    if (standData && farcasterUser?.fid !== OWNER_FID) {
+      alert('你已经唤醒过替身了！每人只能生成一次。');
+      return;
+    }
+    
     // Auto-use user's PFP if no image selected
     let imageToUse = base64Image || farcasterUser?.pfpUrl;
     if (!imageToUse) {
@@ -908,7 +954,7 @@ export default function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, base64Image, calculatedData, farcasterUser]);
+  }, [isLoading, base64Image, calculatedData, farcasterUser, standData]);
 
   const onReset = () => {
     setStandData(null);
