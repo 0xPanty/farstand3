@@ -993,36 +993,43 @@ export default function App() {
     const castText = `I just awakened my Farstand: ${standData.standName}! ✨\n\nAwaken your dormant abilities now! ⚡️\n\nCreated by @xqc`;
     
     try {
-      // Step 1: 尝试截取小票图片（如果在打印机页面）
-      let imageToUpload = standData.standImageUrl;
-      const receiptImage = await captureReceiptAsImage();
-      if (receiptImage) {
-        console.log('📸 Using receipt image for share');
-        imageToUpload = receiptImage;
-      } else {
-        console.log('📷 Using stand image for share (receipt not visible)');
-      }
-      
-      // Step 2: 上传图片获取公开URL
-      let publicImageUrl = imageToUpload;
-      if (imageToUpload?.startsWith('data:')) {
+      // Step 1: 上传替身图片
+      let standImageUrl = standData.standImageUrl;
+      if (standData.standImageUrl?.startsWith('data:')) {
         const uploadRes = await fetch('/api/upload-image', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ dataUrl: imageToUpload }),
+          body: JSON.stringify({ dataUrl: standData.standImageUrl }),
         });
         if (uploadRes.ok) {
           const data = await uploadRes.json();
-          publicImageUrl = data.url;
+          standImageUrl = data.url;
         }
       }
       
-      // Step 3: 保存Stand到数据库（share页面需要读取）- 使用截取的图片
+      // Step 2: 尝试截取并上传小票图片（如果在打印机页面）
+      let receiptImageUrl: string | null = null;
+      const receiptImage = await captureReceiptAsImage();
+      if (receiptImage) {
+        console.log('📸 Receipt captured, uploading...');
+        const uploadRes = await fetch('/api/upload-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dataUrl: receiptImage }),
+        });
+        if (uploadRes.ok) {
+          const data = await uploadRes.json();
+          receiptImageUrl = data.url;
+          console.log('✅ Receipt uploaded:', receiptImageUrl);
+        }
+      }
+      
+      // Step 3: 保存Stand到数据库
       await fetch('/api/save-stand', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          standData: { ...standData, standImageUrl: publicImageUrl },
+          standData: { ...standData, standImageUrl: standImageUrl },
           farcasterUser: {
             fid: farcasterUser.fid,
             username: farcasterUser.username,
@@ -1032,16 +1039,21 @@ export default function App() {
         }),
       });
       
-      // Step 4: Share页面URL（有fc:miniapp meta标签，Farcaster会抓取显示图片）
+      // Step 4: 构建embeds数组（最多2个）
       const sharePageUrl = `${appUrl}/api/share/${farcasterUser.fid}`;
+      const embeds: string[] = [sharePageUrl];
+      if (receiptImageUrl) {
+        embeds.push(receiptImageUrl); // 添加小票图片作为第二个embed
+      }
+      console.log('📤 Sharing with embeds:', embeds);
       
       // 尝试SDK (手机Mini App)
       try {
         const { sdk } = await import('@farcaster/miniapp-sdk');
-        console.log('SDK loaded, calling composeCast with:', sharePageUrl);
+        console.log('SDK loaded, calling composeCast with:', embeds);
         const result = await sdk.actions.composeCast({ 
           text: castText, 
-          embeds: [sharePageUrl] 
+          embeds: embeds as [string] | [string, string]
         });
         console.log('composeCast result:', result);
         return;
@@ -1051,7 +1063,11 @@ export default function App() {
       }
       
       // PC网页版
-      window.open(`https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}&embeds[]=${encodeURIComponent(sharePageUrl)}`, '_blank');
+      let warpcastUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}&embeds[]=${encodeURIComponent(sharePageUrl)}`;
+      if (receiptImageUrl) {
+        warpcastUrl += `&embeds[]=${encodeURIComponent(receiptImageUrl)}`;
+      }
+      window.open(warpcastUrl, '_blank');
       
     } catch (error) {
       console.error('Share error:', error);
