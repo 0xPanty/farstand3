@@ -112,43 +112,48 @@ export async function downloadStandImage(imageUrl: string, standName: string) {
  * Uses html2canvas to capture the receipt paper
  */
 export async function captureReceiptAsImage(): Promise<string | null> {
-  try {
-    console.log('📸 Starting receipt capture...');
-    const html2canvas = (await import('html2canvas')).default;
-    
-    const element = document.getElementById('receipt-paper');
-    console.log('📸 Receipt element:', element ? 'FOUND' : 'NOT FOUND');
-    
-    if (!element) {
-      console.error('Receipt element not found - make sure you printed first!');
+  // 设置超时，避免阻塞分享流程
+  const timeoutPromise = new Promise<null>((resolve) => {
+    setTimeout(() => {
+      console.log('⏱️ Receipt capture timeout');
+      resolve(null);
+    }, 3000); // 3秒超时
+  });
+
+  const capturePromise = (async (): Promise<string | null> => {
+    try {
+      console.log('📸 Starting receipt capture...');
+      
+      const element = document.getElementById('receipt-paper');
+      if (!element) {
+        console.log('📸 Receipt element not found');
+        return null;
+      }
+
+      // 动态导入 html2canvas
+      const html2canvas = (await import('html2canvas')).default;
+      
+      // 使用最简配置，减少 CSP 问题
+      const canvas = await html2canvas(element, {
+        backgroundColor: '#f8f8f5',
+        scale: 1.5,
+        logging: false,
+        useCORS: true,
+        allowTaint: true,
+        foreignObjectRendering: false, // 禁用可能触发 CSP 的功能
+      });
+
+      const dataUrl = canvas.toDataURL('image/png', 0.8);
+      console.log('✅ Receipt captured, size:', dataUrl.length);
+      return dataUrl;
+    } catch (error) {
+      console.error('❌ Receipt capture error:', error);
       return null;
     }
+  })();
 
-    // 确保元素可见
-    const rect = element.getBoundingClientRect();
-    console.log('📸 Element position:', rect.top, rect.left, rect.width, rect.height);
-
-    // Capture the element as canvas
-    const canvas = await html2canvas(element, {
-      backgroundColor: '#f8f8f5',
-      scale: 2,
-      logging: true, // 开启日志
-      useCORS: true,
-      allowTaint: true,
-      scrollX: 0,
-      scrollY: -window.scrollY, // 处理滚动偏移
-    });
-
-    console.log('📸 Canvas size:', canvas.width, canvas.height);
-
-    // Convert canvas to base64
-    const dataUrl = canvas.toDataURL('image/png');
-    console.log('✅ Receipt captured successfully, length:', dataUrl.length);
-    return dataUrl;
-  } catch (error) {
-    console.error('❌ Receipt capture error:', error);
-    return null;
-  }
+  // 返回先完成的（成功或超时）
+  return Promise.race([capturePromise, timeoutPromise]);
 }
 
 /**
