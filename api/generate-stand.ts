@@ -15,7 +15,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  if (req.method !== 'POST') {
+    if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -23,6 +23,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { base64Image, action, farcasterStats, farcasterBio, visualPrompt } = req.body;
 
     if (!base64Image) {
+      console.error('ERROR: Missing base64Image in request');
+      return res.status(400).json({ error: 'Missing image data. Please upload a photo.' });
+    }
+
+    // Check if base64 is empty or malformed
+    if (base64Image === 'data:application/octet-stream;base64,' || 
+        base64Image === 'data:image/jpeg;base64,' ||
+        base64Image === 'data:image/png;base64,') {
+      console.error('ERROR: Empty base64 data received');
+      return res.status(400).json({ 
+        error: 'Image upload failed. Please try again.' 
+      });
+    }
+
+    // Validate base64 has actual content
+    const base64Data = base64Image.split(',')[1];
+    if (!base64Data || base64Data.length < 100) {
+      console.error('ERROR: Base64 data too short:', base64Data?.length || 0);
+      return res.status(400).json({ 
+        error: 'Image data incomplete. Please try a different photo.' 
+      });
+    }
+
+    console.log('Valid base64 received, size:', base64Data.length, 'bytes');
+
+    // Action: 'analyze' or 'visualize'
+    if (action === 'analyze') {
       return res.status(400).json({ error: 'Missing base64Image' });
     }
 
