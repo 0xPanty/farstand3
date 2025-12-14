@@ -1,4 +1,4 @@
-
+﻿
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
@@ -21,7 +21,7 @@ const RadarChart: React.FC<{ stats: StandStats }> = ({ stats }) => {
   const radius = 95;         
   
   const keys = ["power", "speed", "range", "durability", "precision", "potential"];
-  const jpLabels = ["破壊力", "速度", "射程", "持続力", "精密", "成長"];
+  const jpLabels = ["鐮村鍔?, "閫熷害", "灏勭▼", "鎸佺稓鍔?, "绮惧瘑", "鎴愰暦"];
   
   const gradeToVal = (g: StatValue) => {
     const map: Record<string, number> = { 'A': 1.0, 'B': 0.8, 'C': 0.6, 'D': 0.4, 'E': 0.2, 'N/A': 0 };
@@ -128,11 +128,11 @@ const StatCircle: React.FC<StatCircleProps> = ({ label, subLabel, value, detail 
 const MenacingFloaters = () => {
     return (
         <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-            <div className="absolute top-[10%] left-[10%] text-[#ec4899] font-black text-5xl animate-float-menacing menacing-text" style={{ animationDelay: '0s' }}>ゴ</div>
-            <div className="absolute top-[40%] right-[15%] text-[#a855f7] font-black text-6xl animate-float-menacing menacing-text" style={{ animationDelay: '1.2s' }}>ゴ</div>
-            <div className="absolute bottom-[20%] left-[20%] text-[#ec4899] font-black text-4xl animate-float-menacing menacing-text" style={{ animationDelay: '0.5s' }}>ゴ</div>
-            <div className="absolute top-[15%] right-[25%] text-[#8b5cf6] font-black text-3xl animate-float-menacing menacing-text" style={{ animationDelay: '2.5s' }}>ド</div>
-            <div className="absolute bottom-[10%] right-[5%] text-[#ec4899] font-black text-7xl animate-float-menacing menacing-text" style={{ animationDelay: '1.8s' }}>ゴ</div>
+            <div className="absolute top-[10%] left-[10%] text-[#ec4899] font-black text-5xl animate-float-menacing menacing-text" style={{ animationDelay: '0s' }}>銈?/div>
+            <div className="absolute top-[40%] right-[15%] text-[#a855f7] font-black text-6xl animate-float-menacing menacing-text" style={{ animationDelay: '1.2s' }}>銈?/div>
+            <div className="absolute bottom-[20%] left-[20%] text-[#ec4899] font-black text-4xl animate-float-menacing menacing-text" style={{ animationDelay: '0.5s' }}>銈?/div>
+            <div className="absolute top-[15%] right-[25%] text-[#8b5cf6] font-black text-3xl animate-float-menacing menacing-text" style={{ animationDelay: '2.5s' }}>銉?/div>
+            <div className="absolute bottom-[10%] right-[5%] text-[#ec4899] font-black text-7xl animate-float-menacing menacing-text" style={{ animationDelay: '1.8s' }}>銈?/div>
         </div>
     );
 };
@@ -237,20 +237,20 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
     
     const getRankColor = (rank: string): string => {
         switch (rank) {
-            case 'S': return '#ff00ff'; // 紫色 - 最强
-            case 'A': return '#fbbf24'; // 金色
-            case 'B': return '#22c55e'; // 绿色
-            case 'C': return '#06b6d4'; // 青色
-            case 'D': return '#f97316'; // 橙色
-            default: return '#888888'; // 灰色
+            case 'S': return '#ff00ff'; // 绱壊 - 鏈€寮?
+            case 'A': return '#fbbf24'; // 閲戣壊
+            case 'B': return '#22c55e'; // 缁胯壊
+            case 'C': return '#06b6d4'; // 闈掕壊
+            case 'D': return '#f97316'; // 姗欒壊
+            default: return '#888888'; // 鐏拌壊
         }
     };
     
     // Star rating (1-5 stars based on score)
     const getStars = (score: number): string => {
         const starCount = Math.ceil((score / 600) * 5);
-        const filled = '★'.repeat(starCount);
-        const empty = '☆'.repeat(5 - starCount);
+        const filled = '鈽?.repeat(starCount);
+        const empty = '鈽?.repeat(5 - starCount);
         return filled + empty;
     };
 
@@ -332,7 +332,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                             <div className="text-[#fbbf24] font-bold">@{user.username}</div>
                                             <div className="text-[#666] text-[10px]">FID: #{user.fid}</div>
                                             <div className="text-[#06b6d4] text-[10px] mt-2 animate-pulse tracking-wider">
-                                                {isPrinting ? '▶ PRINTING...' : '▶ READY TO PRINT...'}
+                                                {isPrinting ? '鈻?PRINTING...' : '鈻?READY TO PRINT...'}
                                             </div>
                                         </>
                                     )
@@ -450,7 +450,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 onClick={handleReset}
                                 className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center text-[#aaa] hover:text-[#333] transition-colors z-20 text-xs"
                             >
-                                ✕
+                                鉁?
                             </button>
                             
                             {/* Receipt Content - Full Japanese Style */}
@@ -470,7 +470,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 {/* Order Info */}
                                 <div className="text-[9px] text-[#333] mb-3 pb-2 border-b border-dashed border-[#999]">
                                     <div className="font-bold">ORDER #{user?.fid?.toString().padStart(6, '0') || '000000'} FOR STAND ANALYSIS</div>
-                                    <div>{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}　　{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}</div>
+                                    <div>{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}銆€銆€{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}</div>
                                 </div>
                                 
                                 {/* User Section */}
@@ -481,7 +481,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                     </div>
                                     <div className="flex justify-between text-[10px] mb-1">
                                         <span className="text-[#666]">NAME</span>
-                                        <span className="font-bold text-[#1a1a1a]">{user?.displayName}{user?.powerBadge ? ' ⚡' : ''}</span>
+                                        <span className="font-bold text-[#1a1a1a]">{user?.displayName}{user?.powerBadge ? ' 鈿? : ''}</span>
                                     </div>
                                     {user?.verifications?.[0] && (
                                         <div className="flex justify-between text-[10px]">
@@ -496,7 +496,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                     <div className="mb-3 pb-2 border-b border-dotted border-[#bbb]">
                                         <div className="text-[9px] text-[#666] mb-1">STAND NAME</div>
                                         <div className="text-lg font-black text-[#1a1a1a] tracking-wide">
-                                            『{standName.replace(/[『』]/g, '')}』
+                                            銆巤standName.replace(/[銆庛€廬/g, '')}銆?
                                         </div>
                                     </div>
                                 )}
@@ -505,7 +505,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 {/* Stand Parameters */}
                                 {stats && statDetails && (
                                     <div className="mb-4 pb-3 border-b border-dotted border-[#999]">
-                                        <div className="text-[10px] text-[#444] mb-2 tracking-wider">─── STAND PARAMETERS ───</div>
+                                        <div className="text-[10px] text-[#444] mb-2 tracking-wider">鈹€鈹€鈹€ STAND PARAMETERS 鈹€鈹€鈹€</div>
                                         <div className="space-y-1.5 text-[11px] text-[#333]">
                                             <div className="flex items-center"><span className="w-20 text-[#666]">POWER</span><span className="text-[14px] font-bold w-6 text-right">{stats.power}</span><span className="flex-1 border-b border-dotted border-[#ccc] mx-2"></span><span className="text-[9px] text-[#888]">{statDetails.power}</span></div>
                                             <div className="flex items-center"><span className="w-20 text-[#666]">SPEED</span><span className="text-[14px] font-bold w-6 text-right">{stats.speed}</span><span className="flex-1 border-b border-dotted border-[#ccc] mx-2"></span><span className="text-[9px] text-[#888]">{statDetails.speed}</span></div>
@@ -595,7 +595,7 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
                                 )}
                                 
                                 {/* Printing cursor */}
-                                {isPrinting && <span className="animate-blink text-[#333] text-lg">█</span>}
+                                {isPrinting && <span className="animate-blink text-[#333] text-lg">鈻?/span>}
                             </div>
                         </div>
                         
@@ -748,9 +748,9 @@ const LoadingScreen = () => {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)] pointer-events-none"></div>
 
             <div className="flex gap-4 mb-16 relative z-10">
-                <span className="text-[#db2777] font-black text-6xl menacing-text animate-rumble" style={{ animationDelay: '0s' }}>ゴ</span>
-                <span className="text-[#db2777] font-black text-6xl menacing-text animate-rumble" style={{ animationDelay: '0.1s' }}>ゴ</span>
-                <span className="text-[#db2777] font-black text-6xl menacing-text animate-rumble" style={{ animationDelay: '0.2s' }}>ゴ</span>
+                <span className="text-[#db2777] font-black text-6xl menacing-text animate-rumble" style={{ animationDelay: '0s' }}>銈?/span>
+                <span className="text-[#db2777] font-black text-6xl menacing-text animate-rumble" style={{ animationDelay: '0.1s' }}>銈?/span>
+                <span className="text-[#db2777] font-black text-6xl menacing-text animate-rumble" style={{ animationDelay: '0.2s' }}>銈?/span>
             </div>
 
             <div className="w-64 border-2 border-[#701a75] bg-black/80 rounded-lg p-3 shadow-[0_0_20px_rgba(112,26,117,0.5)] relative z-10">
@@ -830,7 +830,7 @@ const PrinterView: React.FC<PrinterViewProps> = ({ onBack, user, stats, statDeta
 // Main Application
 // ==========================================
 
-// 管理员FID - 可以无限生成
+// 绠＄悊鍛楩ID - 鍙互鏃犻檺鐢熸垚
 const OWNER_FID = 275646;
 
 export default function App() {
@@ -839,7 +839,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [isReadyToAwaken, setIsReadyToAwaken] = useState(false); // 两步流程：第一次点击确认头像
+  const [isReadyToAwaken, setIsReadyToAwaken] = useState(false); // 涓ゆ娴佺▼锛氱涓€娆＄偣鍑荤‘璁ゅご鍍?
   
   // Navigation State
   const [showInteraction, setShowInteraction] = useState(false);
@@ -855,7 +855,7 @@ export default function App() {
   const [showGallery, setShowGallery] = useState(false);
   const [context, setContext] = useState<any>(null);
 
-  // 加载已有的Stand
+  // 鍔犺浇宸叉湁鐨凷tand
   const loadExistingStand = async (fid: number) => {
     try {
       const res = await fetch(`/api/get-stand?fid=${fid}`);
@@ -897,7 +897,7 @@ export default function App() {
             if (context?.user?.fid) {
                 const fid = context.user.fid;
                 
-                // 立即使用 SDK 提供的基本用户信息（更快显示）
+                // 绔嬪嵆浣跨敤 SDK 鎻愪緵鐨勫熀鏈敤鎴蜂俊鎭紙鏇村揩鏄剧ず锛?
                 const quickUser: FarcasterProfile = {
                     fid: fid,
                     username: context.user.username || '',
@@ -906,15 +906,21 @@ export default function App() {
                     bio: '',
                     followerCount: 0,
                     followingCount: 0,
+                    castCount: 0,
+                    likesReceived: 0,
+                    recastsReceived: 0,
+                    repliesReceived: 0,
+                    verifications: [],
+                    powerBadge: false,
                 };
                 setFarcasterUser(quickUser);
                 
-                // 加载详细用户数据
+                // 鍔犺浇璇︾粏鐢ㄦ埛鏁版嵁
                 const profile = await fetchFarcasterUser(fid);
                 
                 if (profile) {
                     setFarcasterUser(profile);
-                    // 计算统计数据
+                    // 璁＄畻缁熻鏁版嵁
                     const data = await calculateFarcasterStats(profile);
                     setCalculatedData(data);
                 }
@@ -1018,10 +1024,10 @@ export default function App() {
       if (result) {
         setStandData(result);
         
-        // 保存到数据库
+        // 淇濆瓨鍒版暟鎹簱
         if (farcasterUser?.fid) {
           try {
-            // 上传图片获取公开URL
+            // 涓婁紶鍥剧墖鑾峰彇鍏紑URL
             let publicImageUrl = result.standImageUrl;
             if (result.standImageUrl?.startsWith('data:')) {
               const uploadRes = await fetch('/api/upload-image', {
@@ -1035,7 +1041,7 @@ export default function App() {
               }
             }
             
-            // 保存到数据库
+            // 淇濆瓨鍒版暟鎹簱
             await fetch('/api/save-stand', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -1049,7 +1055,7 @@ export default function App() {
                 }
               }),
             });
-            console.log('✅ Stand saved to database');
+            console.log('鉁?Stand saved to database');
           } catch (saveError) {
             console.error('Failed to save stand:', saveError);
           }
@@ -1088,22 +1094,22 @@ export default function App() {
     );
 
     if (success) {
-      alert('✅ Image downloaded!');
+      alert('鉁?Image downloaded!');
     } else {
-      alert('❌ Download failed');
+      alert('鉂?Download failed');
     }
   }, [standData]);
 
   const handleShare = useCallback(async () => {
     if (!standData || !farcasterUser?.fid) {
-      alert('请等待数据加载完成');
+      alert('璇风瓑寰呮暟鎹姞杞藉畬鎴?);
       return;
     }
     
-    if (isSharing) return; // 防止重复点击
+    if (isSharing) return; // 闃叉閲嶅鐐瑰嚮
     setIsSharing(true);
     
-    // 计算评分
+    // 璁＄畻璇勫垎
     const gradeToScore = (g: string): number => {
       const map: Record<string, number> = { 'A': 100, 'B': 80, 'C': 60, 'D': 40, 'E': 20, 'N/A': 0 };
       return map[g] || 0;
@@ -1124,19 +1130,19 @@ export default function App() {
     const rank = getRank(totalScore);
     
     const appUrl = 'https://farstand3.vercel.app';
-    const castText = `I just awakened my Farstand: ${standData.standName}! ✨ Rank: ${rank}\n\nAwaken your dormant abilities now! ⚡️\n\nCreated by @xqc`;
+    const castText = `I just awakened my Farstand: ${standData.standName}! 鉁?Rank: ${rank}\n\nAwaken your dormant abilities now! 鈿★笍\n\nCreated by @xqc`;
     
     try {
-      console.log('🔄 Starting share...');
+      console.log('馃攧 Starting share...');
       
-      // 尝试截取小票（有超时保护，不会阻塞）
+      // 灏濊瘯鎴彇灏忕エ锛堟湁瓒呮椂淇濇姢锛屼笉浼氶樆濉烇級
       const receiptImage = await captureReceiptAsImage();
-      console.log('🔄 Receipt:', receiptImage ? 'OK' : 'SKIP');
+      console.log('馃攧 Receipt:', receiptImage ? 'OK' : 'SKIP');
       
-      // 并行上传：替身图片 + 小票图片
+      // 骞惰涓婁紶锛氭浛韬浘鐗?+ 灏忕エ鍥剧墖
       const uploadPromises: Promise<string | null>[] = [];
       
-      // 上传替身图片
+      // 涓婁紶鏇胯韩鍥剧墖
       if (standData.standImageUrl?.startsWith('data:')) {
         uploadPromises.push(
           fetch('/api/upload-image', {
@@ -1150,7 +1156,7 @@ export default function App() {
         uploadPromises.push(Promise.resolve(standData.standImageUrl));
       }
       
-      // 上传小票图片（如果有）
+      // 涓婁紶灏忕エ鍥剧墖锛堝鏋滄湁锛?
       if (receiptImage) {
         uploadPromises.push(
           fetch('/api/upload-image', {
@@ -1166,7 +1172,7 @@ export default function App() {
       
       const [standImageUrl, receiptImageUrl] = await Promise.all(uploadPromises);
       
-      // 保存到数据库（后台执行，不等待）
+      // 淇濆瓨鍒版暟鎹簱锛堝悗鍙版墽琛岋紝涓嶇瓑寰咃級
       fetch('/api/save-stand', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1179,20 +1185,20 @@ export default function App() {
             pfpUrl: farcasterUser.pfpUrl,
           }
         }),
-      }).catch(console.error); // 不等待，后台执行
+      }).catch(console.error); // 涓嶇瓑寰咃紝鍚庡彴鎵ц
       
-      // 构建embeds数组（最多2个）
-      // 1. 替身图片 URL（显示图片）
-      // 2. Universal Link（点击打开 Mini App）
+      // 鏋勫缓embeds鏁扮粍锛堟渶澶?涓級
+      // 1. 鏇胯韩鍥剧墖 URL锛堟樉绀哄浘鐗囷級
+      // 2. Universal Link锛堢偣鍑绘墦寮€ Mini App锛?
       const universalLink = `https://farcaster.xyz/miniapps/ekpKBe5wqvLJ/farstand`;
       const embeds: string[] = [];
       if (standImageUrl) {
         embeds.push(standImageUrl);
       }
       embeds.push(universalLink);
-      console.log('📤 Sharing with embeds:', embeds);
+      console.log('馃摛 Sharing with embeds:', embeds);
       
-      // 尝试SDK (手机Mini App)
+      // 灏濊瘯SDK (鎵嬫満Mini App)
       try {
         const { sdk } = await import('@farcaster/miniapp-sdk');
         console.log('SDK loaded, calling composeCast with:', embeds);
@@ -1204,10 +1210,10 @@ export default function App() {
         return;
       } catch (e: any) {
         console.error('SDK composeCast error:', e?.message || e);
-        // SDK失败，用网页版
+        // SDK澶辫触锛岀敤缃戦〉鐗?
       }
       
-      // PC网页版
+      // PC缃戦〉鐗?
       let warpcastUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}`;
       embeds.forEach(embed => {
         warpcastUrl += `&embeds[]=${encodeURIComponent(embed)}`;
@@ -1286,7 +1292,7 @@ export default function App() {
                                 STAND NAME
                              </div>
                              <h1 className="text-2xl md:text-3xl font-black italic font-jojo text-white drop-shadow-[3px_3px_0_#000] leading-[0.9] tracking-tight text-outline-thick transform -rotate-1 origin-top-left break-words">
-                                {standData.standName.replace(/[『』]/g, '')}
+                                {standData.standName.replace(/[銆庛€廬/g, '')}
                              </h1>
                         </div>
                         
@@ -1320,7 +1326,7 @@ export default function App() {
                         {/* 1. Name Strip */}
                         <div className="p-6 pb-2">
                             <div className="border-l-8 border-[#db2777] pl-4">
-                                <h2 className="text-4xl font-black text-gray-900 leading-none tracking-tight">{standData.standName.replace(/[『』]/g, '')}</h2>
+                                <h2 className="text-4xl font-black text-gray-900 leading-none tracking-tight">{standData.standName.replace(/[銆庛€廬/g, '')}</h2>
                             </div>
                         </div>
     
@@ -1340,12 +1346,12 @@ export default function App() {
     
                              {/* Grid - Compact layout - Use REAL Farcaster data, not AI generated */}
                              <div className="grid grid-cols-3 gap-x-2 gap-y-4 px-2 w-full">
-                                 <StatCircle label="破壊力" subLabel="POWER" value={stats?.power || 'E'} detail={statDetails?.power} />
-                                 <StatCircle label="スピード" subLabel="SPEED" value={stats?.speed || 'E'} detail={statDetails?.speed} />
-                                 <StatCircle label="持続力" subLabel="DURABILITY" value={stats?.durability || 'E'} detail={statDetails?.durability} />
-                                 <StatCircle label="精密動作" subLabel="PRECISION" value={stats?.precision || 'E'} detail={statDetails?.precision} />
-                                 <StatCircle label="射程距離" subLabel="RANGE" value={stats?.range || 'E'} detail={statDetails?.range} />
-                                 <StatCircle label="成長性" subLabel="POTENTIAL" value={stats?.potential || 'E'} detail={statDetails?.potential} />
+                                 <StatCircle label="鐮村鍔? subLabel="POWER" value={stats?.power || 'E'} detail={statDetails?.power} />
+                                 <StatCircle label="銈广償銉笺儔" subLabel="SPEED" value={stats?.speed || 'E'} detail={statDetails?.speed} />
+                                 <StatCircle label="鎸佺稓鍔? subLabel="DURABILITY" value={stats?.durability || 'E'} detail={statDetails?.durability} />
+                                 <StatCircle label="绮惧瘑鍕曚綔" subLabel="PRECISION" value={stats?.precision || 'E'} detail={statDetails?.precision} />
+                                 <StatCircle label="灏勭▼璺濋洟" subLabel="RANGE" value={stats?.range || 'E'} detail={statDetails?.range} />
+                                 <StatCircle label="鎴愰暦鎬? subLabel="POTENTIAL" value={stats?.potential || 'E'} detail={statDetails?.potential} />
                              </div>
                         </div>
     
@@ -1361,7 +1367,7 @@ export default function App() {
                                      onClick={(e) => { e.stopPropagation(); setShowInteraction(true); }}
                                      className="flex items-center gap-2 px-5 py-2.5 bg-black text-[#fbbf24] rounded-full text-sm font-black active:scale-95 transition-transform border-2 border-[#fbbf24] hover:bg-[#fbbf24] hover:text-black shadow-[0_0_15px_rgba(251,191,36,0.3)]"
                                  >
-                                     <span className="text-lg">🖨️</span>
+                                     <span className="text-lg">馃枿锔?/span>
                                      <span>PRINT DATA</span>
                                  </button>
                             </div>
@@ -1372,7 +1378,7 @@ export default function App() {
                                      <span className="text-xs font-black text-black">MAIN ABILITY</span>
                                  </div>
                                  <div className="p-6 pt-8">
-                                     <h3 className="font-bold text-2xl text-[#db2777] mb-2 leading-tight">{standData.ability.split('：')[0] || 'Unknown Ability'}</h3>
+                                     <h3 className="font-bold text-2xl text-[#db2777] mb-2 leading-tight">{standData.ability.split('锛?)[0] || 'Unknown Ability'}</h3>
                                      <p className="text-base text-gray-800 font-medium leading-relaxed">
                                          {standData.ability}
                                      </p>
@@ -1459,14 +1465,14 @@ export default function App() {
                         <div className="absolute inset-0 border-2 border-dashed border-[#db2777] rounded-full animate-[spin_30s_linear_infinite] opacity-50"></div>
                         <div className="absolute inset-4 border border-dotted border-[#fbbf24] rounded-full animate-[spin_20s_linear_infinite_reverse] opacity-50"></div>
                         
-                        {/* Main Button - 两步流程 */}
+                        {/* Main Button - 涓ゆ娴佺▼ */}
                         <button 
                         onClick={() => {
                             if (!isReadyToAwaken) {
-                                // 第一次点击：确认头像
+                                // 绗竴娆＄偣鍑伙細纭澶村儚
                                 setIsReadyToAwaken(true);
                             } else {
-                                // 第二次点击：开始生成
+                                // 绗簩娆＄偣鍑伙細寮€濮嬬敓鎴?
                                 handleGenerate();
                             }
                         }}
@@ -1486,21 +1492,21 @@ export default function App() {
                         {/* 3. Inner Content */}
                         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
                             {isReadyToAwaken ? (
-                                // 第二步：优雅的觉醒效果 - 不遮挡头像
+                                // 绗簩姝ワ細浼橀泤鐨勮閱掓晥鏋?- 涓嶉伄鎸″ご鍍?
                                 <div className="absolute inset-0 pointer-events-none">
-                                    {/* 发光边框动画 */}
+                                    {/* 鍙戝厜杈规鍔ㄧ敾 */}
                                     <div className="absolute inset-0 transform rotate-45 border-4 border-[#fbbf24] animate-[glow-border_1s_ease-in-out_infinite] shadow-[0_0_30px_rgba(251,191,36,0.8),inset_0_0_30px_rgba(251,191,36,0.3)]"></div>
-                                    {/* ゴゴゴ 威压效果 */}
-                                    <span className="absolute top-2 right-2 text-[#db2777] font-black text-3xl animate-[jojo-menace_0.3s_ease-in-out_infinite] menacing-text drop-shadow-[2px_2px_0_#000]">ゴ</span>
-                                    <span className="absolute bottom-2 left-2 text-[#db2777] font-black text-2xl animate-[jojo-menace_0.3s_ease-in-out_infinite_0.15s] menacing-text drop-shadow-[2px_2px_0_#000]">ゴ</span>
-                                    <span className="absolute top-1/3 left-0 text-[#db2777] font-black text-xl animate-[jojo-menace_0.3s_ease-in-out_infinite_0.1s] menacing-text drop-shadow-[2px_2px_0_#000]">ゴ</span>
-                                    {/* 底部文字 */}
+                                    {/* 銈淬偞銈?濞佸帇鏁堟灉 */}
+                                    <span className="absolute top-2 right-2 text-[#db2777] font-black text-3xl animate-[jojo-menace_0.3s_ease-in-out_infinite] menacing-text drop-shadow-[2px_2px_0_#000]">銈?/span>
+                                    <span className="absolute bottom-2 left-2 text-[#db2777] font-black text-2xl animate-[jojo-menace_0.3s_ease-in-out_infinite_0.15s] menacing-text drop-shadow-[2px_2px_0_#000]">銈?/span>
+                                    <span className="absolute top-1/3 left-0 text-[#db2777] font-black text-xl animate-[jojo-menace_0.3s_ease-in-out_infinite_0.1s] menacing-text drop-shadow-[2px_2px_0_#000]">銈?/span>
+                                    {/* 搴曢儴鏂囧瓧 */}
                                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
                                         <span className="text-[#fbbf24] font-black text-lg tracking-[0.2em] drop-shadow-[2px_2px_0_#000] animate-pulse">TAP TO AWAKEN</span>
                                     </div>
                                 </div>
                             ) : (
-                                // 第一步：显示头像预览提示
+                                // 绗竴姝ワ細鏄剧ず澶村儚棰勮鎻愮ず
                                 <div className="text-center transform transition-transform group-hover:scale-110 drop-shadow-md">
                                     <Sparkles className="w-16 h-16 text-white fill-white/50 animate-pulse filter drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" />
                                     <span className="block text-white font-black text-base mt-2 text-shadow-black tracking-wider">AWAKEN NOW</span>
@@ -1559,6 +1565,7 @@ export default function App() {
     </main>
   );
 }
+
 
 
 
