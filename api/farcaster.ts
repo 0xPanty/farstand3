@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+﻿import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY;
 const ETH_RPC_URL = "https://cloudflare-eth.com";
@@ -79,7 +79,7 @@ async function fetchFarcasterUser(fid: number): Promise<any> {
     
     try {
       const castsResponse = await fetch(
-        `https://api.neynar.com/v2/farcaster/feed/user/${fid}/casts?limit=150`,
+        `https://api.neynar.com/v2/farcaster/feed/user/${fid}/casts?limit=50`,
         {
           headers: {
             accept: "application/json",
@@ -231,10 +231,10 @@ async function calculateFarcasterStats(profile: any): Promise<any> {
     ) / profile.castCount;
     
     // Determine precision grade based on weighted quality score (adjusted for Farcaster reality)
-    if (weightedScore >= 20) precision = 'A';       // Viral quality content (top 5%)
-    else if (weightedScore >= 10) precision = 'B';  // High quality engagement (top 15%)
-    else if (weightedScore >= 5) precision = 'C';   // Good engagement (top 40%)
-    else if (weightedScore >= 2) precision = 'D';   // Moderate engagement (above average)
+    if (weightedScore >= 10) precision = 'A';       // Viral quality content (top 5%)
+    else if (weightedScore >= 5) precision = 'B';  // High quality engagement (top 15%)
+    else if (weightedScore >= 2) precision = 'C';   // Good engagement (top 40%)
+    else if (weightedScore >= 1) precision = 'D';   // Moderate engagement (above average)
     else precision = 'E';                           // Low engagement
     
     precisionDetail = `Quality: ${weightedScore.toFixed(1)}`;
@@ -245,10 +245,10 @@ async function calculateFarcasterStats(profile: any): Promise<any> {
   // E. RANGE
   const totalEngagement = profile.likesReceived + profile.recastsReceived;
   let range = 'E';
-  if (totalEngagement > 50000) range = 'A';
-  else if (totalEngagement > 10000) range = 'B';
-  else if (totalEngagement > 2000) range = 'C';
-  else if (totalEngagement > 500) range = 'D';
+  if (totalEngagement > 10000) range = 'A';
+  else if (totalEngagement > 3000) range = 'B';
+  else if (totalEngagement > 1000) range = 'C';
+  else if (totalEngagement > 200) range = 'D';
 
   const rangeDetail = `Engage: ${totalEngagement}`;
 
