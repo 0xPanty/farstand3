@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+﻿import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenAI, Type } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -64,25 +64,25 @@ async function generateStandProfile(
   const modelId = "gemini-2.5-flash";
 
   const statInstruction = forcedStats 
-    ? `
+    ? 
       CRITICAL INSTRUCTION:
       You MUST use the following Stats for the Stand. DO NOT GENERATE RANDOM STATS.
-      - Power: ${forcedStats.power}
-      - Speed: ${forcedStats.speed}
-      - Range: ${forcedStats.range}
-      - Durability: ${forcedStats.durability}
-      - Precision: ${forcedStats.precision}
-      - Potential: ${forcedStats.potential}
+      - Power: 
+      - Speed: 
+      - Range: 
+      - Durability: 
+      - Precision: 
+      - Potential: 
       
       However, you MUST still interpret WHY these stats are the way they are based on the user's visual vibe + bio.
-    ` 
+     
     : "Determine the stats (A-E) based on the 'aura' and intensity of the person in the image.";
 
   const bioInstruction = userBio 
-    ? `The user's personality/bio is: "${userBio}". Use this to theme the Stand Name and Ability.` 
+    ? The user's personality/bio is: "". Use this to theme the Stand Name and Ability. 
     : "";
 
-  const systemInstruction = `
+  const systemInstruction = 
     You are a specialized AI for "JoJo's Bizarre Adventure" (Hirohiko Araki Style).
     
     TASK:
@@ -103,13 +103,13 @@ async function generateStandProfile(
     5. **COMPOSITION**: Vertical Manga Illustration. Dynamic duo composition.
     6. **SFX**: Include Japanese manga sound effects (ゴゴゴ, ドドーン) in the background.
 
-    ${statInstruction}
-    ${bioInstruction}
+    
+    
 
     JSON OUTPUT REQUIRED.
-  `;
+  ;
 
-  const prompt = `
+  const prompt = 
     Analyze this image.
     
     1. **IDENTIFY GENDER FIRST (CRITICAL)**: Carefully analyze the person in the image to determine their gender.
@@ -131,7 +131,7 @@ async function generateStandProfile(
        - **Composition**: "The Stand and User are visually connected, creating a cohesive silhouette. Thick black contour lines, vibrant colors, heavy manga shading."
        - **Background**: "Psychadelic patterns, manga speed lines, floating Katakana SFX 'ゴゴゴ'."
        - **Constraint**: "NO TEXT, NO TITLES, NO LOGOS. Pure Illustration."
-  `;
+  ;
 
   const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
 
@@ -174,13 +174,77 @@ async function generateStandProfile(
     }
   });
 
+  // ==========================================
+  // 🔧 IMPROVED: Enhanced JSON parsing with error handling
+  // ==========================================
   const text = response.text;
-  if (!text) throw new Error("No response from Gemini.");
+  if (!text) {
+    console.error('❌ Empty response from Gemini API');
+    throw new Error("No response from Gemini. Please try again.");
+  }
   
-  const result = JSON.parse(text);
+  // Clean potential markdown code blocks or extra whitespace
+  let cleanText = text.trim();
+  if (cleanText.startsWith('`json')) {
+    cleanText = cleanText.replace(/^`json\n?/, '').replace(/\n?`$/, '');
+  } else if (cleanText.startsWith('`')) {
+    cleanText = cleanText.replace(/^`\n?/, '').replace(/\n?`$/, '');
+  }
+  
+  // Parse JSON with detailed error handling
+  let result: any;
+  try {
+    result = JSON.parse(cleanText);
+  } catch (parseError: any) {
+    console.error('❌ JSON Parse Error:', parseError.message);
+    console.error('📄 Raw response (first 500 chars):', text.substring(0, 500));
+    console.error('📄 Cleaned text (first 500 chars):', cleanText.substring(0, 500));
+    throw new Error('Failed to parse AI response. The image may be unclear - please try uploading a clearer photo with better lighting.');
+  }
+  
+  // Validate and fix gender field
+  if (!result.gender || !['MALE', 'FEMALE'].includes(result.gender.toUpperCase())) {
+    console.warn('⚠️ Invalid or missing gender value:', result.gender, '- defaulting to MALE');
+    result.gender = 'MALE';
+  } else {
+    // Normalize to uppercase
+    result.gender = result.gender.toUpperCase();
+  }
+  
+  // Validate required fields
+  const requiredFields = ['standName', 'userAnalysis', 'standDescription', 'ability', 'battleCry', 'stats', 'visualPrompt'];
+  const missingFields = requiredFields.filter(field => !result[field]);
+  if (missingFields.length > 0) {
+    console.error('❌ Missing required fields:', missingFields);
+    throw new Error(Incomplete AI response (missing: ). Please try again with a different photo.);
+  }
+  
+  // Validate stats object
+  if (!result.stats || typeof result.stats !== 'object') {
+    console.error('❌ Invalid stats object:', result.stats);
+    throw new Error('Invalid stats generated. Please try again.');
+  }
+  
+  const statFields = ['power', 'speed', 'range', 'durability', 'precision', 'potential'];
+  const validStatValues = ['A', 'B', 'C', 'D', 'E', 'N/A'];
+  for (const statField of statFields) {
+    if (!result.stats[statField] || !validStatValues.includes(result.stats[statField])) {
+      console.warn(⚠️ Invalid stat value for :, result.stats[statField], '- defaulting to C');
+      result.stats[statField] = 'C';
+    }
+  }
+  
+  // Override with forced stats if provided
   if (forcedStats) {
+    console.log('✅ Applying forced stats from Farcaster data');
     result.stats = forcedStats;
   }
+  
+  console.log('✅ Stand profile generated successfully:', {
+    standName: result.standName,
+    gender: result.gender,
+    stats: result.stats
+  });
   
   return result;
 }
@@ -193,8 +257,8 @@ async function generateStandVisuals(originalImageBase64: string, visualPrompt: s
 
   const cleanBase64 = originalImageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
 
-  const finalPrompt = `
-    ${visualPrompt}
+  const finalPrompt = 
+    
     
     CRITICAL ART DIRECTION (ARAKI STYLE):
     1. **MANDATORY: FULL COLOR ILLUSTRATION** - This MUST be a vibrant, fully colored artwork. NO black-and-white sketches, NO grayscale. Use rich, saturated colors.
@@ -207,7 +271,7 @@ async function generateStandVisuals(originalImageBase64: string, visualPrompt: s
     7. **FACE**: Sharp jawline, detailed eyes, heavy shading lines on face with full color rendering.
     8. **COLORS**: Bizarre, high-contrast color palettes (e.g. green lips, purple skies, bold outfit colors).
     9. **RENDERING QUALITY**: Professional manga colorization with cell-shading, highlights, and shadows. NOT a rough sketch.
-  `;
+  ;
 
   const response = await ai.models.generateContent({
     model: modelId,
@@ -236,7 +300,7 @@ async function generateStandVisuals(originalImageBase64: string, visualPrompt: s
 
   for (const part of parts) {
     if (part.inlineData && part.inlineData.data) {
-      return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+      return data:;base64,;
     }
   }
   
@@ -251,7 +315,7 @@ async function generateSketchImage(standImageBase64: string): Promise<string> {
 
   const cleanBase64 = standImageBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
 
-  const sketchPrompt = `
+  const sketchPrompt = 
     Create a HAND-DRAWN PENCIL SKETCH portrait of the character in this image.
     
     CRITICAL REQUIREMENTS:
@@ -270,7 +334,7 @@ async function generateSketchImage(standImageBase64: string): Promise<string> {
     7. **WARM TONES** - Use sepia/brown tones for the pencil work, not pure black. Like a graphite or charcoal sketch on cream paper.
     
     DO NOT make it look AI-generated or too clean. It should look like a human artist drew it quickly but skillfully.
-  `;
+  ;
 
   const response = await ai.models.generateContent({
     model: modelId,
@@ -299,7 +363,7 @@ async function generateSketchImage(standImageBase64: string): Promise<string> {
 
   for (const part of parts) {
     if (part.inlineData && part.inlineData.data) {
-      return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+      return data:;base64,;
     }
   }
   

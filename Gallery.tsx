@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { ArrowLeft, Loader, Users, Sparkles } from 'lucide-react';
 import type { StandResult } from './types';
 
@@ -30,6 +30,7 @@ export default function Gallery({ onBack }: GalleryProps) {
   const [selectedStand, setSelectedStand] = useState<GalleryStand | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
+  const [imageErrors, setImageErrors] = useState<Set<number>>(new Set()); // Track failed images
   const limit = 20;
 
   useEffect(() => {
@@ -39,7 +40,7 @@ export default function Gallery({ onBack }: GalleryProps) {
   const loadGallery = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/get-gallery?limit=${limit}&offset=${offset}`);
+      const response = await fetch(/api/get-gallery?limit=&offset=);
       const data = await response.json();
 
       if (data.success) {
@@ -58,6 +59,11 @@ export default function Gallery({ onBack }: GalleryProps) {
   const loadMore = () => {
     setOffset(prev => prev + limit);
     loadGallery();
+  };
+
+  // 🔧 NEW: Handle image load error
+  const handleImageError = (standId: number) => {
+    setImageErrors(prev => new Set(prev).add(standId));
   };
 
   if (error) {
@@ -112,17 +118,23 @@ export default function Gallery({ onBack }: GalleryProps) {
                   onClick={() => setSelectedStand(stand)}
                   className="group cursor-pointer bg-black/40 border-2 border-[#db2777]/30 hover:border-[#fbbf24] rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(251,191,36,0.3)]"
                 >
-                  {/* Stand Image */}
+                  {/* Stand Image - 🔧 IMPROVED: Add error handling */}
                   <div className="aspect-square bg-gradient-to-br from-[#1a0b2e] to-[#2e003e] relative overflow-hidden">
-                    {stand.stand_image_url ? (
+                    {stand.stand_image_url && !imageErrors.has(stand.id) ? (
                       <img 
                         src={stand.stand_image_url} 
                         alt={stand.stand_name}
                         className="w-full h-full object-cover"
+                        onError={() => handleImageError(stand.id)}
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-4">
                         <Sparkles className="text-[#db2777] opacity-30" size={64} />
+                        {imageErrors.has(stand.id) && (
+                          <p className="text-xs text-gray-500 text-center">
+                            Image unavailable
+                          </p>
+                        )}
                       </div>
                     )}
                     
@@ -143,6 +155,10 @@ export default function Gallery({ onBack }: GalleryProps) {
                         src={stand.pfp_url} 
                         alt={stand.display_name}
                         className="w-6 h-6 rounded-full border border-[#db2777]"
+                        onError={(e) => {
+                          // Fallback for broken profile pictures
+                          (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="50" fill="%23db2777"/%3E%3C/svg%3E';
+                        }}
                       />
                       <p className="text-sm text-gray-400 truncate">
                         @{stand.username}
@@ -211,6 +227,9 @@ export default function Gallery({ onBack }: GalleryProps) {
                   src={selectedStand.pfp_url}
                   alt={selectedStand.display_name}
                   className="w-10 h-10 rounded-full border-2 border-[#fbbf24]"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="50" fill="%23db2777"/%3E%3C/svg%3E';
+                  }}
                 />
                 <div>
                   <p className="font-bold">{selectedStand.display_name}</p>
@@ -221,18 +240,24 @@ export default function Gallery({ onBack }: GalleryProps) {
                 onClick={() => setSelectedStand(null)}
                 className="text-2xl hover:text-[#db2777] transition-colors"
               >
-                ✕
+                ×
               </button>
             </div>
 
-            {/* Image */}
+            {/* Image - 🔧 IMPROVED: Add error handling for detail view */}
             <div className="p-4">
-              {selectedStand.stand_image_url && (
+              {selectedStand.stand_image_url && !imageErrors.has(selectedStand.id) ? (
                 <img 
                   src={selectedStand.stand_image_url}
                   alt={selectedStand.stand_name}
                   className="w-full rounded-lg border-2 border-[#db2777]"
+                  onError={() => handleImageError(selectedStand.id)}
                 />
+              ) : (
+                <div className="w-full aspect-square bg-gradient-to-br from-[#1a0b2e] to-[#2e003e] rounded-lg border-2 border-[#db2777]/30 flex flex-col items-center justify-center gap-3">
+                  <Sparkles className="text-[#db2777] opacity-30" size={80} />
+                  <p className="text-gray-500 text-sm">Image unavailable (old storage link)</p>
+                </div>
               )}
             </div>
 
