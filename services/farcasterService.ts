@@ -1,105 +1,24 @@
+import { FarcasterProfile, StandStats, StandStatRawValues } from "../types";
 
-import { FarcasterProfile, StandStats, StatValue, StandStatRawValues } from "../types";
-
-const NEYNAR_API_KEY = import.meta.env.VITE_NEYNAR_API_KEY;
-
-if (!NEYNAR_API_KEY) {
-  console.error("⚠️ VITE_NEYNAR_API_KEY is not set in environment variables!");
-}
-// Use Base chain RPC instead of Ethereum mainnet (Farcaster users are more active on Base)
-const BASE_RPC_URL = "https://mainnet.base.org";
+// API base URL - use relative path for same-origin, or full URL for production
+const API_BASE_URL = import.meta.env.PROD 
+  ? '' // In production, use relative path (same domain)
+  : ''; // In development, also use relative path (Vite proxy can handle it)
 
 // ==========================================
-// 1. Fetch User Data (with extended viewer_fid for more stats)
+// Fetch user data and stats from backend API
+// This keeps the Neynar API key secure on the server side
 // ==========================================
-export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile & { score?: number } | null> => {
+export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile | null> => {
   try {
-    // Use viewer_fid to get more context, and x-neynar-experimental for score
-    const response = await fetch(
-      `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fid}&viewer_fid=${fid}`,
-      {
-        headers: {
-          accept: "application/json",
-          "x-api-key": NEYNAR_API_KEY,
-          "x-neynar-experimental": "true",
-        },
-      }
-    );
-
-    if (!response.ok) throw new Error("Failed to fetch Farcaster user");
-
+    const response = await fetch(`${API_BASE_URL}/api/farcaster?fid=${fid}`);
+    
+    if (!response.ok) {
+      throw new Error(`API returned ${response.status}`);
+    }
+    
     const data = await response.json();
-    const user = data.users?.[0];
-
-    if (!user) return null;
-
-    // Fetch engagement from Neynar API (paid plan)
-    let likesReceived = 0;
-    let recastsReceived = 0;
-    let repliesReceived = 0;
-    let sampledCastCount = 0; // Track actual number of casts we sampled
-    
-    try {
-      const castsResponse = await fetch(
-        `https://api.neynar.com/v2/farcaster/feed/user/casts?fid=${fid}&limit=150`,
-        {
-          headers: {
-            accept: "application/json",
-            "x-api-key": NEYNAR_API_KEY,
-          },
-        }
-      );
-      if (castsResponse.ok) {
-        const castsData = await castsResponse.json();
-        sampledCastCount = castsData.casts?.length || 0;
-        castsData.casts?.forEach((cast: any) => {
-          likesReceived += cast.reactions?.likes_count || 0;
-          recastsReceived += cast.reactions?.recasts_count || 0;
-          repliesReceived += cast.replies?.count || 0;
-        });
-      }
-    } catch (e) {
-      console.warn("Neynar API fetch failed:", e);
-    }
-    
-    // Fetch real cast count from Hub API (with pagination)
-    let castCount = 0;
-    try {
-      let nextPageToken: string | null = null;
-      do {
-        const url = `https://hub.pinata.cloud/v1/castsByFid?fid=${fid}&pageSize=1000${nextPageToken ? `&pageToken=${nextPageToken}` : ''}`;
-        const hubResponse = await fetch(url);
-        if (hubResponse.ok) {
-          const hubData = await hubResponse.json();
-          castCount += hubData.messages?.filter(
-            (m: any) => m.data?.type === 'MESSAGE_TYPE_CAST_ADD'
-          ).length || 0;
-          nextPageToken = hubData.nextPageToken || null;
-        } else {
-          break;
-        }
-      } while (nextPageToken);
-    } catch (e) {
-      console.warn("Hub API fetch failed:", e);
-    }
-
-    return {
-      fid: user.fid,
-      username: user.username,
-      displayName: user.display_name,
-      bio: user.profile?.bio?.text || "",
-      pfpUrl: user.pfp_url,
-      followerCount: user.follower_count || 0,
-      followingCount: user.following_count || 0,
-      castCount,
-      sampledCastCount, // CRITICAL: Must return this!
-      likesReceived,
-      recastsReceived,
-      repliesReceived,
-      verifications: user.verifications || [],
-      powerBadge: user.power_badge || false,
-      score: user.experimental?.neynar_user_score || user.score,
-    };
+    return data.profile || null;
   } catch (error) {
     console.error("Farcaster Fetch Error:", error);
     return null;
@@ -107,192 +26,95 @@ export const fetchFarcasterUser = async (fid: number): Promise<FarcasterProfile 
 };
 
 // ==========================================
-// 2. Get ALL Transaction Count from Base L2 (both sent and received)
+// Fetch complete data (profile + stats) from backend API
 // ==========================================
-const getBaseTransactionCount = async (address: string): Promise<number> => {
+export const fetchFarcasterData = async (fid: number): Promise<{
+  profile: FarcasterProfile;
+  stats: StandStats;
+  details: StandStatRawValues;
+} | null> => {
   try {
-    // Use BaseScan API to get total transaction count (including received transactions)
-    // Fetch max 10000 transactions to get a good estimate
-    const response = await fetch(
-      `https://api.basescan.org/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc`
-    );
+    const response = await fetch(`${API_BASE_URL}/api/farcaster?fid=${fid}`);
     
     if (!response.ok) {
-      throw new Error("BaseScan API request failed");
+      throw new Error(`API returned ${response.status}`);
     }
     
     const data = await response.json();
     
-    // BaseScan API returns status "1" for success, even without API key (rate limited but works)
-    if (data.status === "1" && Array.isArray(data.result)) {
-      // Return actual transaction count
-      // If it's exactly 10000, there might be more, but that's already a lot
-      return data.result.length;
+    if (!data.profile) {
+      return null;
     }
     
-    // If API rate limit or other error, fallback to RPC method (only outgoing transactions)
-    console.warn("BaseScan API response not OK, falling back to RPC", data.message);
-    const rpcResponse = await fetch(BASE_RPC_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        method: "eth_getTransactionCount",
-        params: [address, "latest"],
-        id: 1,
-      }),
-    });
-    
-    if (rpcResponse.ok) {
-      const rpcData = await rpcResponse.json();
-      if (rpcData.result) {
-        const count = parseInt(rpcData.result, 16);
-        return isNaN(count) ? 0 : count;
-      }
-    }
-    
-    return 0;
-    
-  } catch (e) {
-    console.warn("Base transaction fetch failed, using fallback", e);
-    return 0;
+    return {
+      profile: data.profile,
+      stats: data.stats,
+      details: data.details
+    };
+  } catch (error) {
+    console.error("Farcaster Data Fetch Error:", error);
+    return null;
   }
 };
 
 // ==========================================
-// 3. Calculate Stats
+// Calculate stats - now just a wrapper that calls the backend
+// Kept for backward compatibility if any code still uses it
 // ==========================================
 export const calculateFarcasterStats = async (profile: FarcasterProfile & { score?: number }): Promise<{ stats: StandStats; details: StandStatRawValues }> => {
+  // If we already have the profile, fetch the full data from API
+  const data = await fetchFarcasterData(profile.fid);
   
-  // A. POWER (Neynar Score / Social Capital)
-  // Neynar score is 0-1, so multiply by 100 for percentage
-  let power: StatValue = 'E';
-  const scorePercent = profile.score ? profile.score * 100 : 0;
-  
-  if (scorePercent > 0) {
-      if (scorePercent > 90) power = 'A';
-      else if (scorePercent > 70) power = 'B';
-      else if (scorePercent > 50) power = 'C';
-      else if (scorePercent > 30) power = 'D';
-  } else {
-      if (profile.powerBadge) power = 'A';
-      else if (profile.followerCount > 5000) power = 'A';
-      else if (profile.followerCount > 1000) power = 'B';
-      else if (profile.followerCount > 200) power = 'C';
-      else if (profile.followerCount > 50) power = 'D';
+  if (data) {
+    return {
+      stats: data.stats,
+      details: data.details
+    };
   }
-
-  // Display Detail: Prefer Score (as percentage), fall back to Followers
-  const powerDetail = profile.score 
-    ? `Score: ${scorePercent.toFixed(0)}%` 
-    : (profile.powerBadge ? "Power Badge" : `Followers: ${profile.followerCount}`);
-
-  // B. SPEED (Activity Rate - Base L2 transaction count or Cast frequency)
-  let txCount = 0;
-  let speedDetail = 'No data';
   
-  // Try to get Base L2 transaction count first (using first verified wallet)
-  if (profile.verifications.length > 0) {
-    txCount = await getBaseTransactionCount(profile.verifications[0]);
-  }
+  // Fallback: generate basic stats locally if API fails
+  return generateFallbackStats(profile);
+};
 
-  let speed: StatValue = 'E';
+// ==========================================
+// Fallback stats generation (no API needed)
+// ==========================================
+function generateFallbackStats(profile: FarcasterProfile & { score?: number }): { stats: StandStats; details: StandStatRawValues } {
+  type StatValue = 'A' | 'B' | 'C' | 'D' | 'E';
   
-  // If we have transaction data, use it
-  if (txCount > 0) {
-    if (txCount > 500) speed = 'A';
-    else if (txCount > 100) speed = 'B';
-    else if (txCount > 20) speed = 'C';
-    else if (txCount > 0) speed = 'D';
-    speedDetail = `${txCount} Txns`;  // All transactions (sent + received) from BaseScan
-  } else {
-    // Fallback: Use cast activity rate as speed indicator
-    // Higher cast count = more active = faster
-    const castCount = profile.castCount || 0;
-    if (castCount > 5000) speed = 'A';
-    else if (castCount > 2000) speed = 'B';
-    else if (castCount > 500) speed = 'C';
-    else if (castCount > 100) speed = 'D';
-    speedDetail = `${castCount} Casts`;
-  }
+  const getGrade = (value: number, thresholds: number[]): StatValue => {
+    if (value > thresholds[0]) return 'A';
+    if (value > thresholds[1]) return 'B';
+    if (value > thresholds[2]) return 'C';
+    if (value > thresholds[3]) return 'D';
+    return 'E';
+  };
 
-  // C. DURABILITY (Cast Count) - 调整门槛更合理
-  let durability: StatValue = 'E';
-  if (profile.castCount > 3000) durability = 'A';
-  else if (profile.castCount > 1000) durability = 'B';
-  else if (profile.castCount > 300) durability = 'C';
-  else if (profile.castCount > 50) durability = 'D';
-
-  const durabilityDetail = `${profile.castCount} Casts`;
-
-  // D. PRECISION (Engagement Quality Score - Weighted: Likes + Recasts×2 + Replies×3)
-  let precision: StatValue = 'E';
-  let precisionDetail = 'No data';
+  const power: StatValue = profile.powerBadge ? 'A' : getGrade(profile.followerCount, [5000, 1000, 200, 50]);
+  const speed: StatValue = getGrade(profile.castCount, [5000, 2000, 500, 100]);
+  const durability: StatValue = getGrade(profile.castCount, [3000, 1000, 300, 50]);
+  const range: StatValue = getGrade(profile.likesReceived + profile.recastsReceived, [1000, 500, 300, 150]);
   
-  // Use sampledCastCount if available, otherwise fall back to total castCount
-  const castsForCalculation = profile.sampledCastCount || profile.castCount;
+  const castsForCalc = profile.sampledCastCount || profile.castCount || 1;
+  const qualityScore = ((profile.likesReceived || 0) + (profile.recastsReceived || 0) * 2 + (profile.repliesReceived || 0) * 3) / castsForCalc;
+  const precision: StatValue = getGrade(qualityScore, [20, 10, 5, 2]);
   
-  console.log('🔍 PRECISION DEBUG:', {
-    sampledCastCount: profile.sampledCastCount,
-    totalCastCount: profile.castCount,
-    castsForCalculation,
-    likes: profile.likesReceived,
-    recasts: profile.recastsReceived,
-    replies: profile.repliesReceived
-  });
-  
-  if (castsForCalculation > 0) {
-    // Calculate weighted engagement score per cast (using sampled data)
-    // Replies are most valuable (show discussion), Recasts are medium, Likes are baseline
-    const weightedScore = (
-      (profile.likesReceived || 0) + 
-      (profile.recastsReceived || 0) * 2 + 
-      (profile.repliesReceived || 0) * 3
-    ) / castsForCalculation;
-    
-    // Determine precision grade based on weighted quality score (adjusted for Farcaster reality)
-    if (weightedScore >= 20) precision = 'A';       // Viral quality content (top 5%)
-    else if (weightedScore >= 10) precision = 'B';  // High quality engagement (top 15%)
-    else if (weightedScore >= 5) precision = 'C';   // Good engagement (top 40%)
-    else if (weightedScore >= 2) precision = 'D';   // Moderate engagement (above average)
-    else precision = 'E';                           // Low engagement
-    
-    precisionDetail = `Quality: ${weightedScore.toFixed(1)}`;
-  } else {
-    // Fallback for users with no casts
-    precisionDetail = 'No casts';
-  }
-
-  // E. RANGE (Engagement - Likes + Recasts)
-  const totalEngagement = profile.likesReceived + profile.recastsReceived;
-  let range: StatValue = 'E';
-  if (totalEngagement > 1000) range = 'A';
-  else if (totalEngagement > 500) range = 'B';
-  else if (totalEngagement > 300) range = 'C';
-  else if (totalEngagement > 150) range = 'D';
-  else if (totalEngagement > 50) range = 'E';
-
-  const rangeDetail = `Engage: ${totalEngagement}`;
-
-  // F. POTENTIAL (FID Age)
-  let potential: StatValue = 'E';
-  if (profile.fid > 400000) potential = 'A'; // Very new
+  let potential: StatValue;
+  if (profile.fid > 400000) potential = 'A';
   else if (profile.fid > 200000) potential = 'B';
   else if (profile.fid > 15000) potential = 'C';
   else if (profile.fid > 2000) potential = 'D';
-  else potential = 'E'; // OG
+  else potential = 'E';
 
-  const potentialDetail = `FID: ${profile.fid}`;
-
-  return { 
-    stats: { power, speed, durability, precision, range, potential },
-    details: { 
-      power: powerDetail, 
-      speed: speedDetail, 
-      durability: durabilityDetail,
-      precision: precisionDetail,
-      range: rangeDetail,
-      potential: potentialDetail
+  return {
+    stats: { power, speed, range, durability, precision, potential },
+    details: {
+      power: profile.score ? `Score: ${(profile.score * 100).toFixed(0)}%` : `Followers: ${profile.followerCount}`,
+      speed: `${profile.castCount} Casts`,
+      range: `Engage: ${profile.likesReceived + profile.recastsReceived}`,
+      durability: `${profile.castCount} Casts`,
+      precision: `Quality: ${qualityScore.toFixed(1)}`,
+      potential: `FID: ${profile.fid}`
     }
   };
-};
+}
