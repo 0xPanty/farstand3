@@ -174,7 +174,7 @@ async function fetchFarcasterUser(fid: number): Promise<any> {
     try {
       // 🔥 优化：减少 limit 从 150 到 25
       const castsResponse = await fetch(
-        `https://api.neynar.com/v2/farcaster/feed/user/${fid}/casts?limit=25`,
+        `https://api.neynar.com/v2/farcaster/feed/user/casts?fid=${fid}&limit=50`,
         {
           headers: {
             accept: "application/json",
