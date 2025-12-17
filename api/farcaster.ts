@@ -1,9 +1,8 @@
-﻿import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY;
-const ETH_RPC_URL = "https://cloudflare-eth.com";
 
-// 🔥 缓存机制
+// 缓存机制
 const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000;
 
@@ -24,209 +23,155 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const { fid } = req.query;
-
     if (!fid) {
       return res.status(400).json({ error: 'Missing fid parameter' });
     }
 
     const cacheKey = `user_${fid}`;
-    
-    // 检查缓存
     const cached = cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-      console.log(`✅ Cache hit for FID ${fid}`);
       return res.status(200).json(cached.data);
     }
 
-    // 🔥 TRY-CATCH: 尝试获取真实数据，失败则降级
     try {
-      console.log(`📡 Fetching data for FID ${fid}`);
       const profile = await fetchFarcasterUser(Number(fid));
-      
       if (profile) {
         const calculatedData = await calculateFarcasterStats(profile);
-        
-        const result = {
-          profile,
-          stats: calculatedData.stats,
-          details: calculatedData.details
-        };
-
-        // 存入缓存
-        cache.set(cacheKey, {
-          data: result,
-          timestamp: Date.now()
-        });
-
+        const result = { profile, stats: calculatedData.stats, details: calculatedData.details };
+        cache.set(cacheKey, { data: result, timestamp: Date.now() });
         return res.status(200).json(result);
       }
     } catch (neynarError) {
-      console.error('⚠️ Neynar API failed (quota exceeded), using fallback:', neynarError);
+      console.error('Neynar API failed:', neynarError);
     }
 
-    // 🔥 降级方案：使用简单算法生成数值（不依赖 API）
-    console.log(`🔧 Using fallback stats for FID ${fid}`);
     const fallbackData = generateFallbackStats(Number(fid));
-    
-    // 缓存降级数据（较短时间）
-    cache.set(cacheKey, {
-      data: fallbackData,
-      timestamp: Date.now()
-    });
-
+    cache.set(cacheKey, { data: fallbackData, timestamp: Date.now() });
     return res.status(200).json(fallbackData);
 
   } catch (error: any) {
-    console.error('❌ Handler Error:', error);
-    
-    // 最后的兜底
     const { fid } = req.query;
     return res.status(200).json(generateFallbackStats(Number(fid)));
   }
 }
 
-// 🔥 降级方案：基于 FID 生成合理的数值
+// ==========================================
+// 降级方案
+// ==========================================
 function generateFallbackStats(fid: number) {
-  // 使用 FID 作为随机种子，生成一致的数值
   const seed = fid % 100;
+  const grades: Array<'A' | 'B' | 'C' | 'D' | 'E'> = ['A', 'B', 'C', 'D', 'E'];
   
-  // 根据 FID 范围判断用户新老程度
   let potential: 'A' | 'B' | 'C' | 'D' | 'E';
-  if (fid > 400000) potential = 'A'; // 新用户
+  if (fid > 400000) potential = 'A';
   else if (fid > 200000) potential = 'B';
   else if (fid > 15000) potential = 'C';
   else if (fid > 2000) potential = 'D';
-  else potential = 'E'; // OG 用户
-
-  // 基于种子生成其他数值
-  const grades: Array<'A' | 'B' | 'C' | 'D' | 'E'> = ['A', 'B', 'C', 'D', 'E'];
-  const power = grades[seed % 5];
-  const speed = grades[(seed + 1) % 5];
-  const range = grades[(seed + 2) % 5];
-  const durability = grades[(seed + 3) % 5];
-  const precision = grades[(seed + 4) % 5];
+  else potential = 'E';
 
   return {
     profile: {
-      fid: fid,
-      username: `user_${fid}`,
-      displayName: `User ${fid}`,
-      bio: '',
-      pfpUrl: '',
-      followerCount: seed * 10,
-      followingCount: seed * 5,
-      castCount: seed * 20,
-      likesReceived: seed * 15,
-      recastsReceived: seed * 5,
-      repliesReceived: seed * 3,
-      verifications: [],
-      powerBadge: seed > 80
+      fid, username: `user_${fid}`, displayName: `User ${fid}`,
+      bio: '', pfpUrl: '', followerCount: seed * 10, followingCount: seed * 5,
+      castCount: seed * 20, likesReceived: seed * 15, recastsReceived: seed * 5,
+      repliesReceived: seed * 3, verifications: [], powerBadge: false, score: seed / 100
     },
     stats: {
-      power,
-      speed,
-      range,
-      durability,
-      precision,
-      potential
+      power: grades[seed % 5], speed: grades[(seed + 1) % 5], range: grades[(seed + 2) % 5],
+      durability: grades[(seed + 3) % 5], precision: grades[(seed + 4) % 5], potential
     },
     details: {
-      power: `Calculated: ${seed * 10} followers`,
-      speed: `Calculated: ${seed * 20} casts`,
-      range: `Calculated: ${seed * 20} engagement`,
-      durability: `Calculated: ${seed * 20} casts`,
-      precision: `Calculated: Quality ${(seed / 10).toFixed(1)}`,
-      potential: `FID: ${fid}`
+      power: `Score: ${seed}%`, speed: `${seed} Txns`, range: `Engage: ${seed * 20}`,
+      durability: `${seed * 20} Casts`, precision: `Quality: ${(seed / 10).toFixed(1)}`, potential: `FID: ${fid}`
     }
   };
 }
 
 // ==========================================
-// 以下是原有的函数，保持不变但添加优化
+// 获取 Base L2 交易数量
 // ==========================================
-
-async function fetchFarcasterUser(fid: number): Promise<any> {
+async function getBaseTransactionCount(address: string): Promise<number> {
   try {
     const response = await fetch(
-      `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fid}&viewer_fid=${fid}`,
-      {
-        headers: {
-          accept: "application/json",
-          "x-api-key": NEYNAR_API_KEY || "",
-          "x-neynar-experimental": "true",
-        },
-      }
+      `https://api.basescan.org/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=1000&sort=asc`
     );
-
-    if (!response.ok) throw new Error(`API returned ${response.status}`);
-
+    if (!response.ok) return 0;
     const data = await response.json();
-    const user = data.users?.[0];
-
-    if (!user) return null;
-
-    let castCount = 0;
-    let sampledCastCount = 0;
-    let likesReceived = 0;
-    let recastsReceived = 0;
-    let repliesReceived = 0;
-    
-    try {
-      // 🔥 优化：减少 limit 从 150 到 25
-      const castsResponse = await fetch(
-        `https://api.neynar.com/v2/farcaster/feed/user/casts?fid=${fid}&limit=50`,
-        {
-          headers: {
-            accept: "application/json",
-            "x-api-key": NEYNAR_API_KEY || "",
-          },
-        }
-      );
-      if (castsResponse.ok) {
-        const castsData = await castsResponse.json();
-        sampledCastCount = castsData.casts?.length || 0;
-        castCount = user.cast_count || sampledCastCount;
-        castsData.casts?.forEach((cast: any) => {
-          likesReceived += cast.reactions?.likes_count || 0;
-          recastsReceived += cast.reactions?.recasts_count || 0;
-          repliesReceived += cast.replies?.count || 0;
-        });
-      }
-    } catch (e) {
-      console.warn("Casts fetch failed:", e);
+    if (data.status === "1" && Array.isArray(data.result)) {
+      return data.result.length;
     }
-    
-    // 🔥 优化：移除 Hub API 调用
-    castCount = user.cast_count || sampledCastCount || 0;
-
-    return {
-      fid: user.fid,
-      username: user.username,
-      displayName: user.display_name,
-      bio: user.profile?.bio?.text || "",
-      pfpUrl: user.pfp_url,
-      followerCount: user.follower_count || 0,
-      followingCount: user.following_count || 0,
-      castCount,
-      sampledCastCount,
-      likesReceived,
-      recastsReceived,
-      repliesReceived,
-      verifications: user.verifications || [],
-      powerBadge: user.power_badge || false,
-      score: user.experimental?.neynar_user_score || user.score,
-    };
-  } catch (error) {
-    console.error("fetchFarcasterUser Error:", error);
-    throw error;
+    return 0;
+  } catch (e) {
+    return 0;
   }
 }
 
+// ==========================================
+// 获取 Farcaster 用户数据
+// ==========================================
+async function fetchFarcasterUser(fid: number): Promise<any> {
+  const response = await fetch(
+    `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fid}&viewer_fid=${fid}`,
+    {
+      headers: {
+        accept: "application/json",
+        "x-api-key": NEYNAR_API_KEY || "",
+        "x-neynar-experimental": "true",
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error(`API returned ${response.status}`);
+  const data = await response.json();
+  const user = data.users?.[0];
+  if (!user) return null;
+
+  let castCount = user.cast_count || 0;
+  let sampledCastCount = 0;
+  let likesReceived = 0;
+  let recastsReceived = 0;
+  let repliesReceived = 0;
+
+  // 只采样 10 条 Cast (省 API)
+  try {
+    const castsResponse = await fetch(
+      `https://api.neynar.com/v2/farcaster/feed/user/casts?fid=${fid}&limit=10`,
+      { headers: { accept: "application/json", "x-api-key": NEYNAR_API_KEY || "" } }
+    );
+    if (castsResponse.ok) {
+      const castsData = await castsResponse.json();
+      sampledCastCount = castsData.casts?.length || 0;
+      castsData.casts?.forEach((cast: any) => {
+        likesReceived += cast.reactions?.likes_count || 0;
+        recastsReceived += cast.reactions?.recasts_count || 0;
+        repliesReceived += cast.replies?.count || 0;
+      });
+    }
+  } catch (e) {}
+
+  return {
+    fid: user.fid,
+    username: user.username,
+    displayName: user.display_name,
+    bio: user.profile?.bio?.text || "",
+    pfpUrl: user.pfp_url,
+    followerCount: user.follower_count || 0,
+    followingCount: user.following_count || 0,
+    castCount,
+    sampledCastCount,
+    likesReceived,
+    recastsReceived,
+    repliesReceived,
+    verifications: user.verifications || [],
+    powerBadge: user.power_badge || false,
+    score: user.experimental?.neynar_user_score || user.score,
+  };
+}
+
+// ==========================================
+// 计算 Stand 属性
+// ==========================================
 async function calculateFarcasterStats(profile: any): Promise<any> {
-  // 原有的计算逻辑保持不变
-  // ... (这里保持你原来的代码)
-  
-  // 为了简化，这里提供一个简化版本
   const getGrade = (value: number, thresholds: number[]): 'A' | 'B' | 'C' | 'D' | 'E' => {
     if (value > thresholds[0]) return 'A';
     if (value > thresholds[1]) return 'B';
@@ -235,31 +180,56 @@ async function calculateFarcasterStats(profile: any): Promise<any> {
     return 'E';
   };
 
-  const power = profile.powerBadge ? 'A' : getGrade(profile.followerCount, [5000, 1000, 200, 50]);
-  const speed = getGrade(profile.castCount, [5000, 2000, 500, 100]);
-  const durability = getGrade(profile.castCount, [3000, 1000, 300, 50]);
-  const range = getGrade(profile.likesReceived + profile.recastsReceived, [1000, 500, 300, 150]);
-  
-  const castsForCalc = profile.sampledCastCount || profile.castCount || 1;
-  const qualityScore = ((profile.likesReceived || 0) + (profile.recastsReceived || 0) * 2 + (profile.repliesReceived || 0) * 3) / castsForCalc;
-  const precision = getGrade(qualityScore, [20, 10, 5, 2]);
-  
+  // ========== POWER: Neynar Score (0-100%) ==========
+  const scorePercent = profile.score ? profile.score * 100 : 0;
+  let power: 'A' | 'B' | 'C' | 'D' | 'E';
+  if (scorePercent > 90) power = 'A';
+  else if (scorePercent > 70) power = 'B';
+  else if (scorePercent > 50) power = 'C';
+  else if (scorePercent > 30) power = 'D';
+  else power = 'E';
+  const powerDetail = `Score: ${scorePercent.toFixed(0)}%`;
+
+  // ========== SPEED: Base L2 交易数 ==========
+  let txCount = 0;
+  if (profile.verifications?.length > 0) {
+    txCount = await getBaseTransactionCount(profile.verifications[0]);
+  }
+  const speed = getGrade(txCount, [500, 100, 20, 5]);
+  const speedDetail = `${txCount} Txns`;
+
+  // ========== RANGE: 互动量 (likes + recasts) ==========
+  const totalEngagement = (profile.likesReceived || 0) + (profile.recastsReceived || 0);
+  const range = getGrade(totalEngagement, [300, 100, 30, 10]);
+  const rangeDetail = `Engage: ${totalEngagement}`;
+
+  // ========== DURABILITY: Cast 数量 (总数) ==========
+  const durability = getGrade(profile.castCount, [2000, 800, 200, 50]);
+  const durabilityDetail = `${profile.castCount} Casts`;
+
+  // ========== PRECISION: 精度分 (点赞×1 + 转发×1.5 + 回复×3) ==========
+  const precisionScore = (profile.likesReceived || 0) + (profile.recastsReceived || 0) * 1.5 + (profile.repliesReceived || 0) * 3;
+  const precision = getGrade(precisionScore, [200, 100, 50, 20]);
+  const precisionDetail = `Quality: ${precisionScore.toFixed(0)}`;
+
+  // ========== POTENTIAL: FID 年龄 ==========
   let potential: 'A' | 'B' | 'C' | 'D' | 'E';
   if (profile.fid > 400000) potential = 'A';
   else if (profile.fid > 200000) potential = 'B';
   else if (profile.fid > 15000) potential = 'C';
   else if (profile.fid > 2000) potential = 'D';
   else potential = 'E';
+  const potentialDetail = `FID: ${profile.fid}`;
 
   return {
     stats: { power, speed, range, durability, precision, potential },
     details: {
-      power: profile.score ? `Score: ${(profile.score * 100).toFixed(0)}%` : `Followers: ${profile.followerCount}`,
-      speed: `${profile.castCount} Casts`,
-      range: `Engage: ${profile.likesReceived + profile.recastsReceived}`,
-      durability: `${profile.castCount} Casts`,
-      precision: `Quality: ${qualityScore.toFixed(1)}`,
-      potential: `FID: ${profile.fid}`
+      power: powerDetail,
+      speed: speedDetail,
+      range: rangeDetail,
+      durability: durabilityDetail,
+      precision: precisionDetail,
+      potential: potentialDetail
     }
   };
 }
