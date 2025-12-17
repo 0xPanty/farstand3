@@ -854,6 +854,7 @@ export default function App() {
   // New Feature States
   const [showGallery, setShowGallery] = useState(false);
   const [context, setContext] = useState<any>(null);
+  const [safeAreaInsets, setSafeAreaInsets] = useState({ top: 0, bottom: 0, left: 0, right: 0 });
 
   // 加载已有的Stand
   const loadExistingStand = async (fid: number) => {
@@ -894,6 +895,12 @@ export default function App() {
             
             // Context Logic
             const context = await sdk.context;
+            
+            // 获取安全区域
+            if (context?.client?.safeAreaInsets) {
+                setSafeAreaInsets(context.client.safeAreaInsets);
+            }
+            
             if (context?.user?.fid) {
                 const fid = context.user.fid;
                 
@@ -1264,7 +1271,10 @@ export default function App() {
       
       return (
         <main className="h-dvh w-full max-w-md mx-auto bg-black bg-noise pattern-grid flex flex-col items-center justify-start p-0 perspective-1000 overflow-y-auto"
-              style={{}}>
+              style={{
+                paddingTop: safeAreaInsets.top,
+                paddingBottom: safeAreaInsets.bottom,
+              }}>
             
             {/* Card Container with 3D flip - Adjusted for buttons */}
             <div 
@@ -1415,7 +1425,10 @@ export default function App() {
     // Use h-dvh (dynamic viewport height) for mobile browsers
     // REMOVED paddingBottom here to allow background to flow to bottom
     <main className="h-dvh w-full max-w-md mx-auto bg-black bg-noise pattern-flowing-checkers flex flex-col relative overflow-hidden" 
-          style={{}}>
+          style={{
+            paddingTop: safeAreaInsets.top,
+            paddingBottom: safeAreaInsets.bottom,
+          }}>
             
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden"/>
             
