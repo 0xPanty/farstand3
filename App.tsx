@@ -227,11 +227,11 @@ const StandPrinter: React.FC<StandPrinterProps> = ({ user, stats, statDetails, s
     ) : 0;
     
     const getRank = (score: number): string => {
-        if (score >= 520) return 'S';  // Lowered: 5A + 1E = 520 (more fair for OG users)
-        if (score >= 450) return 'A';
-        if (score >= 360) return 'B';
-        if (score >= 270) return 'C';
-        if (score >= 180) return 'D';
+        if (score >= 560) return 'S';  // 几乎全A (5A+1B)
+        if (score >= 500) return 'A';  // 5个A级别
+        if (score >= 420) return 'B';  // 平均A-/B+
+        if (score >= 340) return 'C';  // 平均B/B-
+        if (score >= 260) return 'D';  // 平均C+
         return 'E';
     };
     
@@ -1109,11 +1109,11 @@ export default function App() {
       return map[g] || 0;
     };
     const getRank = (score: number): string => {
-      if (score >= 520) return 'S';
-      if (score >= 450) return 'A';
-      if (score >= 360) return 'B';
-      if (score >= 270) return 'C';
-      if (score >= 180) return 'D';
+      if (score >= 560) return 'S';
+      if (score >= 500) return 'A';
+      if (score >= 420) return 'B';
+      if (score >= 340) return 'C';
+      if (score >= 260) return 'D';
       return 'E';
     };
     const stats = calculatedData?.stats;
