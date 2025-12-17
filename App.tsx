@@ -1487,12 +1487,12 @@ export default function App() {
                         className="relative w-48 h-48 group outline-none active:scale-95 transition-transform"
                         >
                         {/* 1. Diamond Background */}
-                        <div className={`absolute inset-0 bg-gradient-to-br from-[#fbbf24] to-[#b45309] transition-all duration-300 transform rotate-45 border-4 border-white group-hover:scale-105 ${isReadyToAwaken ? 'shadow-[0_0_50px_rgba(251,191,36,0.8)]' : 'shadow-[0_0_30px_rgba(251,191,36,0.4)]'}`}></div>
+                        <div className={`absolute inset-0 bg-gradient-to-br from-[#fbbf24] to-[#b45309] transition-all duration-300 transform rotate-45 border-4 border-white group-hover:scale-105 ${isReadyToAwaken ? 'shadow-[0_0_50px_rgba(251,191,36,0.8)]' : 'shadow-[0_0_30px_rgba(251,191,36,0.4)]'}`} style={{ willChange: 'transform, box-shadow' }}></div>
                         
                         {/* 2. User Avatar Preview Overlay */}
                         {farcasterUser?.pfpUrl && !isLoading && (
                             <div className="absolute inset-0 overflow-hidden transform rotate-45 border-4 border-black z-0">
-                                <img src={farcasterUser.pfpUrl} className={`w-full h-full object-cover transform -rotate-45 scale-150 transition-opacity ${isReadyToAwaken ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'}`} alt="Your Avatar" />
+                                <img src={farcasterUser.pfpUrl} className={`w-full h-full object-cover transform -rotate-45 scale-150 transition-opacity ${isReadyToAwaken ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'}`} style={{ willChange: 'opacity' }} alt="Your Avatar" />
                             </div>
                         )}
 
@@ -1502,11 +1502,11 @@ export default function App() {
                                 // 第二步：优雅的觉醒效果 - 不遮挡头像
                                 <div className="absolute inset-0 pointer-events-none">
                                     {/* 发光边框动画 */}
-                                    <div className="absolute inset-0 transform rotate-45 border-4 border-[#fbbf24] animate-[glow-border_1s_ease-in-out_infinite] shadow-[0_0_30px_rgba(251,191,36,0.8),inset_0_0_30px_rgba(251,191,36,0.3)]"></div>
+                                    <div className="absolute inset-0 transform rotate-45 border-4 border-[#fbbf24] animate-[glow-border_1s_ease-in-out_infinite] shadow-[0_0_30px_rgba(251,191,36,0.8),inset_0_0_30px_rgba(251,191,36,0.3)]" style={{ willChange: 'box-shadow, border-color' }}></div>
                                     {/* ゴゴゴ 威压效果 */}
-                                    <span className="absolute top-2 right-2 text-[#db2777] font-black text-3xl animate-[jojo-menace_0.3s_ease-in-out_infinite] menacing-text drop-shadow-[2px_2px_0_#000]">ゴ</span>
-                                    <span className="absolute bottom-2 left-2 text-[#db2777] font-black text-2xl animate-[jojo-menace_0.3s_ease-in-out_infinite_0.15s] menacing-text drop-shadow-[2px_2px_0_#000]">ゴ</span>
-                                    <span className="absolute top-1/3 left-0 text-[#db2777] font-black text-xl animate-[jojo-menace_0.3s_ease-in-out_infinite_0.1s] menacing-text drop-shadow-[2px_2px_0_#000]">ゴ</span>
+                                    <span className="absolute top-2 right-2 text-[#db2777] font-black text-3xl animate-[jojo-menace_0.3s_ease-in-out_infinite] menacing-text drop-shadow-[2px_2px_0_#000]" style={{ willChange: 'transform, opacity' }}>ゴ</span>
+                                    <span className="absolute bottom-2 left-2 text-[#db2777] font-black text-2xl animate-[jojo-menace_0.3s_ease-in-out_infinite_0.15s] menacing-text drop-shadow-[2px_2px_0_#000]" style={{ willChange: 'transform, opacity' }}>ゴ</span>
+                                    <span className="absolute top-1/3 left-0 text-[#db2777] font-black text-xl animate-[jojo-menace_0.3s_ease-in-out_infinite_0.1s] menacing-text drop-shadow-[2px_2px_0_#000]" style={{ willChange: 'transform, opacity' }}>ゴ</span>
                                     {/* 底部文字 */}
                                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
                                         <span className="text-[#fbbf24] font-black text-lg tracking-[0.2em] drop-shadow-[2px_2px_0_#000] animate-pulse">TAP TO AWAKEN</span>
