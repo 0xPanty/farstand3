@@ -221,36 +221,25 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
 
   const durabilityDetail = `${profile.castCount} Casts`;
 
-  // D. PRECISION (Engagement Quality Score - Weighted: Likes + Recasts×2 + Replies×3)
+  // D. PRECISION (Engagement Quality Score - Weighted: Likes + Recasts×1.5 + Replies×3)
   let precision: StatValue = 'E';
   let precisionDetail = 'No data';
   
-  // Use sampledCastCount if available, otherwise fall back to total castCount
-  const castsForCalculation = profile.sampledCastCount || profile.castCount;
+  // 固定用25作为分母（采样的cast数量）
+  const sampledCasts = 25;
   
-  console.log('🔍 PRECISION DEBUG:', {
-    sampledCastCount: profile.sampledCastCount,
-    totalCastCount: profile.castCount,
-    castsForCalculation,
-    likes: profile.likesReceived,
-    recasts: profile.recastsReceived,
-    replies: profile.repliesReceived
-  });
-  
-  if (castsForCalculation > 0) {
-    // Calculate weighted engagement score per cast (using sampled data)
-    // Replies are most valuable (show discussion), Recasts are medium, Likes are baseline
+  if (profile.likesReceived > 0 || profile.recastsReceived > 0) {
     const weightedScore = (
       (profile.likesReceived || 0) + 
-      (profile.recastsReceived || 0) * 2 + 
+      (profile.recastsReceived || 0) * 1.5 + 
       (profile.repliesReceived || 0) * 3
-    ) / castsForCalculation;
+    ) / sampledCasts;
     
-    // Determine precision grade based on weighted quality score (adjusted for Farcaster reality)
-    if (weightedScore >= 20) precision = 'A';       // Viral quality content (top 5%)
-    else if (weightedScore >= 10) precision = 'B';  // High quality engagement (top 15%)
-    else if (weightedScore >= 5) precision = 'C';   // Good engagement (top 40%)
-    else if (weightedScore >= 2) precision = 'D';   // Moderate engagement (above average)
+    // 调整后的门槛
+    if (weightedScore >= 10) precision = 'A';
+    else if (weightedScore >= 5) precision = 'B';
+    else if (weightedScore >= 2) precision = 'C';
+    else if (weightedScore >= 1) precision = 'D';
     else precision = 'E';                           // Low engagement
     
     precisionDetail = `Quality: ${weightedScore.toFixed(1)}`;
@@ -259,14 +248,13 @@ export const calculateFarcasterStats = async (profile: FarcasterProfile & { scor
     precisionDetail = 'No casts';
   }
 
-  // E. RANGE (Engagement - Likes + Recasts)
+  // E. RANGE (基于采样25条的互动量)
   const totalEngagement = profile.likesReceived + profile.recastsReceived;
   let range: StatValue = 'E';
-  if (totalEngagement > 1000) range = 'A';
-  else if (totalEngagement > 500) range = 'B';
-  else if (totalEngagement > 300) range = 'C';
-  else if (totalEngagement > 150) range = 'D';
-  else if (totalEngagement > 50) range = 'E';
+  if (totalEngagement > 500) range = 'A';
+  else if (totalEngagement > 250) range = 'B';
+  else if (totalEngagement > 100) range = 'C';
+  else if (totalEngagement > 25) range = 'D';
 
   const rangeDetail = `Engage: ${totalEngagement}`;
 
