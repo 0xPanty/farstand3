@@ -855,6 +855,7 @@ export default function App() {
   const [showGallery, setShowGallery] = useState(false);
   const [context, setContext] = useState<any>(null);
   const [safeAreaInsets, setSafeAreaInsets] = useState({ top: 0, bottom: 0, left: 0, right: 0 });
+  const [showBackgroundEffects, setShowBackgroundEffects] = useState(false);
 
   // 加载已有的Stand
   const loadExistingStand = async (fid: number) => {
@@ -892,6 +893,9 @@ export default function App() {
         try {
             // Signal to Farcaster client that the frame is ready to display
             await sdk.actions.ready();
+            
+            // 延迟显示背景动画，减少初始渲染压力
+            setTimeout(() => setShowBackgroundEffects(true), 100);
             
             // Context Logic
             const context = await sdk.context;
@@ -1432,9 +1436,13 @@ export default function App() {
             
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden"/>
             
-            {/* Background Layers */}
-            <FarcasterGateBackground />
-            <MenacingFloaters />
+            {/* Background Layers - 延迟加载减少初始卡顿 */}
+            {showBackgroundEffects && (
+              <>
+                <FarcasterGateBackground />
+                <MenacingFloaters />
+              </>
+            )}
 
 
 
