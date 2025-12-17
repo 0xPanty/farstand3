@@ -135,7 +135,7 @@ async function fetchFarcasterUser(fid: number): Promise<any> {
   // 只采样 10 条 Cast (省 API)
   try {
     const castsResponse = await fetch(
-      `https://api.neynar.com/v2/farcaster/feed/user/casts?fid=${fid}&limit=10`,
+      `https://api.neynar.com/v2/farcaster/feed/user/${fid}/casts?limit=10`,
       { headers: { accept: "application/json", "x-api-key": NEYNAR_API_KEY || "" } }
     );
     if (castsResponse.ok) {
