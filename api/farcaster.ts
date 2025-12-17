@@ -79,7 +79,7 @@ async function fetchFarcasterUser(fid: number): Promise<any> {
     
     try {
       const castsResponse = await fetch(
-        `https://api.neynar.com/v2/farcaster/feed/user/${fid}/casts?limit=50`,
+        `https://api.neynar.com/v2/farcaster/feed/user/${fid}/casts?limit=25`,
         {
           headers: {
             accept: "application/json",
@@ -217,18 +217,18 @@ async function calculateFarcasterStats(profile: any): Promise<any> {
 
   const durabilityDetail = `${profile.castCount} Casts`;
 
-  // D. PRECISION (Engagement Quality Score - Weighted: Likes + Recasts×2 + Replies×3)
+  // D. PRECISION (Engagement Quality Score - Weighted: Likes + Recasts×1.5 + Replies×3)
   let precision = 'E';
   let precisionDetail = 'No data';
   
-  if (profile.castCount > 0) {
-    // Calculate weighted engagement score per cast
-    // Replies are most valuable (show discussion), Recasts are medium, Likes are baseline
+  // 用采样数(50条)做分母，不是总cast数
+  const sampledCasts = 25; // 采样的cast数量
+  if (profile.likesReceived > 0 || profile.recastsReceived > 0) {
     const weightedScore = (
       (profile.likesReceived || 0) + 
-      (profile.recastsReceived || 0) * 2 + 
+      (profile.recastsReceived || 0) * 1.5 + 
       (profile.repliesReceived || 0) * 3
-    ) / profile.castCount;
+    ) / sampledCasts;
     
     // Determine precision grade based on weighted quality score (adjusted for Farcaster reality)
     if (weightedScore >= 10) precision = 'A';       // Viral quality content (top 5%)
@@ -242,13 +242,13 @@ async function calculateFarcasterStats(profile: any): Promise<any> {
     precisionDetail = 'No casts';
   }
 
-  // E. RANGE
+  // E. RANGE (基于采样25条的互动量)
   const totalEngagement = profile.likesReceived + profile.recastsReceived;
   let range = 'E';
-  if (totalEngagement > 10000) range = 'A';
-  else if (totalEngagement > 3000) range = 'B';
-  else if (totalEngagement > 1000) range = 'C';
-  else if (totalEngagement > 200) range = 'D';
+  if (totalEngagement > 500) range = 'A';
+  else if (totalEngagement > 250) range = 'B';
+  else if (totalEngagement > 100) range = 'C';
+  else if (totalEngagement > 25) range = 'D';
 
   const rangeDetail = `Engage: ${totalEngagement}`;
 
