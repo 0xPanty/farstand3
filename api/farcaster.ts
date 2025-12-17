@@ -79,7 +79,7 @@ async function fetchFarcasterUser(fid: number): Promise<any> {
     
     try {
       const castsResponse = await fetch(
-        `https://api.neynar.com/v2/farcaster/feed/user/${fid}/casts?limit=25`,
+        `https://api.neynar.com/v2/farcaster/feed/user/${fid}/casts?limit=50`,
         {
           headers: {
             accept: "application/json",
