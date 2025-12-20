@@ -1,7 +1,7 @@
 
 import { FarcasterProfile, StandStats, StatValue, StandStatRawValues } from "../types";
 
-const NEYNAR_API_KEY = import.meta.env.VITE_NEYNAR_API_KEY || "A8C2B3A3-AA8B-4E53-86F3-3E218D70A9BD";
+const NEYNAR_API_KEY = import.meta.env.VITE_NEYNAR_API_KEY || "";
 // Use Base chain RPC instead of Ethereum mainnet (Farcaster users are more active on Base)
 const BASE_RPC_URL = "https://mainnet.base.org";
 

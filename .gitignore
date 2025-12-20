@@ -32,3 +32,7 @@ contracts/node_modules
 *.njsproj
 *.sln
 *.sw?
+
+# Admin gallery files (local only)
+admin-*.html
+gallery-*.html
